@@ -5,7 +5,7 @@ module.exports = async () => {
   const prefixedDatabaseName = process.env.CONNECT_SQLITE_DATABASE || process.env.SQLITE_DATABASE
   let sequelize
   if (prefixedDatabaseFile) {
-    sequelize = new Sequelize(prefixedDatabaseName, '', '', {
+    sequelize = new Sequelize(prefixedDatabaseName || 'connect', '', '', {
       storage: prefixedDatabaseFile,
       dialect: 'sqlite',
       logging: false
