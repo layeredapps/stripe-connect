@@ -1,0 +1,40 @@
+{
+  "dashboard": {
+    "title": "Stripe Connect module",
+    "modules": [
+      "@layeredapps/maxmind-geoip"
+    ],
+    "server": [
+      "/src/server/stripe-connect/bind-stripekey.js"
+    ]
+  },
+  "dependencies": {
+    "@layeredapps/maxmind-geoip": "github:layeredapps/maxmind-geoip",
+    "stripe": "^8.127.0"
+  },
+  "peerDependencies": {
+    "@layeredapps/dashboard": "github:layeredapps/dashboard"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "latest",
+    "mocha": "latest",
+    "ngrok": "latest",
+    "puppeteer": "latest",
+    "standard": "latest"
+  },
+  "engines": {
+    "node": ">=16",
+    "npm": ">=8"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "name": "@layeredapps/stripe-connect",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/layeredapps/stripe-connect.git"
+  },
+  "scripts": {
+    "test": "act -j test-fs-storage"
+  },
+  "version": "0.0.1"
+}

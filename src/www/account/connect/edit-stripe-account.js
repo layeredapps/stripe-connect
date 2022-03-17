@@ -1,0 +1,252 @@
+const connect = require('../../../../index.js')
+const dashboard = require('@layeredapps/dashboard')
+const formatStripeObject = require('../../../stripe-object.js')
+
+module.exports = {
+  before: beforeRequest,
+  get: renderPage,
+  post: submitForm
+}
+
+async function beforeRequest (req) {
+  if (!req.query || !req.query.stripeid) {
+    throw new Error('invalid-stripeid')
+  }
+  const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
+  if (!stripeAccountRaw) {
+    throw new Error('invalid-stripeid')
+  }
+  const stripeAccount = formatStripeObject(stripeAccountRaw)
+  stripeAccount.stripePublishableKey = global.stripePublishableKey
+  req.data = { stripeAccount }
+}
+
+async function renderPage (req, res, messageTemplate) {
+  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.stripeAccount, 'stripeAccount')
+  const removeElements = []
+  if (global.stripeJS !== 3) {
+    removeElements.push('stripe-v3', 'connect-v3', 'handler-v3')
+  } else {
+    const stripePublishableKey = doc.getElementById('stripe-publishable-key')
+    stripePublishableKey.setAttribute('value', global.stripePublishableKey)
+    res.setHeader('content-security-policy',
+      'default-src * \'unsafe-inline\'; ' +
+    `style-src https://uploads.stripe.com/v1/files https://m.stripe.com/ https://m.stripe.network/ https://js.stripe.com/v3/ https://js.stripe.com/v2/ ${global.dashboardServer}/public/ 'unsafe-inline'; ` +
+    `script-src * https://uploads.stripe.com/v1/files https://q.stripe.com/ https://m.stripe.com/ https://m.stripe.network/ https://js.stripe.com/v3/ https://js.stripe.com/v2/ ${global.dashboardServer}/public/ 'unsafe-inline' 'unsafe-eval'; ` +
+    'frame-src * https://uploads.stripe.com/v1/files https://m.stripe.com/ https://m.stripe.network/ https://js.stripe.com/ \'unsafe-inline\'; ' +
+    'connect-src https://uploads.stripe.com/v1/files https://m.stripe.com/ https://m.stripe.network/ https://js.stripe.com/ \'unsafe-inline\'; ')
+  }
+  if (messageTemplate) {
+    dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
+    if (messageTemplate === 'success') {
+      removeElements.push('business-profile-container', 'company-container', 'individual-container')
+      for (const id of removeElements) {
+        const element = doc.getElementById(id)
+        element.parentNode.removeChild(element)
+      }
+      return dashboard.Response.end(req, res, doc)
+    }
+  }
+  if (req.data.stripeAccount.country !== 'JP') {
+    removeElements.push(
+      'individual-kana-container',
+      'individual-kanji-container',
+      'individual-address-kana-kanji-container',
+      'individual-address-kana-kanji-container',
+      'company-kana-kanji-container',
+      'company-address-kana-container',
+      'company-address-kanji-container')
+  } else if (req.data.stripeAccount.business_type === 'company') {
+    removeElements.push('individual-kana-container', 'individual-kanji-container', 'individual-address-kana-kanji-container', 'individual-address-kana-kanji-container')
+  } else if (req.data.stripeAccount.business_type === 'individual') {
+    removeElements.push('company-kana-kanji-container', 'company-address-kana-container', 'company-address-kanji-container')
+  }
+  if (req.data.stripeAccount.business_type === 'individual') {
+    removeElements.push('company-container')
+  } else {
+    removeElements.push('individual-container')
+  }
+  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due) 
+  let requireAddress = false
+  for (const field of requirements) {
+    requireAddress = field.indexOf(`${req.data.stripeAccount.business_type}.address`) > -1
+    if (requireAddress) {
+      break
+    }
+  }
+  if (!requireAddress) {
+    removeElements.push(`${req.data.stripeAccount.business_type}_address-container`)
+  } else {
+    if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.line1`) === -1) {
+      removeElements.push(
+        `${req.data.stripeAccount.business_type}_address_line1-container`, 
+        `${req.data.stripeAccount.business_type}_address_line2-container`
+      )
+    }
+    if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.city`) === -1) {
+      removeElements.push(`${req.data.stripeAccount.business_type}_address_city-container`)
+    }
+    if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.state`) === -1) {
+      removeElements.push(`${req.data.stripeAccount.business_type}_address_state-container`)
+    }
+    if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.postal_code`) === -1) {
+      removeElements.push(`${req.data.stripeAccount.business_type}_address_postal_code-container`)
+    }
+  }
+  if (requirements.indexOf('business_profile.mcc') > -1) {
+    const mccList = connect.getMerchantCategoryCodes(req.language)
+    dashboard.HTML.renderList(doc, mccList, 'mcc-option', 'business_profile_mcc')
+  } else {
+    removeElements.push('business_profile_mcc-container')
+  }
+  if (requirements.indexOf('business_profile.url') === -1) {
+    removeElements.push('business_profile_url-container')
+  }
+  if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.state`) > -1) {
+    const personalStates = connect.countryDivisions[req.data.stripeAccount.country]
+    dashboard.HTML.renderList(doc, personalStates, 'state-option', `${req.data.stripeAccount.business_type}_address_state`)
+  }
+  if (requirements.indexOf('individual.first_name') === -1) {
+    removeElements.push('individual_first_name-container')
+  }
+  if (requirements.indexOf('individual.last_name') === -1) {
+    removeElements.push('individual_last_name-container')
+  }
+  if (requirements.indexOf('individual.phone') === -1) {
+    removeElements.push('individual_phone-container')
+  }
+  if (requirements.indexOf('company.phone') === -1) {
+    removeElements.push('company_phone-container')
+  }
+  if (requirements.indexOf('company.tax_id') === -1) {
+    removeElements.push('company_tax_id-container')
+  }
+  if (requirements.indexOf('company.registration_number') === -1) {
+    removeElements.push('company_registration_number-container')
+  }
+  if (requirements.indexOf('individual.email') === -1) {
+    removeElements.push('individual_email-container')
+  }
+  if (requirements.indexOf('individual.dob.day') === -1) {
+    removeElements.push('individual_dob-container')
+  }
+  if (requirements.indexOf('individual.gender') === -1) {
+    removeElements.push('individual_gender-container')
+  }
+  if (requirements.indexOf('individual.id_number') === -1) {
+    removeElements.push('individual_id_number-container')
+  }
+  if (requirements.indexOf('individual.ssn_last_4') === -1) {
+    removeElements.push('individual_ssn_last_4-container')
+  }
+  if (requirements.indexOf('company.verification.document') === -1) {
+    removeElements.push('company_verification_document-container')
+  }
+  if (requirements.indexOf('individual.verification.document') === -1) {
+    removeElements.push('individual_verification_document-container')
+  }
+  if (requirements.indexOf('individual.verification.additional_document') === -1) {
+    removeElements.push('individual_verification_additional_document-container')
+  }
+  if (req.body) {
+    for (const field in req.body) {
+      const element = doc.getElementById(field)
+      if (!element) {
+        continue
+      }
+      if (element.tag === 'input') {
+        element.setAttribute('value', (req.body[field] || '').split("'").join('&quot;'))
+      } else if (element.tag === 'select') {
+        dashboard.HTML.setSelectedOptionByValue(doc, field, (req.body[field] || '').split("'").join('&quot;'))
+      }
+    }
+  }
+  for (const id of removeElements) {
+    const element = doc.getElementById(id)
+    if (!element) {
+      continue
+    }
+    element.parentNode.removeChild(element)
+  }
+  return dashboard.Response.end(req, res, doc)
+}
+
+async function submitForm (req, res) {
+  if (!req.body || req.body.refresh === 'true') {
+    return renderPage(req, res)
+  }
+  if (req.query && req.query.message === 'success') {
+    return renderPage(req, res)
+  }
+  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due) 
+  for (const field of requirements) {
+    const pseudonym = field.split('.').join('_')
+    if (!req.body[pseudonym]) {
+      if (field === 'address.line2' ||
+        field === 'company.verification.document' ||
+        field === 'individual.verification.document' ||
+        field === 'individual.verification.additional_document' ||
+        field === 'external_account' ||
+        field.startsWith('relationship.') ||
+        field.startsWith('tos_acceptance.') ||
+        field.startsWith('company.owners') ||
+        field.startsWith('company.directors') ||
+        field.startsWith('company.executives') ||
+        field.startsWith('company.representative') ||
+        field.startsWith('owners') ||
+        field.startsWith('directors') ||
+        field.startsWith('executives') ||
+        field.startsWith('representative') ||
+        field.startsWith('person_') ||
+        (field === 'business_profile.url' && req.body.business_profile_product_description) ||
+        (field === 'business_profile.product_description' && req.body.business_profile_url)) {
+        continue
+      }
+      if (field === 'business_profile.product_description' && !req.body.business_profile_url) {
+        return renderPage(req, res, 'invalid-business_profile_url')
+      }
+      return renderPage(req, res, `invalid-${pseudonym}`)
+    }
+  }
+  if (requirements.indexOf('company.verification.document') > -1) {
+    if (!req.uploads || !req.uploads.verification_document_front) {
+      return renderPage(req, res, 'invalid-verification_document_front')
+    }
+    if (!req.uploads || !req.uploads.verification_document_back) {
+      return renderPage(req, res, 'invalid-verification_document_back')
+    }
+  }
+  if (requirements.indexOf('individual_verification.document') > -1) {
+    if (!req.uploads || !req.uploads.verification_document_front) {
+      return renderPage(req, res, 'invalid-verification_document_front')
+    }
+    if (!req.uploads || !req.uploads.verification_document_back) {
+      return renderPage(req, res, 'invalid-verification_document_back')
+    }
+  }
+  if (requirements.indexOf('individual_verification.additional_document') > -1) {
+    if (!req.uploads || !req.uploads.verification_additional_document_front) {
+      return renderPage(req, res, 'invalid-verification_additional_document_front')
+    }
+    if (!req.uploads || !req.uploads.verification_additional_document_back) {
+      return renderPage(req, res, 'invalid-verification_additional_document_back')
+    }
+  }
+  try {
+    await global.api.user.connect.UpdateStripeAccount.patch(req)
+  } catch (error) {
+    if (error.message.startsWith('invalid-')) {
+      return renderPage(req, res, error.message.split('.').join('_'))
+    }
+    return renderPage(req, res, error.message)
+  }
+  if (req.query['return-url']) {
+    return dashboard.Response.redirect(req, res, req.query['return-url'])
+  } else {
+    res.writeHead(302, {
+      location: `${req.urlPath}?stripeid=${req.query.stripeid}&message=success`
+    })
+    return res.end()
+  }
+}
