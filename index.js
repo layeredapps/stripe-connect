@@ -37,6 +37,7 @@ for (const countrySpec of countrySpecsRaw.data) {
   if (process.env.COUNTRY && process.env.COUNTRY !== countrySpec.id) {
     continue
   }
+  countrySpec.name = countryNameIndex[countrySpec.id]
   countrySpecs.push(countrySpec)
   countrySpecIndex[countrySpec.id] = countrySpec
   countryCurrencyIndex[countrySpec.id] = []
@@ -44,6 +45,9 @@ for (const countrySpec of countrySpecsRaw.data) {
     countryCurrencyIndex[countrySpec.id].push({ name: currency.toUpperCase(), currency, object: 'currency' })
   }
 }
+countrySpecs.sort((a ,b) => {
+  return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
+})
 const countryDivisions = {}
 const raw = require('./country-divisions.json')
 for (const object in raw) {
