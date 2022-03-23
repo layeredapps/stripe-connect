@@ -13,8 +13,11 @@ module.exports = {
     }
     const response = await dashboard.Proxy.get(req)
     req.url = urlWas
-    if (response.redirect) {
-      return dashboard.Response.redirect(req, res, response.redirect)
+    if (response.startsWith('{')) {
+      const result = JSON.parse(response)
+      if (response.redirect) {
+        return dashboard.Response.redirect(req, res, response.redirect)
+      }
     }
   }
 }
