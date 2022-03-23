@@ -5,13 +5,14 @@ module.exports = {
     if (!req.url.startsWith('/account/connect/delete-stripe-account')) {
       return
     }
-    const requestObject = {}
+    const urlWas = req.url
     if (process.env.CHECK_BEFORE_DELETE_STRIPE_ACCOUNT) {
-      requestObject.url = `${process.env.CHECK_BEFORE_DELETE_STRIPE_ACCOUNT}?stripeid=${req.query.stripeid}`
+      req.url = `${process.env.CHECK_BEFORE_DELETE_STRIPE_ACCOUNT}?stripeid=${req.query.stripeid}`
     } else {
-      requestObject.url = `/api/check-before-delete-stripe-account?stripeid=${req.query.stripeid}`
+      req.url = `/api/check-before-delete-stripe-account?stripeid=${req.query.stripeid}`
     }
-    const response = await dashboard.Proxy.get(requestObject)
+    const response = await dashboard.Proxy.get(req)
+    req.url = urlWas
     if (response.redirect) {
       return dashboard.Response.redirect(req, res, response.redirect)
     }
