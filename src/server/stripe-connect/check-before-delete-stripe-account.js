@@ -1,5 +1,4 @@
 const dashboard = require('@layeredapps/dashboard')
-const Proxy = require('../proxy.js')
 
 module.exports = {
   after: async (req, res) => {
@@ -12,7 +11,7 @@ module.exports = {
     } else {
       req.url = `/api/check-before-delete-stripe-account?stripeid=${req.query.stripeid}`
     }
-    const response = await Proxy.get(req)
+    const response = await dashboard.Proxy.get(req)
     req.url = urlWas
     if (response.redirect) {
       return dashboard.Response.redirect(req, res, response.redirect)
