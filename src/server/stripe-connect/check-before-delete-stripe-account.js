@@ -15,7 +15,7 @@ module.exports = {
     req.url = urlWas
     if (response.startsWith('{')) {
       const result = JSON.parse(response)
-      if (response.redirect) {
+      if (result.redirect) {
         return dashboard.Response.redirect(req, res, response.redirect)
       }
     }
