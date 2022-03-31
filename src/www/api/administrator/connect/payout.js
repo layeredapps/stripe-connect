@@ -1,4 +1,5 @@
 const connect = require('../../../../../index.js')
+const dashboard = require('@layeredapps/dashboard')
 
 module.exports = {
   get: async (req) => {

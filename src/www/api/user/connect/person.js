@@ -25,7 +25,7 @@ module.exports = {
       }
       await dashboard.StorageCache.set(req.query.personid, person)
     }
-    if(person.accountid !== req.account.accountid) {
+    if (person.accountid !== req.account.accountid) {
       throw new Error('invalid-account')
     }
     return person
