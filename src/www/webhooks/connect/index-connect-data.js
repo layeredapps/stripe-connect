@@ -12,6 +12,7 @@ const stripe = require('stripe')({
 })
 const stripeCache = require('../../../stripe-cache.js')
 const connect = require('../../../../index.js')
+const dashboard = require('@layeredapps/dashboard')
 
 module.exports = {
   auth: false,
@@ -28,6 +29,9 @@ module.exports = {
     }
     if (!stripeEvent) {
       return res.end()
+    }
+    if (stripeEvent.data && stripeEvent.data.object && stripeEvent.data.object.id) {
+      await dashboard.StorageCache.remove(stripeEvent.data.object.id)
     }
     Log.info('stripe event', stripeEvent.type)
     res.statusCode = 200

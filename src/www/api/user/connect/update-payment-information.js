@@ -1,5 +1,6 @@
 const connect = require('../../../../../index.js')
 const stripeCache = require('../../../../stripe-cache.js')
+const dashboard = require('@layeredapps/dashboard')
 
 module.exports = {
   patch: async (req) => {
@@ -163,6 +164,7 @@ module.exports = {
           stripeid: req.query.stripeid
         }
       })
+      await dashboard.StorageCache.remove(req.query.stripeid)
       return global.api.user.connect.StripeAccount.get(req)
     } catch (error) {
       if (error.message && error.message.startsWith('invalid-external_account_')) {

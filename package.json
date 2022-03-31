@@ -13,9 +13,10 @@
     "stripe": "^8.127.0"
   },
   "peerDependencies": {
-    "@layeredapps/dashboard": "github:layeredapps/dashboard"
+    "@layeredapps/dashboard": "@layeredapps/dashboard"
   },
   "devDependencies": {
+    "@layeredapps/dashboard": "latest",
     "@faker-js/faker": "latest",
     "mocha": "latest",
     "ngrok": "latest",

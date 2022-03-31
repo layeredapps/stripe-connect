@@ -1,5 +1,6 @@
 const connect = require('../../../../../index.js')
 const stripeCache = require('../../../../stripe-cache.js')
+const dashboard = require('@layeredapps/dashboard')
 
 module.exports = {
   patch: async (req) => {
@@ -33,6 +34,7 @@ module.exports = {
     if (global.stripeJS === 3 && req.body.token) {
       updateInfo.person_token = req.body.token
       try {
+        await dashboard.StorageCache.remove(req.query.personid)
         const personNow = await stripeCache.execute('accounts', 'updatePerson', person.stripeid, person.personid, updateInfo, req.stripeKey)
         await connect.Storage.Person.update({
           stripeObject: personNow,
@@ -239,6 +241,7 @@ module.exports = {
         personid: req.query.personid
       }
     })
+    await dashboard.StorageCache.remove(req.query.personid)
     return global.api.user.connect.Person.get(req)
   }
 }
