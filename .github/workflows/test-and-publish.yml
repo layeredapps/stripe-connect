@@ -28,6 +28,7 @@ jobs:
         export RESPONSE_PATH=`pwd`/documentation
         export SCREENSHOT_PATH=`pwd`/documentation/screenshots
         npm install -g mocha
+        npm i -D
         npm run write-tests | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
@@ -69,6 +70,7 @@ jobs:
       uses: JS-DevTools/npm-publish@v1
       with:
         token: ${{ secrets.NPM_TOKEN }}
+        access: 'public'
     - name: Publish documentation assets
       uses: peaceiris/actions-gh-pages@v3
       with:
