@@ -41,7 +41,6 @@ describe('/api/administrator/connect/payout', function () {
       const administrator = await TestHelper.createOwner()
       const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
       await TestHelper.createPayout(user)
-      await TestHelper.waitForPayout(user.payout.payoutid)
       const req = TestHelper.createRequest(`/api/administrator/connect/payout?payoutid=${user.payout.payoutid}`)
       req.account = administrator.account
       req.session = administrator.session

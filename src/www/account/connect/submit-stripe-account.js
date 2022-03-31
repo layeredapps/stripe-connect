@@ -64,8 +64,9 @@ async function beforeRequest (req) {
   if (!completedPayment) {
     req.error = req.error || 'invalid-payment-details'
   }
-  if (stripeAccount.requirements.currently_due.length) {
-    for (const field of stripeAccount.requirements.currently_due) {
+  const requirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+  if (requirements.length) {
+    for (const field of requirements) {
       if (field !== 'tos_acceptance.date' &&
           field !== 'tos_acceptance.ip') {
         req.error = req.error || 'invalid-registration'

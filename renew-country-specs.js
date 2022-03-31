@@ -1,6 +1,6 @@
 (async () => {
   const stripeKey = {
-    apiKey: process.env.STRIPE_KEY
+    apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
   }
   const stripe = require('stripe')({
     apiVersion: global.stripeAPIVersion,

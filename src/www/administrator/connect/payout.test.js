@@ -23,7 +23,9 @@ describe('/administrator/connect/payout', function () {
       const administrator = await TestHelper.createOwner()
       const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
       await TestHelper.createPayout(user)
-      await TestHelper.waitForPayout(user.payout.payoutid)
+      await TestStripeAccounts.waitForWebhook('payout.created', (stripeEvent) => {
+        return stripeEvent.data.object.id === user.payout.payoutid
+      })
       const req = TestHelper.createRequest(`/administrator/connect/payout?payoutid=${user.payout.payoutid}`)
       req.account = administrator.account
       req.session = administrator.session
@@ -37,7 +39,9 @@ describe('/administrator/connect/payout', function () {
       const administrator = await TestHelper.createOwner()
       const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
       await TestHelper.createPayout(user)
-      await TestHelper.waitForPayout(user.payout.payoutid)
+      await TestStripeAccounts.waitForWebhook('payout.created', (stripeEvent) => {
+        return stripeEvent.data.object.id === user.payout.payoutid
+      })
       const req = TestHelper.createRequest(`/administrator/connect/payout?payoutid=${user.payout.payoutid}`)
       req.account = administrator.account
       req.session = administrator.session

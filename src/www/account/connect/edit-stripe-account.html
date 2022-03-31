@@ -1,722 +1,733 @@
 <!DOCTYPE html>
-<html lang="en" data-template="false">
-
-<head>
-  <meta charset="utf-8" />
-  <title translate="yes">Edit ${stripeAccount.id}</title>
-  <link rel="stylesheet" href="/public/pure-min.css">
-  <link rel="stylesheet" href="/public/content.css">
-  <link rel="stylesheet" href="/public/content-additional.css">
-  <link rel="stylesheet" href="/public/connect/connect.css">
-  <script id="stripe-v3" src="https://js.stripe.com/v3/"></script>
-  <script id="connect-v3" src="/public/connect/connect.js"></script>
-  <script id="handler-v3" src="/public/connect/stripe-v3-edit-stripe-account.js"></script>
-</head>
-<body class="entry">
-  <form id="submit-form" enctype="multipart/form-data" method="POST"
-    class="pure-form pure-form-stacked entry-form connect-form"
-    action="/account/connect/edit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
-    <input type="hidden" id="stripe-publishable-key" />
-    <input type="hidden" name="token" id="token">
-    <h1 translate="yes">Edit ${stripeAccount.id}</h1>
-    <div id="message-container"></div>
-    <div id="business-profile-container">
-      <div id="business_profile_url-container" class="pure-control-group">
-        <label for="business_profile_url" translate="yes">Website URL</label>
-        <input required="required" id="business_profile_url" name="business_profile_url" type="text" maxlength="50">
-      </div>
-      <div id="business_profile_product_description-container" class="pure-control-group">
-        <label for="business_profile_product_description" translate="yes">Product description</label>
-        <input id="business_profile_product_description" name="business_profile_product_description" type="text"
-          maxlength="50">
-      </div>
-      <div id="business_profile_mcc-container" class="pure-control-group">
-        <label for="business_profile_mcc" translate="yes">Merchant category code</label>
-        <select id="business_profile_mcc" name="business_profile_mcc">
-          <option value="" translate="yes">
-            Select the code for your business
-          </option>
-        </select>
-      </div>
-    </div>
-    <div id="company-container">
-      <div class="pure-g">
-        <div class="pure-u-12-24">
-          <div id="company_name-container" class="pure-control-group">
-            <a id="company_name-anchor"></a>
-            <label for="company_name" translate="yes">Business name</label>
-            <input required="required" id="company_name" name="company_name" type="text" maxlength="50">
+<html lang="en" data-navbar="/account/connect/navbar-stripe-account.html">
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8" />
+    <title translate="yes">Edit Stripe account</title>
+    <link rel="stylesheet" href="/public/content.css">
+    <link rel="stylesheet" href="/public/content-additional.css">
+    <link rel="stylesheet" href="/public/connect/connect.css">
+    <script id="stripe-v3" src="https://js.stripe.com/v3/"></script>
+    <script id="connect-v3" src="/public/connect/connect.js"></script>
+    <script id="handler-v3" src="/public/connect/stripe-v3-edit-stripe-account.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <h1 translate="yes">Edit Stripe account</h1>
+      <div id="message-container"></div>
+      <form id="submit-form" enctype="multipart/form-data" method="POST" class="input-form" action="/account/connect/edit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
+        <input type="hidden" id="stripe-publishable-key" />
+        <input type="hidden" name="token" id="token">
+        <div id="business-profile-container">
+          <div id="business_profile_url-container" class="input-fields">
+            <label class="field-label" for="business_profile_url" translate="yes">Website URL</label>
+            <div class="field">
+              <input required="required" id="business_profile_url" name="business_profile_url" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="business_profile_product_description-container" class="input-fields">
+            <label class="field-label" for="business_profile_product_description" translate="yes">Product description</label>
+            <div class="field">
+              <input id="business_profile_product_description" name="business_profile_product_description" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="business_profile_mcc-container" class="input-fields">
+            <label class="field-label" for="business_profile_mcc" translate="yes">Merchant category code</label>
+            <div class="field">
+              <select id="business_profile_mcc" name="business_profile_mcc">
+                <option value="" translate="yes">
+                  Select the code for your business
+                </option>
+              </select>
+            </div>
           </div>
         </div>
-        <div class="pure-u-1-24"></div>
-        <div class="pure-u-11-24">
-          <div id="company_tax_id-container" class="pure-control-group">
-            <a id="company_tax_id-anchor"></a>
-            <label for="company_tax_id" translate="yes">Tax ID number</label>
-            <input required="required" id="company_tax_id" name="company_tax_id" type="text" maxlength="50">
+        <div id="company-container">
+          <div id="company_name-container" class="input-fields">
+            <label class="field-label" for="company_name" translate="yes">Business name</label>
+            <div class="field">
+              <input required="required" id="company_name" name="company_name" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="company_tax_id-container" class="input-fields">
+            <label class="field-label" for="company_tax_id" translate="yes">Tax ID number</label>
+            <div class="field">
+              <input required="required" id="company_tax_id" name="company_tax_id" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="company_registration_number-container" class="input-fields">
+            <label class="field-label" for="company_registration_number" translate="yes">Registration number</label>
+            <div class="field">
+              <input required="required" id="company_registration_number" name="company_registration_number" type="text" maxlength="50">
+            </div>
           </div>
         </div>
-        <div class="pure-u-11-24">
-          <div id="company_registration_number-container" class="pure-control-group">
-            <a id="company_registration_number-anchor"></a>
-            <label for="company_registration_number" translate="yes">Registration number</label>
-            <input required="required" id="company_registration_number" name="company_registration_number" type="text" maxlength="50">
+        <div id="company-kana-kanji-container">
+          <div id="company_name_kana-container" class="input-fields">
+            <label class="field-label" for="company_name_kana" translate="yes">Kana business name</label>
+            <div class="field">
+              <input required="required" id="company_name_kana" name="company_name_kana" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="company_name_kanji-container" class="input-fields">
+            <label class="field-label" for="company_name_kanji" translate="yes">Kanji business name</label>
+            <div class="field">
+              <input required="required" id="company_name_kanji" name="company_name_kanji" type="text" maxlength="50">
+            </div>
           </div>
         </div>
-      </div>
-      <div id="company-kana-kanji-container" class="pure-g">
-        <div class="pure-u-1-2">
-          <div id="company_name_kana-container" class="pure-control-group">
-            <a id="company_name_kana-anchor"></a>
-            <label for="company_name_kana" translate="yes">Kana business name</label>
-            <input required="required" id="company_name_kana" name="company_name_kana" type="text" maxlength="50">
-          </div>
-        </div>
-        <div class="pure-u-1-2">
-          <div id="company_name_kanji-container" class="pure-control-group">
-            <a id="company_name_kanji-anchor"></a>
-            <label for="company_name_kanji" translate="yes">Kanji business name</label>
-            <input required="required" id="company_name_kanji" name="company_name_kanji" type="text" maxlength="50">
-          </div>
-        </div>
-      </div>
-      <div class="pure-g">
-        <div class="pure-u-1-24"></div>
-        <div class="pure-u-11-24">
-          <div id="company_phone-container" class="pure-control-group">
-            <a id="company_phone-anchor"></a>
-            <label for="company_phone" translate="yes">Phone number</label>
+        <div id="company_phone-container" class="input-fields">
+          <label class="field-label" for="company_phone" translate="yes">Phone number</label>
+          <div class="field">
             <input required="required" id="company_phone" name="company_phone" type="text" maxlength="50">
           </div>
         </div>
-      </div>
-      <div id="company_verification_document-container" class="pure-control-group">
-        <a id="company_verification_document_front-anchor"></a>
-        <a id="company_verification_document_back-anchor"></a>
-        <h2 translate="yes">Company incorporation</h2>
-        <label for="company_verification_document_front" translate="yes">Front scan/photo</label>
-        <input name="company_verification_document_front" id="company_verification_document_front" type="file">
-        <label for="company_verification_document_back" translate="yes">Back scan/photo</label>
-        <input name="company_verification_document_back" id="company_verification_document_back" type="file">
-      </div>
-      <div id="company-address-container">
-        <h2 translate="yes">company address</h2>
-        <div id="company_address_line1-container" class="pure-control-group">
-          <label for="company_address_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="company_address_line1" name="company_address_line1" type="text"
-            maxlength="100">
+        <div id="company_verification_document-container" class="input-fields">
+          <h2 translate="yes">Company incorporation</h2>
+          <label class="field-label" for="company_verification_document_front" translate="yes">Front scan/photo</label>
+          <div class="field">
+            <input name="company_verification_document_front" id="company_verification_document_front" type="file">
+          </div>
+          <label class="field-label" for="company_verification_document_back" translate="yes">Back scan/photo</label>
+          <div class="field">
+            <input name="company_verification_document_back" id="company_verification_document_back" type="file">
+          </div>
         </div>
-        <div id="company_address_line2-container" class="pure-control-group">
-          <label for="company_address_line2" translate="yes">Line 2</label>
-          <input class="full-width" required="required" id="company_address_line2" name="company_address_line2" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_city-container" class="pure-control-group">
-          <label for="company_address_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="company_address_city" name="company_address_city" type="text" maxlength="100">
-        </div>
-        <div class="pure-control-group">
-          <div class="pure-g">
-            <div id="company_address_state-container" class="pure-u-17-24">
-              <label for="company_address_state" translate="yes">State or province</label>
+        <div id="company-address-container">
+          <h2 translate="yes">Company address</h2>
+          <div id="company_address_line1-container" class="input-fields">
+            <label class="field-label" for="company_address_line1" translate="yes">Line 1</label>
+            <div class="field">
+              <input required="required" id="company_address_line1" name="company_address_line1" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_line2-container" class="input-fields">
+            <label class="field-label" for="company_address_line2" translate="yes">Line 2</label>
+            <div class="field">
+              <input required="required" id="company_address_line2" name="company_address_line2" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_city-container" class="input-fields">
+            <label class="field-label" for="company_address_city" translate="yes">City</label>
+            <div class="field">
+              <input required="required" id="company_address_city" name="company_address_city" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_state-container" class="input-fields">
+            <label class="field-label" for="company_address_state" translate="yes">State or province</label>
+            <div class="field">
               <select id="company_address_state" name="company_address_state">
                 <option value="" translate="yes">
                   Select state
                 </option>
               </select>
             </div>
-            <div id="company_address_state-container-bridge" class="pure-u-1-24"></div>
-            <div id="company_address_postal_code-container" class="pure-u-6-24">
-              <div class="pure-control-group">
-                <label for="company_address_postal_code">ZIP</label>
-                <input class="full-width" required="required" id="company_address_postal_code" name="company_address_postal_code"
-                  type="text" maxlength="50">
+          </div>
+          <div id="company_address_postal_code-container" class="input-fields">
+            <label class="field-label" for="company_address_postal_code">ZIP</label>
+            <div class="field">
+              <input required="required" id="company_address_postal_code" name="company_address_postal_code" type="text" maxlength="50">
+            </div>
+          </div>
+        </div>
+        <div id="company-address-kana-container">
+          <h2 translate="yes">Kana company address</h2>
+          <div id="company_address_kana_line1-container" class="input-fields">
+            <label class="field-label" for="company_address_kana_line1" translate="yes">Line 1</label>
+            <div class="field">
+              <input required="required" id="company_address_kana_line1" name="company_address_kana_line1" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kana_city-container" class="input-fields">
+            <label class="field-label" for="company_address_kana_city" translate="yes">City</label>
+            <div class="field">
+              <input required="required" id="company_address_kana_city" name="company_address_kana_city" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kana_town-container" class="input-fields">
+            <label class="field-label" for="company_address_kana_town" translate="yes">Town</label>
+            <div class="field">
+              <input required="required" id="company_address_kana_town" name="company_address_kana_town" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kana_state-container" class="input-fields">
+            <label class="field-label" for="company_address_kana_state" translate="yes">State</label>
+            <div class="field">
+              <input required="required" id="company_address_kana_state" name="company_address_kana_state" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kana_postal_code-container" class="input-fields">
+            <label class="field-label" for="company_address_kana_postal_code" translate="yes">Postal code</label>
+            <div class="field">
+              <input required="required" id="company_address_kana_postal_code" name="company_address_kana_postal_code" type="text" maxlength="100">
+            </div>
+          </div>
+        </div>
+        <div id="company-address-kanji-container">
+          <h2 translate="yes">Kanji company address</h2>
+          <div id="company_address_kanji_line1-container" class="input-fields">
+            <label class="field-label" for="company_address_kanji_line1" translate="yes">Line 1</label>
+            <div class="field">
+              <input required="required" id="company_address_kanji_line1" name="company_address_kanji_line1" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kanji_city-container" class="input-fields">
+            <label class="field-label" for="company_address_kanji_city" translate="yes">City</label>
+            <div class="field">
+              <input required="required" id="company_address_kanji_city" name="company_address_kanji_city" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kanji_town-container" class="input-fields">
+            <label class="field-label" for="company_address_kanji_town" translate="yes">Town</label>
+            <div class="field">
+              <input required="required" id="company_address_kanji_town" name="company_address_kanji_town" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kanji_state-container" class="input-fields">
+            <label class="field-label" for="company_address_kanji_state" translate="yes">State</label>
+            <div class="field">
+              <input required="required" id="company_address_kanji_state" name="company_address_kanji_state" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="company_address_kanji_postal_code-container" class="input-fields">
+            <label class="field-label" for="company_address_kanji_postal_code" translate="yes">Postal code</label>
+            <div class="field">
+              <input required="required" id="company_address_kanji_postal_code" name="company_address_kanji_postal_code" type="text" maxlength="100">
+            </div>
+          </div>
+        </div>
+        <div id="individual-container">
+          <h2 translate="yes">Personal information</h2>
+          <div id="individual_first_name-container" class="input-fields">
+            <label class="field-label" for="individual_first_name" translate="yes">First name</label>
+            <div class="field">
+              <input required="required" id="individual_first_name" name="individual_first_name" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="individual_last_name-container" class="input-fields">
+            <label class="field-label" for="individual_last_name" translate="yes">Last name</label>
+            <div class="field">
+              <input required="required" id="individual_last_name" name="individual_last_name" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="individual_email-container" class="input-fields">
+            <label class="field-label" for="email" translate="yes">Email address</label>
+            <div class="field">
+              <input required="required" id="individual_email" name="individual_email" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="individual_phone-container" class="input-fields">
+            <label class="field-label" for="individual_phone" translate="yes">Phone number</label>
+            <div class="field">
+              <input required="required" id="individual_phone" name="individual_phone" type="text" maxlength="100">
+            </div>
+          </div>
+          <div id="individual-kana-container">
+            <h2 translate="yes">Kana personal information</h2>
+            <div id="individual_first_name_kana-container" class="input-fields">
+              <label class="field-label" for="individual_first_name_kana" translate="yes">First name</label>
+              <div class="field">
+                <input required="required" id="individual_first_name_kana" name="individual_first_name_kana" type="text" maxlength="50">
+              </div>
+            </div>
+            <div id="individual_ast_name_kana-container" class="input-fields">
+              <label class="field-label" for="individual_last_name_kana" translate="yes">Last name</label>
+              <div class="field">
+                <input required="required" id="individual_last_name_kana" name="individual_last_name_kana" type="text" maxlength="50">
+              </div>
+            </div>
+          </div>
+          <div id="individual-kanji-container">
+            <h2 translate="yes">Kanji personal information</h2>
+            <div id="individual_first_name_kanji-container" class="input-fields">
+              <label class="field-label" for="individual_first_name_kanji" translate="yes">First name</label>
+              <div class="field">
+                <input required="required" id="individual_first_name_kanji" name="individual_first_name_kanji" type="text" maxlength="50">
+              </div>
+            </div>
+            <div id="individual_last_name_kanji-container" class="input-fields">
+              <label class="field-label" for="individual_last_name_kanji" translate="yes">Last name</label>
+              <div class="field">
+                <input required="required" id="individual_last_name_kanji" name="individual_last_name_kanji" type="text" maxlength="50">
+              </div>
+            </div>
+          </div>
+          <div id="individual_dob-container" class="input-fields">
+            <label class="field-label" for="dob_day" translate="yes">Date of birth</label>
+            <div class="field">
+              <input class="adjacent" required="required" id="individual_dob_day" name="individual_dob_day" type="text" size="2" maxlength="2" placeholder="DD">
+              <input class="adjacent" required="required" id="individual_dob_month" name="individual_dob_month" type="text" size="2" maxlength="2" placeholder="MM">
+              <input class="adjacent" required="required" id="individual_dob_year" name="individual_dob_year" type="text" size="4" maxlength="4" placeholder="YYYY">
+            </div>
+          </div>
+          <div id="individual_ssn_last_4-container" class="input-fields">
+            <label class="field-label" for="individual_ssn_last_4" translate="yes">SSN last 4 digits</label>
+            <div class="field">
+              <input required="required" id="individual_ssn_last_4" name="individual_ssn_last_4" type="text" maxlength="4">
+            </div>
+          </div>
+          <div id="individual_gender-container" class="input-fields">
+            <label class="field-label" for="individual_gender" translate="yes">Gender</label>
+            <div class="checkbox-fields">
+              <label class="field-label"><input id="female" type="radio" name="individual_gender" value="female" /> <span translate="yes">Female</span></label>
+              <label class="field-label"><input id="male" type="radio" name="individual_gender" value="male" /> <span translate="yes">Male</span></label>
+            </div>
+          </div>
+          <div id="individual_id_number-container" class="input-fields">
+            <label class="field-label" for="individual_id_number" translate="yes">Passport or ID number</label>
+            <div class="field">
+              <input required="required" id="individual_id_number" name="individual_id_number" type="text" maxlength="50">
+            </div>
+          </div>
+          <div id="individual-document-container">
+            <h2 translate="yes">Passort or government-issue ID</h2>
+            <div class="input-fields">
+              <label class="field-label" for="individual_verification_document_front" translate="yes">Front scan/photo</label>
+              <div class="field">
+                <input name="individual_verification_document_front" id="individual_verification_document_front" type="file">
+              </div>
+            </div>
+            <div class="input-fields">
+              <label class="field-label" for="individual_verification_document_back" translate="yes">Back scan/photo</label>
+              <div class="field">
+                <input name="individual_verification_document_back" id="individual_verification_document_back" type="file">
+              </div>
+            </div>
+          </div>
+          <div id="individual-additional-document-container">
+            <h2 translate="yes">Proof of address</h2>
+            <div class="input-fields">
+              <label class="field-label" for="individual_verification_additional_document_front" translate="yes">Front scan/photo</label>
+              <div class="field">
+                <input name="individual_verification_additional_document_front" id="individual_verification_additional_document_front" type="file">
+              </div>
+            </div>
+            <div class="input-fields">
+              <label class="field-label" for="individual_verification_additional_document_back" translate="yes">Back scan/photo</label>
+              <div class="field">
+                <input name="individual_verification_additional_document_back" id="individual_verification_additional_document_back" type="file">
+              </div>
+            </div>
+          </div>
+          <div id="individual_address-container">
+            <h2 translate="yes">Address</h2>
+            <div id="individual_address_line1-container" class="input-fields">
+              <label class="field-label" for="individual_address_line1" translate="yes">Line 1</label>
+              <div class="field">
+                <input required="required" id="individual_address_line1" name="individual_address_line1" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_line2-container" class="input-fields">
+              <label class="field-label" for="individual_address_line2" translate="yes">Line 2</label>
+              <div class="field">
+                <input required="required" id="individual_address_line2" name="individual_address_line2" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_city-container" class="input-fields">
+              <label class="field-label" for="individual_address_city" translate="yes">City</label>
+              <div class="field">
+                <input required="required" id="individual_address_city" name="individual_address_city" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_state-container" class="input-fields">
+              <label class="field-label" for="individual_address_state" translate="yes">State or province</label>
+              <div class="field">
+                <select id="individual_address_state" name="individual_address_state">
+                  <option value="" translate="yes">
+                    Select state
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div id="individual_address_postal_code-container" class="input-fields">
+              <label class="field-label" for="individual_address_postal_code">ZIP</label>
+              <div class="field">
+                <input required="required" id="individual_address_postal_code" name="individual_address_postal_code" type="text" maxlength="50">
+              </div>
+            </div>
+          </div>
+          <div id="individual-address-kana-kanji-container">
+            <h2 translate="yes">Kana address</h2>
+            <div id="individual_address_kana_line1-container" class="input-fields">
+              <label class="field-label" for="individual_address_kana_line1" translate="yes">Line 1</label>
+              <div class="field">
+                <input required="required" id="individual_address_kana_line1" name="individual_address_kana_line1" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kana_city-container" class="input-fields">
+              <label class="field-label" for="individual_address_kana_city" translate="yes">City</label>
+              <div class="field">
+                <input required="required" id="individual_address_kana_city" name="individual_address_kana_city" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kana_town-container" class="input-fields">
+              <label class="field-label" for="individual_address_kana_town" translate="yes">Town</label>
+              <div class="field">
+                <input required="required" id="individual_address_kana_town" name="individual_address_kana_town" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kana_state-container" class="input-fields">
+              <label class="field-label" for="individual_address_kana_state" translate="yes">State</label>
+              <div class="field">
+                <input required="required" id="individual_address_kana_state" name="individual_address_kana_state" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kana_postal_code-container" class="input-fields">
+              <label class="field-label" for="individual_address_kana_postal_code" translate="yes">Postal code</label>
+              <div class="field">
+                <input required="required" id="individual_address_kana_postal_code" name="individual_address_kana_postal_code" type="text" maxlength="100">
+              </div>
+            </div>
+          </div>
+          <div id="individual-address-kana-kanji-container">
+            <h2 translate="yes">Kanji address</h2>
+            <div id="individual_address_kanji_line1-container" class="input-fields">
+              <label class="field-label" for="individual_address_kanji_line1" translate="yes">Line 1</label>
+              <div class="field">
+                <input required="required" id="individual_address_kanji_line1" name="individual_address_kanji_line1" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kanji_city-container" class="input-fields">
+              <label class="field-label" for="individual_address_kanji_city" translate="yes">City</label>
+              <div class="field">
+                <input required="required" id="individual_address_kanji_city" name="individual_address_kanji_city" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kanji_town-container" class="input-fields">
+              <label class="field-label" for="individual_address_kanji_town" translate="yes">Town</label>
+              <div class="field">
+                <input required="required" id="individual_address_kanji_town" name="individual_address_kanji_town" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kanji_state-container" class="input-fields">
+              <label class="field-label" for="individual_address_kanji_state" translate="yes">State</label>
+              <div class="field">
+                <input required="required" id="individual_address_kanji_state" name="individual_address_kanji_state" type="text" maxlength="100">
+              </div>
+            </div>
+            <div id="individual_address_kanji_postal_code-container" class="input-fields">
+              <label class="field-label" for="individual_address_kanji_postal_code" translate="yes">Postal code</label>
+              <div class="field">
+                <input required="required" id="individual_address_kanji_postal_code" name="individual_address_kanji_postal_code" type="text" maxlength="100">
               </div>
             </div>
           </div>
         </div>
+        <div class="form-buttons">
+          <button id="submit-button" class="button" translate="yes">Update Stripe account</button>
+        </div>
+      </form>
+    </div>
+    <template id="mcc-option">
+      <option value="${mcc.code}">${mcc.description}</option>
+    </template>
+    <template id="state-option">
+      <option value="${option.value}">${option.text}</option>
+    </template>
+    <template id="success">
+      <div class="success message">
+        <span translate="yes">Success! The Stripe account has been updated</span>
       </div>
-      <div id="company-address-kana-container">
-        <h2 translate="yes">Kana company address</h2>
-        <div id="company_address_kana_line1-container" class="pure-control-group">
-          <label for="company_address_kana_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="company_address_kana_line1" name="company_address_kana_line1" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kana_city-container" class="pure-control-group">
-          <label for="company_address_kana_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="company_address_kana_city" name="company_address_kana_city" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kana_town-container" class="pure-control-group">
-          <label for="company_address_kana_town" translate="yes">Town</label>
-          <input class="full-width" required="required" id="company_address_kana_town" name="company_address_kana_town" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kana_state-container" class="pure-control-group">
-          <label for="company_address_kana_state" translate="yes">State</label>
-          <input class="full-width" required="required" id="company_address_kana_state" name="company_address_kana_state" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kana_postal_code-container" class="pure-control-group">
-          <label for="company_address_kana_postal_code" translate="yes">Postal code</label>
-          <input class="full-width" required="required" id="company_address_kana_postal_code" name="company_address_kana_postal_code"
-            type="text" maxlength="100">
-        </div>
+    </template>
+    <template id="unknown-error">
+      <div class="error message" translate="yes">
+        Error! An unknown error occurred
       </div>
-      <div id="company-address-kanji-container">
-        <h2 translate="yes">Kanji company address</h2>
-        <div id="company_address_kanji_line1-container" class="pure-control-group">
-          <label for="company_address_kanji_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="company_address_kanji_line1" name="company_address_kanji_line1" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kanji_city-container" class="pure-control-group">
-          <label for="company_address_kanji_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="company_address_kanji_city" name="company_address_kanji_city" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kanji_town-container" class="pure-control-group">
-          <label for="company_address_kanji_town" translate="yes">Town</label>
-          <input class="full-width" required="required" id="company_address_kanji_town" name="company_address_kanji_town" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kanji_state-container" class="pure-control-group">
-          <label for="company_address_kanji_state" translate="yes">State</label>
-          <input class="full-width" required="required" id="company_address_kanji_state" name="company_address_kanji_state" type="text"
-            maxlength="100">
-        </div>
-        <div id="company_address_kanji_postal_code-container" class="pure-control-group">
-          <label for="company_address_kanji_postal_code" translate="yes">Postal code</label>
-          <input class="full-width" required="required" id="company_address_kanji_postal_code" name="company_address_kanji_postal_code"
-            type="text" maxlength="100">
-        </div>
+    </template>
+    <template id="upload-error">
+      <div class="error message" translate="yes">
+        Error! An error occurred uploading document images
       </div>
-    </div>
-
-
-
-
-
-
-
-    <div id="individual-container">
-      <h2 translate="yes">Personal information</h2>
-      <div class="pure-g">
-        <div class="pure-u-11-24">
-          <div id="individual_first_name-container" class="pure-control-group">
-            <label for="individual_first_name" translate="yes">First name</label>
-            <input class="full-width" required="required" id="individual_first_name" name="individual_first_name" type="text" maxlength="50">
-          </div>
-        </div>
-        <div class="pure-u-2-24"></div>
-        <div class="pure-u-11-24">
-          <div id="individual_last_name-container" class="pure-control-group">
-            <label for="individual_last_name" translate="yes">Last name</label>
-            <input class="full-width" required="required" id="individual_last_name" name="individual_last_name" type="text" maxlength="50">
-          </div>
-        </div>
+    </template>
+    <template id="invalid-token">
+      <div class="error message" translate="yes">
+        Error! An error occurred submitting the form
       </div>
-      <div id="individual_email-container" class="pure-control-group">
-        <label for="email" translate="yes">Email address</label>
-        <input class="full-width" required="required" id="individual_email" name="individual_email" type="text" maxlength="100">
+    </template>
+    <template id="invalid-business_profile_url">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing business URL
       </div>
-      <div id="individual_phone-container" class="pure-control-group">
-        <label for="individual_phone" translate="yes">Phone number</label>
-        <input class="full-width" required="required" id="individual_phone" name="individual_phone" type="text" maxlength="100">
+    </template>
+    <template id="invalid-business_profile_mcc">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing business Merchant Category Code
       </div>
-      <div id="individual-kana-container">
-        <h2 translate="yes">Kana personal information</h2>
-        <div class="pure-g">
-          <div class="pure-u-11-24">
-            <div id="individual_first_name_kana-container" class="pure-control-group">
-              <label for="individual_first_name_kana" translate="yes">First name</label>
-              <input required="required" id="individual_first_name_kana" name="individual_first_name_kana" type="text" maxlength="50">
-            </div>
-          </div>
-          <div class="pure-u-2-24"></div>
-          <div class="pure-u-11-24">
-            <div id="individual_ast_name_kana-container" class="pure-control-group">
-              <label for="individual_last_name_kana" translate="yes">Last name</label>
-              <input required="required" id="individual_last_name_kana" name="individual_last_name_kana" type="text" maxlength="50">
-            </div>
-          </div>
-        </div>
+    </template>
+    <template id="invalid-business_profile_product_description">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing business product description
       </div>
-      <div id="individual-kanji-container">
-        <h2 translate="yes">Kanji personal information</h2>
-        <div class="pure-g">
-          <div class="pure-u-11-24">
-            <div id="individual_first_name_kanji-container" class="pure-control-group">
-              <label for="individual_first_name_kanji" translate="yes">First name</label>
-              <input required="required" id="individual_first_name_kanji" name="individual_first_name_kanji" type="text" maxlength="50">
-            </div>
-          </div>
-          <div class="pure-u-2-24"></div>
-          <div class="pure-u-11-24">
-            <div id="individual_last_name_kanji-container" class="pure-control-group">
-              <label for="individual_last_name_kanji" translate="yes">Last name</label>
-              <input required="required" id="individual_last_name_kanji" name="individual_last_name_kanji" type="text" maxlength="50">
-            </div>
-          </div>
-        </div>
+    </template>
+    <template id="invalid-individual_id_number">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal ID number
       </div>
-      <div id="individual_dob-container" class="pure-control-group">
-        <label for="dob_day" translate="yes">Date of birth</label>
-        <input class="adjacent" required="required" id="individual_dob_day" name="individual_dob_day" type="text" size="2" maxlength="2" placeholder="DD">
-        <input class="adjacent" required="required" id="individual_dob_month" name="individual_dob_month" type="text" size="2" maxlength="2" placeholder="MM">
-        <input class="adjacent" required="required" id="individual_dob_year" name="individual_dob_year" type="text" size="4" maxlength="4" placeholder="YYYY">
+    </template>
+    <template id="invalid-individual_phone">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing telephone number
       </div>
-      <div id="individual_ssn_last_4-container" class="pure-control-group">
-        <label for="individual_ssn_last_4" translate="yes">SSN last 4 digits</label>
-        <input required="required" id="individual_ssn_last_4" name="individual_ssn_last_4" type="text" maxlength="4">
+    </template>
+    <template id="invalid-individual_gender">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing gender
       </div>
-      <div id="individual_gender-container" class="pure-control-group">
-        <label for="individual_gender" translate="yes">Gender</label>
-        <div class="pure-checkbox">
-          <label><input id="female" type="radio" name="individual_gender" value="female" /> <span translate="yes">Female</span></label>
-          <label><input id="male" type="radio" name="individual_gender" value="male" /> <span translate="yes">Male</span></label>
-        </div>
+    </template>
+    <template id="invalid-individual_ssn_last_4">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing last 4 digits of Social Security Number
       </div>
-      <div id="individual_id_number-container" class="pure-control-group">
-        <h2 translate="yes">Personal identification</h2>
-        <label for="individual_id_number" translate="yes">Passport or ID number</label>
-        <input required="required" id="individual_id_number" name="individual_id_number" type="text" maxlength="50">
+    </template>
+    <template id="invalid-individual_dob_day">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing date of birth
       </div>
-      <div id="individual-document-container" class="pure-control-group">
-        <a id="individual_verification_document_front-anchor"></a>
-        <a id="individual_verification_document_back-anchor"></a>
-        <label for="individual_verification_document_front" translate="yes">Front scan/photo</label>
-        <input name="individual_verification_document_front" id="individual_verification_document_front" type="file">
-        <label for="individual_verification_document_back" translate="yes">Back scan/photo</label>
-        <input name="individual_verification_document_back" id="individual_verification_document_back" type="file">
+    </template>
+    <template id="invalid-individual_dob_month">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing date of birth
       </div>
-      <div id="individual-additional-document-container" class="pure-control-group">
-        <h2 translate="yes">Proof of address</h2>
-        <a id="individual_verification_additional_document_front-anchor"></a>
-        <a id="individual_verification_additional_document_back-anchor"></a>
-        <label for="individual_verification_additional_document_front" translate="yes">Front scan/photo</label>
-        <input name="individual_verification_additional_document_front" id="individual_verification_additional_document_front" type="file">
-        <label for="individual_verification_additional_document_back" translate="yes">Back scan/photo</label>
-        <input name="individual_verification_additional_document_back" id="individual_verification_additional_document_back" type="file">
+    </template>
+    <template id="invalid-individual_dob_year">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing date of birth
       </div>
-      <div id="individual_address-container">
-        <h2 translate="yes">individual_address</h2>
-        <div id="individual_address_line1-container" class="pure-control-group">
-          <label for="individual_address_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="individual_address_line1" name="individual_address_line1" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_line2-container" class="pure-control-group">
-          <label for="individual_address_line2" translate="yes">Line 2</label>
-          <input class="full-width" required="required" id="individual_address_line2" name="individual_address_line2" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_city-container" class="pure-control-group">
-          <label for="individual_address_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="individual_address_city" name="individual_address_city" type="text" maxlength="100">
-        </div>
-        <div class="pure-control-group">
-          <div class="pure-g">
-            <div id="individual_address_state-container" class="pure-u-17-24">
-              <label for="individual_address_state" translate="yes">State or province</label>
-              <select id="individual_address_state" name="individual_address_state">
-                <option value="" translate="yes">
-                  Select state
-                </option>
-              </select>
-            </div>
-            <div id="individual_address_state-container-bridge" class="pure-u-1-24"></div>
-            <div id="individual_address_postal_code-container" class="pure-u-6-24">
-              <div class="pure-control-group">
-                <label for="individual_address_postal_code">ZIP</label>
-                <input class="full-width" required="required" id="individual_address_postal_code" name="individual_address_postal_code"
-                  type="text" maxlength="50">
-              </div>
-            </div>
-          </div>
-        </div>
+    </template>
+    <template id="invalid-individual_first_name">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing first name
       </div>
-      <div id="individual-address-kana-kanji-container">
-        <h2 translate="yes">Kana individual_address</h2>
-        <div id="individual_address_kana_line1-container" class="pure-control-group">
-          <label for="individual_address_kana_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="individual_address_kana_line1" name="individual_address_kana_line1" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kana_city-container" class="pure-control-group">
-          <label for="individual_address_kana_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="individual_address_kana_city" name="individual_address_kana_city" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kana_town-container" class="pure-control-group">
-          <label for="individual_address_kana_town" translate="yes">Town</label>
-          <input class="full-width" required="required" id="individual_address_kana_town" name="individual_address_kana_town" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kana_state-container" class="pure-control-group">
-          <label for="individual_address_kana_state" translate="yes">State</label>
-          <input class="full-width" required="required" id="individual_address_kana_state" name="individual_address_kana_state" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kana_postal_code-container" class="pure-control-group">
-          <label for="individual_address_kana_postal_code" translate="yes">Postal code</label>
-          <input class="full-width" required="required" id="individual_address_kana_postal_code" name="individual_address_kana_postal_code"
-            type="text" maxlength="100">
-        </div>
+    </template>
+    <template id="invalid-individual_first_name_kana">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana first name
       </div>
-      <div id="individual-address-kana-kanji-container">
-        <h2 translate="yes">Kanji individual_address</h2>
-        <div id="individual_address_kanji_line1-container" class="pure-control-group">
-          <label for="individual_address_kanji_line1" translate="yes">Line 1</label>
-          <input class="full-width" required="required" id="individual_address_kanji_line1" name="individual_address_kanji_line1" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kanji_city-container" class="pure-control-group">
-          <label for="individual_address_kanji_city" translate="yes">City</label>
-          <input class="full-width" required="required" id="individual_address_kanji_city" name="individual_address_kanji_city" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kanji_town-container" class="pure-control-group">
-          <label for="individual_address_kanji_town" translate="yes">Town</label>
-          <input class="full-width" required="required" id="individual_address_kanji_town" name="individual_address_kanji_town" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kanji_state-container" class="pure-control-group">
-          <label for="individual_address_kanji_state" translate="yes">State</label>
-          <input class="full-width" required="required" id="individual_address_kanji_state" name="individual_address_kanji_state" type="text"
-            maxlength="100">
-        </div>
-        <div id="individual_address_kanji_postal_code-container" class="pure-control-group">
-          <label for="individual_address_kanji_postal_code" translate="yes">Postal code</label>
-          <input class="full-width" required="required" id="individual_address_kanji_postal_code" name="individual_address_kanji_postal_code"
-            type="text" maxlength="100">
-        </div>
+    </template>
+    <template id="invalid-individual_first_name_kanji">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji first name
       </div>
-    </div>
-    <div id="submit-container" class="pure-controls">
-      <button id="submit-button" class="pure-button pure-button-primary" translate="yes">Update Stripe account</button>
-    </div>
-  </form>
-  <template id="mcc-option">
-    <option value="${mcc.code}">${mcc.description}</option>
-  </template>
-  <template id="state-option">
-    <option value="${option.value}">${option.text}</option>
-  </template>
-  <template id="success">
-    <div class="success message">
-      <span translate="yes">Success! The Stripe account has been updated</span>
-      <a href="/account/connect" translate="yes">Return to account</a>
-    </div>
-  </template>
-  <template id="unknown-error">
-    <div class="error message" translate="yes">
-      Error! An unknown error occurred
-    </div>
-  </template>
-  <template id="upload-error">
-    <div class="error message" translate="yes">
-      Error! An error occurred uploading document images
-    </div>
-  </template>
-  <template id="invalid-token">
-    <div class="error message" translate="yes">
-      Error! An error occurred submitting the form
-    </div>
-  </template>
-  <template id="invalid-business_profile_url">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing business URL
-    </div>
-  </template>
-  <template id="invalid-business_profile_mcc">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing business Merchant Category Code
-    </div>
-  </template>
-  <template id="invalid-business_profile_product_description">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing business product description
-    </div>
-  </template>
-  <template id="invalid-individual_id_number">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal ID number
-    </div>
-  </template>
-
-  <template id="invalid-individual_phone">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing telephone number
-    </div>
-  </template>
-  <template id="invalid-individual_gender">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing gender
-    </div>
-  </template>
-  <template id="invalid-individual_ssn_last_4">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing last 4 digits of Social Security Number
-    </div>
-  </template>
-  <template id="invalid-individual_dob_day">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing date of birth
-    </div>
-  </template>
-  <template id="invalid-individual_dob_month">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing date of birth
-    </div>
-  </template>
-  <template id="invalid-individual_dob_year">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing date of birth
-    </div>
-  </template>
-  <template id="invalid-individual_first_name">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing first name
-    </div>
-  </template>
-  <template id="invalid-individual_first_name_kana">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana first name
-    </div>
-  </template>
-  <template id="invalid-individual_first_name_kanji">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji first name
-    </div>
-  </template>
-  <template id="invalid-individual_last_name">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing last name
-    </div>
-  </template>
-  <template id="invalid-individual_last_name_kana">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana last name
-    </div>
-  </template>
-  <template id="invalid-individual_last_name_kanji">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji last name
-    </div>
-  </template>
-  <template id="invalid-individual_email">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing email
-    </div>
-  </template>
-  <template id="invalid-individual_address_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address city
-    </div>
-  </template>
-  <template id="invalid-individual_address_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address state
-    </div>
-  </template>
-  <template id="invalid-individual_address_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address line 1
-    </div>
-  </template>
-  <template id="invalid-individual_address_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal postal code
-    </div>
-  </template>
-  <template id="invalid-individual_address_kana_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address city
-    </div>
-  </template>
-  <template id="invalid-individual_address_kana_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address state
-    </div>
-  </template>
-  <template id="invalid-individual_address_kana_town">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address town
-    </div>
-  </template>
-  <template id="invalid-individual_address_kana_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address line 1
-    </div>
-  </template>
-  <template id="invalid-individual_address_kana_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address postal code
-    </div>
-  </template>
-  <template id="invalid-individual_address_kanji_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address city
-    </div>
-  </template>
-  <template id="invalid-individual_address_kanji_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address state
-    </div>
-  </template>
-  <template id="invalid-individual_address_kanji_town">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address town
-    </div>
-  </template>
-  <template id="invalid-individual_address_kanji_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address line 1
-    </div>
-  </template>
-  <template id="invalid-individual_address_kanji_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address postal code
-    </div>
-  </template>
-  <template id="invalid-individual_verification_document_front">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing document front scan or photo
-    </div>
-  </template>
-  <template id="invalid-individual_verification_document_back">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing document back scan or photo
-    </div>
-  </template>
-  <template id="invalid-individual_verification_additional_document_front">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing additional document front scan or photo
-    </div>
-  </template>
-  <template id="invalid-individual_verification_additional_document_back">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing additional document back scan or photo
-    </div>
-  </template>
-
-
-
-
-
-
-  <template id="invalid-company_name">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing business name
-    </div>
-  </template>
-  <template id="invalid-company_name_kana">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing kana business name
-    </div>
-  </template>
-  <template id="invalid-company_name_kanji">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing kanji business name
-    </div>
-  </template>
-  <template id="invalid-company_phone">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing telephone number
-    </div>
-  </template>
-  <template id="invalid-company_tax_id">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing business tax id
-    </div>
-  </template>
-  <template id="invalid-company_registration_number">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing company registration number
-    </div>
-  </template>
-  <template id="invalid-company_address_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address city
-    </div>
-  </template>
-  <template id="invalid-company_address_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address state
-    </div>
-  </template>
-  <template id="invalid-company_address_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal address line 1
-    </div>
-  </template>
-  <template id="invalid-company_address_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing personal postal code
-    </div>
-  </template>
-  <template id="invalid-company_address_kana_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address city
-    </div>
-  </template>
-  <template id="invalid-company_address_kana_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address state
-    </div>
-  </template>
-  <template id="invalid-company_address_kana_town">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address town
-    </div>
-  </template>
-  <template id="invalid-company_address_kana_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address line 1
-    </div>
-  </template>
-  <template id="invalid-company_address_kana_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kana address postal code
-    </div>
-  </template>
-  <template id="invalid-company_address_kanji_city">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address city
-    </div>
-  </template>
-  <template id="invalid-company_address_kanji_state">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address state
-    </div>
-  </template>
-  <template id="invalid-company_address_kanji_town">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address town
-    </div>
-  </template>
-  <template id="invalid-company_address_kanji_line1">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address line 1
-    </div>
-  </template>
-  <template id="invalid-company_address_kanji_postal_code">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing Kanji address postal code
-    </div>
-  </template>
-  <template id="invalid-company_verification_document_front">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing document front scan or photo
-    </div>
-  </template>
-  <template id="invalid-company_verification_document_back">
-    <div class="error message" translate="yes">
-      Error! Invalid or missing document back scan or photo
-    </div>
-  </template>
-</body>
-
+    </template>
+    <template id="invalid-individual_last_name">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing last name
+      </div>
+    </template>
+    <template id="invalid-individual_last_name_kana">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana last name
+      </div>
+    </template>
+    <template id="invalid-individual_last_name_kanji">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji last name
+      </div>
+    </template>
+    <template id="invalid-individual_email">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing email
+      </div>
+    </template>
+    <template id="invalid-individual_address_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address city
+      </div>
+    </template>
+    <template id="invalid-individual_address_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address state
+      </div>
+    </template>
+    <template id="invalid-individual_address_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address line 1
+      </div>
+    </template>
+    <template id="invalid-individual_address_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal postal code
+      </div>
+    </template>
+    <template id="invalid-individual_address_kana_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address city
+      </div>
+    </template>
+    <template id="invalid-individual_address_kana_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address state
+      </div>
+    </template>
+    <template id="invalid-individual_address_kana_town">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address town
+      </div>
+    </template>
+    <template id="invalid-individual_address_kana_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address line 1
+      </div>
+    </template>
+    <template id="invalid-individual_address_kana_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address postal code
+      </div>
+    </template>
+    <template id="invalid-individual_address_kanji_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address city
+      </div>
+    </template>
+    <template id="invalid-individual_address_kanji_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address state
+      </div>
+    </template>
+    <template id="invalid-individual_address_kanji_town">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address town
+      </div>
+    </template>
+    <template id="invalid-individual_address_kanji_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address line 1
+      </div>
+    </template>
+    <template id="invalid-individual_address_kanji_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address postal code
+      </div>
+    </template>
+    <template id="invalid-individual_verification_document_front">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing document front scan or photo
+      </div>
+    </template>
+    <template id="invalid-individual_verification_document_back">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing document back scan or photo
+      </div>
+    </template>
+    <template id="invalid-individual_verification_additional_document_front">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing additional document front scan or photo
+      </div>
+    </template>
+    <template id="invalid-individual_verification_additional_document_back">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing additional document back scan or photo
+      </div>
+    </template>
+    <template id="invalid-company_name">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing business name
+      </div>
+    </template>
+    <template id="invalid-company_name_kana">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing kana business name
+      </div>
+    </template>
+    <template id="invalid-company_name_kanji">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing kanji business name
+      </div>
+    </template>
+    <template id="invalid-company_phone">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing telephone number
+      </div>
+    </template>
+    <template id="invalid-company_tax_id">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing business tax id
+      </div>
+    </template>
+    <template id="invalid-company_registration_number">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing company registration number
+      </div>
+    </template>
+    <template id="invalid-company_address_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address city
+      </div>
+    </template>
+    <template id="invalid-company_address_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address state
+      </div>
+    </template>
+    <template id="invalid-company_address_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal address line 1
+      </div>
+    </template>
+    <template id="invalid-company_address_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing personal postal code
+      </div>
+    </template>
+    <template id="invalid-company_address_kana_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address city
+      </div>
+    </template>
+    <template id="invalid-company_address_kana_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address state
+      </div>
+    </template>
+    <template id="invalid-company_address_kana_town">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address town
+      </div>
+    </template>
+    <template id="invalid-company_address_kana_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address line 1
+      </div>
+    </template>
+    <template id="invalid-company_address_kana_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kana address postal code
+      </div>
+    </template>
+    <template id="invalid-company_address_kanji_city">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address city
+      </div>
+    </template>
+    <template id="invalid-company_address_kanji_state">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address state
+      </div>
+    </template>
+    <template id="invalid-company_address_kanji_town">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address town
+      </div>
+    </template>
+    <template id="invalid-company_address_kanji_line1">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address line 1
+      </div>
+    </template>
+    <template id="invalid-company_address_kanji_postal_code">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing Kanji address postal code
+      </div>
+    </template>
+    <template id="invalid-company_verification_document_front">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing document front scan or photo
+      </div>
+    </template>
+    <template id="invalid-company_verification_document_back">
+      <div class="error message" translate="yes">
+        Error! Invalid or missing document back scan or photo
+      </div>
+    </template>
+  </body>
 </html>

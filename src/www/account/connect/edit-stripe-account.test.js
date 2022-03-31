@@ -1,10 +1,8 @@
 /* eslint-env mocha */
 const assert = require('assert')
-const connect = require('../../../../index.js')
 const TestHelper = require('../../../../test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
-const testData = require('../../../../test-data.json')
 
 describe('/account/connect/edit-stripe-account', function () {
   describe('exceptions', () => {
@@ -155,25 +153,25 @@ describe('/account/connect/edit-stripe-account', function () {
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field individual_id_number', async () => {
-      const result = cachedResults['individual_id_number']
+      const result = cachedResults.individual_id_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('individual_id_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field individual_phone', async () => {
-      const result = cachedResults['individual_phone']
+      const result = cachedResults.individual_phone
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('individual_phone')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field individual_ssn_last_4', async () => {
-      const result = cachedResults['individual_ssn_last_4']
+      const result = cachedResults.individual_ssn_last_4
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('individual_ssn_last_4')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field individual_email', async () => {
-      const result = cachedResults['individual_email']
+      const result = cachedResults.individual_email
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('individual_email')
       assert.notStrictEqual(field, undefined)
@@ -436,14 +434,14 @@ describe('/account/connect/edit-stripe-account', function () {
     it('should update registration no stripe.js (individual)', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
-        country: 'US',
+        country: 'AT',
         business_type: 'individual'
       })
       const req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      req.uploads = TestStripeAccounts.createUploadData(user.stripeAccount.stripeObject)
+      req.uploads = TestStripeAccounts.createAccountUploadData(user.stripeAccount.stripeObject)
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -463,12 +461,12 @@ describe('/account/connect/edit-stripe-account', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
       req.uploads = {
-        individual_verification_document_front: TestHelper['success_id_scan_front.png'],
-        individual_verification_document_back: TestHelper['success_id_scan_back.png'],
-        individual_verification_additional_document_front: TestHelper['success_id_scan_front.png'],
-        individual_verification_additional_document_back: TestHelper['success_id_scan_back.png']
+        individual_verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        individual_verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        individual_verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        individual_verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png']
       }
-      // req.uploads = TestStripeAccounts.createUploadData(user.stripeAccount.stripeObject)
+      // req.uploads = TestStripeAccounts.createAccountUploadData(user.stripeAccount.stripeObject)
       // req.body = Object.assign(req.body, req.uploads)
       req.filename = __filename
       req.screenshots = [
@@ -482,15 +480,9 @@ describe('/account/connect/edit-stripe-account', function () {
           waitAfter: async (page) => {
             while (true) {
               try {
-                const frame = await page.frames().find(f => f.name() === 'application-iframe')
-                if (frame) {
-                  const loaded = await frame.evaluate(() => {
-                    const accountTable = document.getElementById('stripe-accounts-table')
-                    return accountTable && accountTable.children.length
-                  })
-                  if (loaded) {
-                    break
-                  }
+                const table = await page.$('#stripe-accounts-table')
+                if (table) {
+                  return
                 }
               } catch (error) {
               }
@@ -515,7 +507,7 @@ describe('/account/connect/edit-stripe-account', function () {
       req.account = user.account
       req.session = user.session
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      req.uploads = TestStripeAccounts.createUploadData(user.stripeAccount.stripeObject)
+      req.uploads = TestStripeAccounts.createAccountUploadData(user.stripeAccount.stripeObject)
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -548,7 +540,7 @@ describe('/account/connect/edit-stripe-account', function () {
         }
       }
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      req.uploads = TestStripeAccounts.createUploadData(user.stripeAccount.stripeObject)
+      req.uploads = TestStripeAccounts.createAccountUploadData(user.stripeAccount.stripeObject)
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -691,11 +683,11 @@ describe('/account/connect/edit-stripe-account', function () {
       // await req.post()
       // await TestHelper.waitForCurrentlyDueFields(user, 'individual.verification.document')
       // req.uploads = {
-      //   individual_verification_document_front: TestHelper['success_id_scan_front.png']
+      //   individual_verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       // }
       // cachedResults.invalid_individual_verification_document_back = await req.post()
       // req.uploads = {
-      //   individual_verification_document_back: TestHelper['success_id_scan_front.png']
+      //   individual_verification_document_back: TestStripeAccounts['success_id_scan_front.png']
       // }
       // cachedResults.invalid_individual_verification_document_front = await req.post()
       // company
@@ -797,11 +789,11 @@ describe('/account/connect/edit-stripe-account', function () {
       // delete (req.body)
       // await TestHelper.waitForCurrentlyDueFields(user, 'company.verification.document')
       // req.uploads = {
-      //   company_verification_document_back: TestHelper['success_id_scan_back.png'],
+      //   company_verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
       // }
       // cachedResults.invalid_company_verification_document_front = await req.post()
       // req.uploads = {
-      //   company_verification_document_front: TestHelper['success_id_scan_back.png'],
+      //   company_verification_document_front: TestStripeAccounts['success_id_scan_back.png'],
       // }
       // cachedResults.invalid_company_verification_document_back = await req.post()
     })
@@ -842,28 +834,28 @@ describe('/account/connect/edit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-individual_dob_year')
     })
     it('reject invalid field individual_id_number', async () => {
-      const result = cachedResults['invalid_individual_id_number']
+      const result = cachedResults.invalid_individual_id_number
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_id_number')
     })
     it('reject invalid field individual_phone', async () => {
-      const result = cachedResults['invalid_individual_phone']
+      const result = cachedResults.invalid_individual_phone
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_phone')
     })
     it('reject invalid field individual_ssn_last_4', async () => {
-      const result = cachedResults['invalid_individual_ssn_last_4']
+      const result = cachedResults.invalid_individual_ssn_last_4
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_ssn_last_4')
     })
     it('reject invalid field individual_email', async () => {
-      const result = cachedResults['invalid_individual_email']
+      const result = cachedResults.invalid_individual_email
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]

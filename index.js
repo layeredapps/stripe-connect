@@ -5,11 +5,11 @@ global.connectWebhookEndPointSecret = global.connectWebhookEndPointSecret || pro
 if (!global.connectWebhookEndPointSecret) {
   throw new Error('invalid-connect-webhook-endpoint-secret')
 }
-global.stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY
+global.stripePublishableKey = process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
 if (global.stripeJS > 0 && !global.stripePublishableKey) {
   throw new Error('invalid-stripe-publishable-key')
 }
-global.stripeKey = process.env.STRIPE_KEY
+global.stripeKey = process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 if (!global.stripeKey) {
   throw new Error('invalid-stripe-key')
 }
@@ -45,7 +45,7 @@ for (const countrySpec of countrySpecsRaw.data) {
     countryCurrencyIndex[countrySpec.id].push({ name: currency.toUpperCase(), currency, object: 'currency' })
   }
 }
-countrySpecs.sort((a ,b) => {
+countrySpecs.sort((a, b) => {
   return a.name.toLowerCase() < b.name.toLowerCase() ? -1 : 1
 })
 const countryDivisions = {}

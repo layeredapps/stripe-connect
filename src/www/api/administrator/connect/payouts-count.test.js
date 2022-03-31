@@ -10,7 +10,6 @@ describe('/api/administrator/connect/payouts-count', function () {
       for (let i = 0, len = global.pageSize + 1; i < len; i++) {
         const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
         await TestHelper.createPayout(user)
-        await TestHelper.waitForPayout(user.payout.payoutid)
       }
       const req = TestHelper.createRequest('/api/administrator/connect/payouts-count')
       req.account = administrator.account

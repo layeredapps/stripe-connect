@@ -51,9 +51,13 @@ module.exports = {
         await updateStripeAccount(stripeEvent, req.stripeKey)
         break
     }
+    // for testing we stash the webhooks for analysis but
+    // since ngrok throttles requests we delay to space things out
     if (global.testNumber) {
       global.webhooks = global.webhooks || []
-      global.webhooks.unshift(stripeEvent)
+      setTimeout(() => {
+        global.webhooks.unshift(stripeEvent)
+      }, 20000)
     }
     return res.end()
   }
@@ -94,7 +98,6 @@ async function loadPerson (stripeid, id, key) {
 }
 
 async function updatePerson (stripeEvent, stripeKey) {
-  // stripeKey.stripeAccount = stripeEvent.account
   const stripeObject = await loadPerson(stripeEvent.data.object.account, stripeEvent.data.object.id, stripeKey)
   if (!stripeObject) {
     return
@@ -109,7 +112,6 @@ async function updatePerson (stripeEvent, stripeKey) {
 }
 
 async function updateStripeAccount (stripeEvent, stripeKey) {
-  // stripeKey.stripeAccount = stripeEvent.account
   const stripeObject = await load(stripeEvent.data.object.id, 'accounts', stripeKey)
   if (!stripeObject) {
     return
@@ -124,26 +126,6 @@ async function updateStripeAccount (stripeEvent, stripeKey) {
 }
 
 async function updatePayout (stripeEvent, stripeKey) {
-  // stripeKey.stripeAccount = stripeEvent.account
-  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
-    apiKey: stripeKey.apiKey,
-    stripeAccount: stripeEvent.account
-  })
-  if (!stripeObject) {
-    return
-  }
-  const existing = await connect.Storage.StripeAccount.findOne({
-    where: {
-      stripeid: stripeEvent.account
-    }
-  })
-  if (!existing) {
-    return
-  }
-  await upsert(connect.Storage.Payout, 'payoutid', stripeObject.id, {
-    payoutid: stripeObject.id,
-    stripeObject
-  })
   let stripeAccount
   try {
     stripeAccount = await global.api.administrator.connect.StripeAccount.get({
@@ -155,14 +137,26 @@ async function updatePayout (stripeEvent, stripeKey) {
   } catch (error) {
     return
   }
-  if (stripeAccount) {
-    await connect.Storage.Payout.update({
-      stripeid: stripeAccount.stripeid,
-      accountid: stripeAccount.accountid
-    }, {
-      where: {
-        payoutid: stripeObject.id
-      }
-    })
+  if (!stripeAccount) {
+    return
   }
+  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
+    apiKey: stripeKey.apiKey,
+    stripeAccount: stripeEvent.account
+  })
+  if (!stripeObject) {
+    return
+  }
+  await upsert(connect.Storage.Payout, 'payoutid', stripeObject.id, {
+    payoutid: stripeObject.id,
+    stripeObject
+  })
+  await connect.Storage.Payout.update({
+    stripeid: stripeAccount.stripeid,
+    accountid: stripeAccount.accountid
+  }, {
+    where: {
+      payoutid: stripeObject.id
+    }
+  })
 }

@@ -85,7 +85,7 @@ async function renderPage (req, res, messageTemplate) {
       const personalStates = connect.countryDivisions[req.data.stripeAccount.country]
       dashboard.HTML.renderList(doc, personalStates, 'state-option', 'address_state')
     } else if (removeElements.indexOf('address-container') === -1) {
-      removeElements.push('address_state-container', 'address_state-container-bridge')
+      removeElements.push('address_state-container')
     }
     if (requirements.indexOf('address.line1') === -1) {
       removeElements.push('address_line1-container', 'address.line2-container')

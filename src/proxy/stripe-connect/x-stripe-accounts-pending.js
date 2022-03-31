@@ -14,7 +14,7 @@ module.exports = async (req, proxyRequestOptions) => {
   for (const i in registrations) {
     registrations[i] = registrations[i].stripeObject
     if (registrations[i].requirements.pending_verification.length) {
-      requiring.push(registrations[i])
+      pending.push(registrations[i])
     }
   }
   proxyRequestOptions.headers['x-stripe-accounts-pending'] = JSON.stringify(pending || [])

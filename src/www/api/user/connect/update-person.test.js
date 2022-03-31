@@ -158,14 +158,10 @@ describe('/api/user/connect/update-person', function () {
         cachedResults.invalidAccount = error.message
       }
       // invalid person
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'US', user.representative.stripeObject)
-      await req.patch(req)
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
+      const user3 = await TestStripeAccounts.createCompanyReadyForSubmission('DE')
+      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.representative.personid}`)
+      req.account = user3.account
+      req.session = user3.session
       req.body = {}
       try {
         await req.patch(req)
@@ -317,6 +313,7 @@ describe('/api/user/connect/update-person', function () {
         relationship_title: 'SVP Testing',
         relationship_percent_ownership: '0'
       })
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
       let req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
       req.account = user.account
       req.session = user.session
@@ -326,15 +323,15 @@ describe('/api/user/connect/update-person', function () {
       for (const field in req.body) {
         cachedResponses[field] = result.stripeObject
       }
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'verification.document')
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'verification.additional_document')
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
       req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
       req.account = user.account
       req.session = user.session
       req.body = {}
-      req.uploads = TestStripeAccounts.createUploadData(user.representative.stripeObject)
+      req.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
       result = await req.patch()
-      await TestHelper.waitForWebhook('person.updated', (stripeEvent) => {
+      await TestStripeAccounts.waitForWebhook('person.updated', (stripeEvent) => {
         if (stripeEvent.data.object.id === user.representative.personid &&
             stripeEvent.data.object.verification.status === 'pending') {
           for (const field in req.uploads) {
@@ -343,7 +340,6 @@ describe('/api/user/connect/update-person', function () {
           return true
         }
       })
-
       // some fields only by BR
       await TestHelper.createStripeAccount(user, {
         country: 'BR',
@@ -381,31 +377,31 @@ describe('/api/user/connect/update-person', function () {
         cachedResponses[field] = cachedResponses[field] || result.stripeObject
       }
     })
-    it('optionally-required posted dob.day', async () => {
+    it('optionally-required posted dob_day', async () => {
       const personNow = cachedResponses.dob_day
       assert.strictEqual(personNow.dob.day, 1)
     })
-    it('optionally-required posted dob.month', async () => {
+    it('optionally-required posted dob_month', async () => {
       const personNow = cachedResponses.dob_month
       assert.strictEqual(personNow.dob.month, 1)
     })
-    it('optionally-required posted dob.year', async () => {
+    it('optionally-required posted dob_year', async () => {
       const personNow = cachedResponses.dob_year
       assert.strictEqual(personNow.dob.year, 1970)
     })
-    it('optionally-required posted address.line1', async () => {
+    it('optionally-required posted address_line1', async () => {
       const personNow = cachedResponses.address_line1
       assert.strictEqual(personNow.address.line1, '123 Park Lane')
     })
-    it('optionally-required posted address.city', async () => {
+    it('optionally-required posted address_city', async () => {
       const personNow = cachedResponses.address_city
       assert.strictEqual(personNow.address.city, 'Vienna')
     })
-    it('optionally-required posted address.state', async () => {
+    it('optionally-required posted address_state', async () => {
       const personNow = cachedResponses.address_state
       assert.strictEqual(personNow.address.state, 'SP')
     })
-    it('optionally-required posted address.postal_code', async () => {
+    it('optionally-required posted address_postal_code', async () => {
       const personNow = cachedResponses.address_postal_code
       assert.strictEqual(personNow.address.postal_code, '1020')
     })
@@ -429,11 +425,11 @@ describe('/api/user/connect/update-person', function () {
       const personNow = cachedResponses.ssn_last_4
       assert.strictEqual(personNow.ssn_last_4_provided, true)
     })
-    it('optionally-required posted verification_document.front', async () => {
+    it('optionally-required posted verification_document_front', async () => {
       const personNow = cachedResponses.verification_document_front
       assert.strictEqual(personNow.verification.status, 'pending')
     })
-    it('optionally-required posted verification_document.back', async () => {
+    it('optionally-required posted verification_document_back', async () => {
       const personNow = cachedResponses.verification_document_back
       assert.strictEqual(personNow.verification.status, 'pending')
     })
@@ -460,8 +456,7 @@ describe('/api/user/connect/update-person', function () {
         relationship_title: 'SVP Testing',
         relationship_percent_ownership: '0'
       })
-      await TestHelper.waitForAccountRequirement(user, `${user.representative.personid}.first_name`)
-      await TestHelper.waitForPersonRequirement(user, user.representative.personid, 'first_name')
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
       const req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
       req.account = user.account
       req.session = user.session
@@ -478,52 +473,42 @@ describe('/api/user/connect/update-person', function () {
       global.stripeJS = 3
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
-        country: 'GB',
+        country: 'DE',
         business_type: 'company'
       })
       await TestHelper.createPerson(user, {
         relationship_representative: 'true',
-        relationship_executcive: 'true',
+        relationship_executive: 'true',
         relationship_title: 'SVP Testing',
         relationship_percent_ownership: '0'
       })
-      await TestHelper.waitForAccountRequirement(user, `${user.representative.personid}.first_name`)
-      await TestHelper.waitForPersonRequirement(user, user.representative.personid, 'first_name')
-      const req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
+      const req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
       req.account = user.account
       req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'GB', user.representative.stripeObject)
-      req.uploads = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
-      }
-      req.waitAfter = async () => {
-        // TODO: verifying information was submitted by token is not possible
-        // because the fields don't leave the 'currently_due' etc arrays in
-        // test mode so for now a metadata.tokenUpdate flag gets set
-        await TestHelper.waitForWebhook('person.updated', (stripeEvent) => {
+      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'DE', user.representative.stripeObject)
+      await req.patch()
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
+      const req2 = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+      req2.account = user.account
+      req2.session = user.session
+      req2.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
+      global.webhooks = []
+      req2.waitAfter = async () => {
+        await TestStripeAccounts.waitForWebhook('person.updated', (stripeEvent) => {
           return stripeEvent.data.object.id === user.representative.personid &&
-                stripeEvent.data.object.metadata.tokenUpdate !== undefined
+                 stripeEvent.data.object.requirements.currently_due.indexOf('first_name') === -1
         })
       }
-      for (const field in req.body) {
-        if (field.indexOf('.') > -1) {
-          req.body[field.split('.').join('_')] = req.body[field]
-          delete (req.body[field])
-        }
-      }
-      for (const field in req.uploads) {
-        req.uploads[field.split('.').join('_')] = req.uploads[field]
-        delete (req.uploads[field])
-      }
-      await req.post()
+      await req2.post()
       const personNow = await global.api.administrator.connect.Person.get({
         query: {
           personid: user.representative.personid
         }
       })
-      assert.strictEqual(user.representative.stripeObject.metadata.tokenUpdate, undefined)
-      assert.notStrictEqual(personNow.stripeObject.metadata.tokenUpdate, undefined)
+      assert.notStrictEqual(personNow.tokenUpdate, null)
+      assert.notStrictEqual(personNow.tokenUpdate, undefined)
     })
   })
 })

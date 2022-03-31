@@ -5,6 +5,127 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/edit-person', function () {
+  const cachedResults = {}
+  before(async () => {
+    await DashboardTestHelper.setupBeforeEach()
+    await TestHelper.setupBeforeEach()
+    const user = await TestHelper.createUser()
+    await TestHelper.createStripeAccount(user, {
+      country: 'AU',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
+    let req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.dob = cachedResults.address = cachedResults.relationship_percent_ownership = await req.get()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.dob_day = '-1'
+    cachedResults['invalid-dob_day'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.dob_month = '-1'
+    cachedResults['invalid-dob_month'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.dob_year = 'invalid'
+    cachedResults['invalid-dob_year'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.relationship_percent_ownership = '-1'
+    cachedResults['invalid-relationship_percent_ownership'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.address_country = '-1'
+    cachedResults['invalid-address_country'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.address_state = '-1'
+    cachedResults['invalid-address_state'] = await req.post()
+    // id number
+    await TestHelper.createStripeAccount(user, {
+      country: 'HK',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.id_number = await req.get()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.id_number = '-1'
+    cachedResults['invalid-id_number'] = await req.post()
+    // invalid phone
+    // kata and kana fields
+    await TestHelper.createStripeAccount(user, {
+      country: 'JP',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address_kana.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.kana_kanji = await req.get()
+    // phone and ssn
+    await TestHelper.createStripeAccount(user, {
+      country: 'US',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.phone = cachedResults.ssn_last_4 = await req.get()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.phone = '-1'
+    cachedResults['invalid-phone'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.ssn_last_4 = '-1'
+    cachedResults['invalid-ssn_last_4'] = await req.post()
+    // email
+    await TestHelper.createStripeAccount(user, {
+      country: 'AT',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.email = await req.get()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.email = '-1'
+    cachedResults['invalid-email'] = await req.post()
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    await req.post()
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResults.uploads = await req.get()
+  })
   describe('exceptions', () => {
     it('should reject invalid person', async () => {
       const user = await TestHelper.createUser()
@@ -22,95 +143,6 @@ describe('/account/connect/edit-person', function () {
   })
 
   describe('view', async () => {
-    const cachedResults = {}
-    before(async () => {
-      await DashboardTestHelper.setupBeforeEach()
-      await TestHelper.setupBeforeEach()
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'AU',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      let req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResults.dob = cachedResults.address = cachedResults.relationship_percent_ownership = await req.get()
-      // id number
-      await TestHelper.createStripeAccount(user, {
-        country: 'HK',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResults.id_number = await req.get()
-      // kata and kana fields
-      await TestHelper.createStripeAccount(user, {
-        country: 'JP',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address_kana.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResults.kana_kanji = await req.get()
-      // phone and ssn
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResults.phone = cachedResults.ssn_last_4 = await req.get()
-      // email
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'AT', user.representative.stripeObject)
-      cachedResults.email = await req.get()
-      await req.post()
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'verification.document')
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'verification.additional_document')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResults.uploads = await req.get()
-    })
     it('should present the form', async () => {
       const result = cachedResults.dob
       const doc = TestHelper.extractDoc(result.html)
@@ -300,38 +332,28 @@ describe('/account/connect/edit-person', function () {
   })
 
   describe('submit', async () => {
-    it('should update person (screenshots) no stripe.js', async () => {
+    it('should update person no stripe.js', async () => {
       const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
       const req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.owner.personid}`)
       req.account = user.account
       req.session = user.session
       req.uploads = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       }
       req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'DE', user.owner.stripeObject)
-      req.filename = __filename
-      req.screenshots = [
-        { hover: '#account-menu-container' },
-        { click: '/account/connect' },
-        { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/person?personid=${user.owner.personid}` },
-        { click: `/account/connect/edit-person?personid=${user.owner.personid}` },
-        { fill: '#submit-form' }
-      ]
       const result = await req.post()
       assert.strictEqual(result.redirect, `/account/connect/person?personid=${user.owner.personid}`)
     })
 
-    it('should update person stripe.js v3', async () => {
+    it('should update person stripe.js v3 (screenshots)', async () => {
       const user = await TestStripeAccounts.createCompanyWithOwners('US', 1)
       const req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.owner.personid}`)
       req.account = user.account
       req.session = user.session
       req.uploads = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       }
       req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'US', user.owner.stripeObject)
       req.filename = __filename
@@ -342,7 +364,9 @@ describe('/account/connect/edit-person', function () {
         { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
         { click: `/account/connect/person?personid=${user.owner.personid}` },
         { click: `/account/connect/edit-person?personid=${user.owner.personid}` },
-        { fill: '#submit-form', waitAfter: async (page) => {
+        {
+          fill: '#submit-form',
+          waitAfter: async (page) => {
             while (true) {
               try {
                 const url = await page.url()
@@ -363,104 +387,6 @@ describe('/account/connect/edit-person', function () {
   })
 
   describe('errors', () => {
-    const cachedResults = {}
-    before(async () => {
-      await DashboardTestHelper.setupBeforeEach()
-      await TestHelper.setupBeforeEach()
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'AU',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      // invalid date of birth
-      let req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.dob_day = '-1'
-      cachedResults['invalid-dob_day'] = await req.post()
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.dob_month = '-1'
-      cachedResults['invalid-dob_month'] = await req.post()
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.dob_year = 'invalid'
-      cachedResults['invalid-dob_year'] = await req.post()
-      // invalid percent ownership
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.relationship_percent_ownership = '-1'
-      cachedResults['invalid-relationship_percent_ownership'] = await req.post()
-      // invalid country
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.address_country = '-1'
-      cachedResults['invalid-address_country'] = await req.post()
-      // invalid state
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.address_state = '-1'
-      cachedResults['invalid-address_state'] = await req.post()
-      // invalid id number
-      await TestHelper.createStripeAccount(user, {
-        country: 'HK',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.id_number = '-1'
-      cachedResults['invalid-id_number'] = await req.post()
-      // invalid phone
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.phone = '-1'
-      cachedResults['invalid-phone'] = await req.post()
-      // invalid ssn last 4
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.ssn_last_4 = '-1'
-      cachedResults['invalid-ssn_last_4'] = await req.post()
-      // invalid email
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'address.city')
-      req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
-      req.body.email = '-1'
-      cachedResults['invalid-email'] = await req.post()
-    })
-
     it('reject invalid field dob_day', async () => {
       const result = cachedResults['invalid-dob_day']
       const doc = TestHelper.extractDoc(result.html)

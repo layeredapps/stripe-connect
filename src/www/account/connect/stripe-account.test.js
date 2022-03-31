@@ -87,8 +87,10 @@ describe('/account/connect/stripe-account', () => {
         country: 'US',
         business_type: 'individual'
       })
+      await TestStripeAccounts.waitForAccountField(user, 'individual.first_name')
       const accountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
       await TestHelper.updateStripeAccount(user, accountData)
+      await TestStripeAccounts.waitForAccountFieldToLeave(user, 'individual.first_name')
       const req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -100,16 +102,7 @@ describe('/account/connect/stripe-account', () => {
     })
 
     it('should show payment information required', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const accountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      await TestHelper.updateStripeAccount(user, accountData, {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
-      })
+      const user = await TestStripeAccounts.createCompanyMissingPaymentDetails('US')
       const req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -121,24 +114,7 @@ describe('/account/connect/stripe-account', () => {
     })
 
     it('should show payment information created', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const accountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      await TestHelper.updateStripeAccount(user, accountData, {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
-      })
-      await TestHelper.createExternalAccount(user, {
-        account_holder_name: `${user.profile.firstName} ${user.profile.lastName}`,
-        account_holder_type: 'individual',
-        account_number: '000123456789',
-        country: 'US',
-        currency: 'usd',
-        routing_number: '110000000'
-      })
+      const user = await TestStripeAccounts.createIndividualReadyForSubmission('US')
       const req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -150,13 +126,7 @@ describe('/account/connect/stripe-account', () => {
     })
 
     it('should show ready to submit', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const accountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      await TestHelper.updateStripeAccount(user, accountData)
+      const user = await TestStripeAccounts.createIndividualReadyForSubmission('US')
       const req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -168,7 +138,7 @@ describe('/account/connect/stripe-account', () => {
     })
 
     it('should show registration is submitted', async () => {
-      const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
+      const user = await TestStripeAccounts.createSubmittedCompany('NZ')
       const req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session

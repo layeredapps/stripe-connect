@@ -3,15 +3,18 @@ window.uploadDocumentFiles = function (documentFront, documentBack, callback) {
       (!documentBack || !documentBack.files || !documentBack.files.length)) {
     return callback()
   }
+  if ((!documentFront[0] && !documentBack.files[0])) {
+    return callback()
+  }
   let first = true
   let frontFile, backFile
   function upload () {
     let field = first ? documentFront : documentBack
-    if (!field || !field.files || !field.files.length) {
+    if (!field || !field.files || !field.files.length || (field.files && !field.files[0])) {
       if (first) {
         field = documentBack
         first = false
-        if (!field || !field.files || !field.files.length) {
+        if (!field || !field.files || !field.files.length || (field.files[0] && !field.files[0])) {
           return callback(null, frontFile, backFile)
         }
       } else {

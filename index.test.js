@@ -8,16 +8,21 @@ const properties = [
   { camelCase: 'stripePublishableKey', raw: 'STRIPE_PUBLISHABLE_KEY', description: 'The `pk_test_xxx` key from Stripe', value: 'pk_test_xxx', valueDescription: 'String', noDefaultValue: true }
 ]
 
-const stripeKey = process.env.STRIPE_KEY
-const stripePublishableKey = process.env.STRIPE_PUBLISHABLE_KEY
-const webhookSecret = process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET
+const stripeKey = process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+const stripePublishableKey = process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
 
 describe('index', () => {
+  let webhookSecret
+  before(async () => {
+    const testHelper = require('./test-helper.js')
+    await testHelper.setupBefore()
+    webhookSecret = global.connectWebhookEndPointSecret
+  })
   afterEach(() => {
-    process.env.STRIPE_KEY = stripeKey
-    process.env.STRIPE_PUBLISHABLE_KEY = stripePublishableKey
+    process.env.CONNECT_STRIPE_KEY = stripeKey
+    process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = stripePublishableKey
     process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = webhookSecret
-    global.connectWebhookEndPointSecret = false
+    global.connectWebhookEndPointSecret = webhookSecret
     delete (require.cache[require.resolve('./index.js')])
     require('./index.js').setup(global.applicationPath)
   })
@@ -32,8 +37,8 @@ describe('index', () => {
           it('default ' + (property.default || property.defaultDescription || 'unset'), async () => {
             if (property.raw.startsWith('STRIPE_')) {
               process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = 'wh_sec_xxx'
-              process.env.STRIPE_KEY = 'sk_test_xxx'
-              process.env.STRIPE_PUBLISHABLE_KEY = 'pk_test_xxx'
+              process.env.CONNECT_STRIPE_KEY = 'sk_test_xxx'
+              process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = 'pk_test_xxx'
             }
             delete (process.env[property.raw])
             delete (require.cache[require.resolve('./index.js')])
@@ -45,8 +50,8 @@ describe('index', () => {
         it(property.valueDescription, async () => {
           if (property.raw.startsWith('STRIPE_')) {
             process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = 'wh_sec_xxx'
-            process.env.STRIPE_KEY = 'sk_test_xxx'
-            process.env.STRIPE_PUBLISHABLE_KEY = 'pk_test_xxx'
+            process.env.CONNECT_STRIPE_KEY = 'sk_test_xxx'
+            process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = 'pk_test_xxx'
           }
           delete (require.cache[require.resolve('./index.js')])
           process.env[property.raw] = property.value
@@ -57,8 +62,8 @@ describe('index', () => {
         })
       })
       process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = webhookSecret
-      process.env.STRIPE_KEY = stripeKey
-      process.env.STRIPE_PUBLISHABLE_KEY = stripePublishableKey
+      process.env.CONNECT_STRIPE_KEY = stripeKey
+      process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = stripePublishableKey
       delete (require.cache[require.resolve('./index.js')])
       require('./index.js').setup(global.applicationPath)
     })

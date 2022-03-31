@@ -14,7 +14,7 @@
       eventList.push(event.substring(0, event.indexOf('.js')))
     }
     const stripeKey = {
-      apiKey: process.env.STRIPE_KEY
+      apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
     }
     const webhooks = await stripe.webhookEndpoints.list({ limit: 100 }, stripeKey)
     if (webhooks && webhooks.data && webhooks.data.length) {

@@ -7,11 +7,9 @@ global.testConfiguration.stripeJS = false
 global.testConfiguration.maximumStripeRetries = 0
 global.testConfiguration.webhooks = []
 
-const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect')
 const util = require('util')
 const ngrok = require('ngrok')
 const packageJSON = require('./package.json')
-const path = require('path')
 const stripe = require('stripe')({
   apiVersion: global.stripeAPIVersion,
   telemetry: false,
@@ -23,7 +21,7 @@ const stripe = require('stripe')({
   }
 })
 const stripeKey = {
-  apiKey: process.env.STRIPE_KEY
+  apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 }
 
 const wait = util.promisify((callback) => {
@@ -43,46 +41,11 @@ module.exports = {
   submitCompanyDirectors,
   submitCompanyExecutives,
   submitStripeAccount,
-  triggerVerification,
   updatePerson,
-  updateStripeAccount,
-  waitForAccountRequirement: util.promisify(waitForAccountRequirement),
-  waitForPersonRequirement: util.promisify(waitForPersonRequirement),
-  waitForPersonCurrentlyDueFields,
-  waitForCurrentlyDueFields,
-  waitForPendingFieldsToLeave: util.promisify(waitForPendingFieldsToLeave),
-  waitForVerification: util.promisify(waitForVerification),
-  waitForPayoutsEnabled: util.promisify(waitForPayoutsEnabled),
-  waitForVerificationFieldsToLeave: util.promisify(waitForVerificationFieldsToLeave),
-  waitForCurrentlyDueFieldsToLeave: util.promisify(waitForCurrentlyDueFieldsToLeave),
-  waitForVerificationFailure: util.promisify(waitForVerificationFailure),
-  waitForVerificationStart: util.promisify(waitForVerificationStart),
-  waitForPayout,
-  waitForWebhook: util.promisify(waitForWebhook),
-  'success_id_scan_front.png': {
-    filename: 'id_scan_front.png',
-    name: 'id_scan_front.png',
-    path: path.join(__dirname, '/test-documentid-success.png')
-  },
-  'fail_id_scan_front.png': {
-    filename: 'id_scan_front.png',
-    name: 'id_scan_front.png',
-    path: path.join(__dirname, '/test-documentid-failed.png')
-  },
-  'success_id_scan_back.png': {
-    filename: 'id_scan_back.png',
-    name: 'id_scan_back.png',
-    path: path.join(__dirname, '/test-documentid-success.png')
-  },
-  'fail_id_scan_back.png': {
-    filename: 'id_scan_back.png',
-    name: 'id_scan_back.png',
-    path: path.join(__dirname, '/test-documentid-failed.png')
-  }
+  updateStripeAccount
 }
 
 const TestHelper = require('@layeredapps/dashboard/test-helper.js')
-
 for (const x in TestHelper) {
   module.exports[x] = TestHelper[x]
 }
@@ -92,11 +55,14 @@ const createRequest = module.exports.createRequest = (rawURL, method) => {
   return req
 }
 
+let connect
+
 async function setupBefore () {
+  connect = require('./index.js')
+  await connect.setup()
   if (!webhook) {
     await deleteOldWebhooks(true)
     await setupWebhook()
-    await require('./index.js').setup()
   }
   const helperRoutes = require('./test-helper-routes.js')
   global.sitemap['/api/fake-payout'] = helperRoutes.fakePayout
@@ -106,7 +72,6 @@ async function setupBefore () {
 
 async function setupBeforeEach () {
   global.webhooks = []
-  const connect = require('./index.js')
   await connect.Storage.flush()
 }
 
@@ -295,12 +260,11 @@ before(setupBefore)
 beforeEach(setupBeforeEach)
 
 afterEach(async () => {
+  await connect.Storage.flush()
   if (data) {
     await deleteOldStripeAccounts()
     data = false
   }
-  const connect = require('./index.js')
-  await connect.Storage.flush()
 })
 
 after(async () => {
@@ -343,21 +307,37 @@ async function deleteOldStripeAccounts () {
   let accounts
   while (true) {
     try {
-      accounts = await stripe.accounts.list(stripeKey)
+      accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
       break
     } catch (error) {
+      console.log(1111, error)
     }
   }
   while (accounts.data && accounts.data.length) {
     for (const account of accounts.data) {
+      if (accounts.business_type === 'company') {
+        try {
+          const persons = await stripe.accounts.listPersons(account.id, { limit: 100 }, stripeKey)
+          for (const person of persons) {
+            await stripe.accounts.deletePerson(
+              account.id,
+              person.id,
+              stripeKey
+            )
+          }
+        } catch (error) {
+          console.log(22222, error)
+        }
+      }
       try {
         await stripe.accounts.del(account.id, stripeKey)
       } catch (error) {
       }
     }
     try {
-      accounts = await stripe.accounts.list(stripeKey)
+      accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
     } catch (error) {
+      console.log(33333, error)
     }
   }
 }
@@ -539,385 +519,4 @@ async function submitStripeAccount (user) {
     } catch (error) {
     }
   }
-}
-
-async function waitForPayout (payoutid) {
-  Log.info('waitForPayout', payoutid)
-  const req = module.exports.createRequest(`/api/administrator/connect/payout?payoutid=${payoutid}`)
-  req.stripeKey = stripeKey
-  while (true) {
-    try {
-      const payout = await req.route.api.get(req)
-      return payout
-    } catch (error) {
-      await wait(100)
-    }
-  }
-}
-
-async function waitForPayoutsEnabled (user, callback) {
-  Log.info('waitForPayoutsEnabled')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}&from=waitForPayoutsEnabled`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (stripeAccount.stripeObject.requirements.currently_due.length) {
-        throw new Error('account requires fields ' + stripeAccount.stripeObject.requirements.currently_due.join(', '))
-      } else if (stripeAccount.stripeObject.requirements.eventually_due.length) {
-        throw new Error('account requires fields ' + stripeAccount.stripeObject.requirements.eventually_due.join(', '))
-      }
-      if (!stripeAccount.stripeObject.payouts_enabled) {
-        return setTimeout(wait, 100)
-      }
-      return setTimeout(() => {
-        return callback(null, stripeAccount)
-      }, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForVerification (user, callback) {
-  Log.info('waitForVerification')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}&from=waitForVerification`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (stripeAccount.business_type === 'individual') {
-        if (!stripeAccount.individual || stripeAccount.individual.verification.status !== 'verified') {
-          return setTimeout(wait, 100)
-        }
-      }
-      if (!stripeAccount.stripeObject.payouts_enabled || stripeAccount.stripeObject.requirements.currently_due.length) {
-        return setTimeout(wait, 100)
-      }
-      user.stripeAccount = stripeAccount
-      return callback(null, stripeAccount)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForVerificationFailure (user, callback) {
-  Log.info('waitForVerificationFailure')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}&from=waitForVerificationFailure`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (stripeAccount.business_type === 'individual') {
-        if ((stripeAccount.stripeObject.requirements && stripeAccount.stripeObject.requirements.pending_verification.length) ||
-            (stripeAccount.stripeObject.individual && stripeAccount.stripeObject.individual.verification.status !== 'unverified')) {
-          return setTimeout(wait, 100)
-        }
-      } else {
-        if ((stripeAccount.stripeObject.requirements && stripeAccount.stripeObject.requirements.pending_verification.length) ||
-          (stripeAccount.stripeObject.company && stripeAccount.stripeObject.company.verification.status !== 'unverified')) {
-          return setTimeout(wait, 100)
-        }
-      }
-      return setTimeout(callback, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForPendingFieldsToLeave (user, callback) {
-  Log.info('waitForPendingFieldsToLeave')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (stripeAccount.stripeObject.requirements.pending_verification.length) {
-        return setTimeout(wait, 100)
-      }
-      user.stripeAccount = stripeAccount
-      return setTimeout(callback, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForCurrentlyDueFieldsToLeave (user, contains, callback) {
-  Log.info('waitForCurrentlyDueFieldsToLeave', contains, user.stripeAccount.stripeObject.requirements.currently_due)
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      for (const field of stripeAccount.stripeObject.requirements.currently_due) {
-        if (field.indexOf(contains) > -1) {
-          Log.info('waitForCurrentlyDueFieldsToLeave', contains, stripeAccount.stripeObject.requirements.currently_due)
-          return setTimeout(wait, 100)
-        }
-      }
-      Log.info('finished waitForCurrentlyDueFieldsToLeave', contains, stripeAccount.stripeObject.requirements.currently_due)
-      user.stripeAccount = stripeAccount
-      return setTimeout(callback, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForVerificationFieldsToLeave (user, contains, callback) {
-  Log.info('waitForVerificationFieldsToLeave')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      for (const field of stripeAccount.stripeObject.requirements.eventually_due) {
-        if (field.indexOf(contains) > -1) {
-          return setTimeout(wait, 100)
-        }
-      }
-      for (const field of stripeAccount.stripeObject.requirements.past_due) {
-        if (field.indexOf(contains) > -1) {
-          return setTimeout(wait, 100)
-        }
-      }
-      for (const field of stripeAccount.stripeObject.requirements.currently_due) {
-        if (field.indexOf(contains) > -1) {
-          return setTimeout(wait, 100)
-        }
-      }
-      user.stripeAccount = stripeAccount
-      return setTimeout(callback, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForVerificationStart (user, callback) {
-  Log.info('waitForVerificationStart')
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (stripeAccount.stripeObject.requirements.eventually_due.length ||
-        stripeAccount.stripeObject.requirements.past_due.length ||
-        stripeAccount.stripeObject.requirements.currently_due.length) {
-        return setTimeout(wait, 100)
-      }
-      user.stripeAccount = stripeAccount
-      return setTimeout(callback, 10)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForAccountRequirement (user, requirement, callback) {
-  Log.info('waitForAccountRequirement', requirement)
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
-      if (!stripeAccount.stripeObject.requirements) {
-        return setTimeout(wait, 100)
-      }
-      if (stripeAccount.stripeObject.requirements.currently_due.indexOf(requirement) > -1) {
-        user.stripeAccount = stripeAccount
-        return setTimeout(callback, 10)
-      }
-      if (stripeAccount.stripeObject.requirements.eventually_due.indexOf(requirement) > -1) {
-        user.stripeAccount = stripeAccount
-        return setTimeout(callback, 10)
-      }
-      return setTimeout(wait, 100)
-    } catch (error) {
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForPersonRequirement (user, personid, requirement, callback) {
-  Log.info('waitForPersonRequirement', personid, requirement)
-  const req = createRequest(`/api/user/connect/person?personid=${personid}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const person = await global.api.user.connect.Person.get(req)
-      if (person && person.stripeObject.requirements) {
-        if (person.stripeObject.requirements.currently_due.indexOf(requirement) > -1 ||
-            person.stripeObject.requirements.eventually_due.indexOf(requirement) > -1) {
-          return setTimeout(callback, 10)
-        }
-      }
-    } catch (error) {
-    }
-    return setTimeout(wait, 100)
-  }
-  return setTimeout(wait, 100)
-}
-
-async function waitForCurrentlyDueFields (user, contains) {
-  Log.info('waitForCurrentlyDueFields', contains === false ? 'none' : contains)
-  const stripeObject = user.stripeAccount.stripeObject
-  const req = createRequest(`/api/user/connect/stripe-account?stripeid=${stripeObject.id}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  while (true) {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const newObject = await req.route.api.get(req)
-      if (contains && newObject.stripeObject.requirements.currently_due.indexOf(contains) > -1) {
-        user.stripeAccount = newObject
-        return newObject
-      } else if (!contains) {
-        let invalid = false
-        for (const field of newObject.stripeObject.requirements.currently_due) {
-          if (field.startsWith('tos_acceptance')) {
-            continue
-          }
-          invalid = true
-          break
-        }
-        if (!invalid) {
-          user.stripeAccount = newObject
-          return newObject
-        }
-      }
-    } catch (error) {
-    }
-    await wait()
-  }
-}
-
-async function waitForPersonCurrentlyDueFields (user, personType, contains) {
-  Log.info('waitForPersonCurrentlyDueFields', personType, contains === false ? 'none' : contains)
-  const person = user[personType].stripeObject
-  const req = createRequest(`/api/user/connect/person?personid=${person.id}`)
-  req.account = user.account
-  req.session = user.session
-  req.stripeKey = stripeKey
-  while (true) {
-    if (global.testEnded) {
-      return
-    }
-    try {
-      const newObject = await req.route.api.get(req)
-      if (contains && newObject.stripeObject.requirements.currently_due.indexOf(contains) > -1) {
-        user[personType] = newObject
-        return newObject
-      } else if (!contains && !newObject.stripeObject.requirements.currently_due.length) {
-        user[personType] = newObject
-        return newObject
-      }
-    } catch (error) {
-    }
-    await wait()
-  }
-}
-
-async function triggerVerification (user) {
-  const accountKey = {
-    apiKey: stripeKey.apiKey,
-    stripeAccount: user.stripeAccount.stripeid
-  }
-  const chargeInfo = {
-    amount: 2000,
-    currency: 'usd',
-    source: 'tok_visa_triggerVerification',
-    description: 'Test charge'
-  }
-  let charge
-  try {
-    charge = await stripe.charges.create(chargeInfo, accountKey)
-  } catch (error) {
-  }
-  user.charge = charge
-  return charge
-}
-
-async function waitForWebhook (webhookType, matching, callback) {
-  Log.info('waitForWebhook', webhookType)
-  if (!webhook) {
-    return callback()
-  }
-  async function wait () {
-    if (global.testEnded) {
-      return
-    }
-    if (!global.webhooks || !global.webhooks.length) {
-      return setTimeout(wait, 10)
-    }
-    for (const received of global.webhooks) {
-      if (received.type !== webhookType) {
-        continue
-      }
-      if (matching(received)) {
-        return callback()
-      }
-    }
-    return setTimeout(wait, 10)
-  }
-  return setTimeout(wait, 10)
 }

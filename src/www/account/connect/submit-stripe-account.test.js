@@ -1,6 +1,5 @@
 /* eslint-env mocha */
 const assert = require('assert')
-const connect = require('../../../../index.js')
 const TestHelper = require('../../../../test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 
@@ -23,7 +22,7 @@ describe('/account/connect/submit-stripe-account', function () {
 
   describe('before', () => {
     it('should bind data to req', async () => {
-      const user = await TestStripeAccounts.createCompanyReadyForSubmission('DE')
+      const user = await TestStripeAccounts.createCompanyReadyForSubmission('NZ')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -33,9 +32,8 @@ describe('/account/connect/submit-stripe-account', function () {
   })
 
   describe('view', () => {
-    it.only('should reject registration that hasn\'t submitted payment details', async () => {
-      const user = await TestStripeAccounts.createCompanyMissingPaymentDetails('DE')
-      console.log(user.stripeAccount.stripeObject)
+    it('should reject registration that hasn\'t submitted payment details', async () => {
+      const user = await TestStripeAccounts.createCompanyMissingPaymentDetails('NZ')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -47,7 +45,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted company owners', async () => {
-      const user = await TestStripeAccounts.createCompanyMissingOwners()
+      const user = await TestStripeAccounts.createCompanyMissingOwners('DE')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -71,7 +69,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted representative information', async () => {
-      const user = await TestStripeAccounts.createCompanyMissingRepresentative()
+      const user = await TestStripeAccounts.createCompanyMissingRepresentative('DE')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -83,7 +81,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted information', async () => {
-      const user = await TestStripeAccounts.createCompanyMissingCompanyDetails()
+      const user = await TestStripeAccounts.createCompanyMissingCompanyDetails('AU')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -95,7 +93,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject individual that hasn\'t submitted information', async () => {
-      const user = await TestStripeAccounts.createIndividualMissingIndividualDetails()
+      const user = await TestStripeAccounts.createIndividualMissingIndividualDetails('DE')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -118,7 +116,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should present the form (company)', async () => {
-      const user = await TestStripeAccounts.createCompanyReadyForSubmission('SE')
+      const user = await TestStripeAccounts.createCompanyReadyForSubmission('BE')
       const req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session

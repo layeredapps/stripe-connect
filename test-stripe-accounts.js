@@ -1,24 +1,236 @@
+const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect')
+const path = require('path')
 const TestHelper = require('./test-helper.js')
 const testData = require('./test-data.json')
+const util = require('util')
 
-module.exports = {
+async function waitForPersonField (user, personType, field) {
+  Log.info('wait for person field', field, user[personType].personid)
+  const person = user[personType].stripeObject
+  const stripeAccount = user.stripeAccount.stripeObject
+  const personRequirements = person.requirements.currently_due.concat(person.requirements.eventually_due)
+  if (personRequirements.indexOf(field) === -1) {
+    await waitForWebhook('person.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== person.id) {
+        return false
+      }
+      const personRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      if (field === false) {
+        if (!personRequirements.length) {
+          return true
+        }
+        let invalid = false
+        for (const field of personRequirements) {
+          if (field.startsWith('tos_acceptance')) {
+            continue
+          }
+          invalid = true
+          break
+        }
+        return !invalid
+      }
+      return personRequirements.indexOf(field) > -1
+    })
+  }
+  Log.info('wait for account to sync field', field, user[personType].personid)
+  const accountRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+  if (accountRequirements.indexOf(`${person.id}.${field}`) === -1) {
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== stripeAccount.id) {
+        return false
+      }
+      const accountRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      if (field === false) {
+        if (!accountRequirements.length) {
+          return true
+        }
+        let invalid = false
+        for (const field of accountRequirements) {
+          if (field.startsWith('tos_acceptance')) {
+            continue
+          }
+          invalid = true
+          break
+        }
+        return !invalid
+      }
+      return accountRequirements.indexOf(`${person.id}.${field}`) > -1
+    })
+  }
+  user[personType] = await global.api.administrator.connect.Person.get({
+    query: {
+      personid: person.id
+    }
+  })
+  user.stripeAccount = await global.api.administrator.connect.StripeAccount.get({
+    query: {
+      stripeid: stripeAccount.id
+    }
+  })
+}
+
+async function waitForPersonFieldToLeave (user, personType, field) {
+  Log.info('wait for person field to leave', field)
+  const person = user[personType].stripeObject
+  const stripeAccount = user.stripeAccount.stripeObject
+  const personRequirements = person.requirements.currently_due.concat(person.requirements.eventually_due)
+  if (personRequirements.indexOf(field) > -1) {
+    await waitForWebhook('person.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== person.id) {
+        return false
+      }
+      const personRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      return personRequirements.indexOf(field) === -1
+    })
+  }
+  const accountRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+  if (accountRequirements.indexOf(`${person.id}.${field}`) > -1) {
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== stripeAccount.id) {
+        return false
+      }
+      const accountRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      return accountRequirements.indexOf(`${person.id}.${field}`) === -1
+    })
+  }
+  user[personType] = await global.api.administrator.connect.Person.get({
+    query: {
+      personid: person.id
+    }
+  })
+  user.stripeAccount = await global.api.administrator.connect.StripeAccount.get({
+    query: {
+      stripeid: stripeAccount.id
+    }
+  })
+}
+
+async function waitForAccountField (user, field) {
+  Log.info('wait for account field', field)
+  const stripeAccount = user.stripeAccount.stripeObject
+  const accountRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+  if (accountRequirements.indexOf(field) === -1) {
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== stripeAccount.id) {
+        return false
+      }
+      const accountRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      if (field === false) {
+        if (!accountRequirements.length) {
+          return true
+        }
+        let invalid = false
+        for (const field of accountRequirements) {
+          if (field.startsWith('tos_acceptance')) {
+            continue
+          }
+          invalid = true
+          break
+        }
+        return !invalid
+      }
+      return accountRequirements.indexOf(field) > -1
+    })
+  }
+  user.stripeAccount = await global.api.administrator.connect.StripeAccount.get({
+    query: {
+      stripeid: stripeAccount.id
+    }
+  })
+}
+
+async function waitForAccountFieldToLeave (user, field) {
+  Log.info('wait for account field to leave', field)
+  const stripeAccount = user.stripeAccount.stripeObject
+  const accountRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+  if (accountRequirements.indexOf(field) > -1) {
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      if (stripeEvent.data.object.id !== stripeAccount.id) {
+        return false
+      }
+      const accountRequirements = stripeEvent.data.object.requirements.currently_due.concat(stripeEvent.data.object.requirements.eventually_due)
+      return accountRequirements.indexOf(field) === -1
+    })
+  }
+  user.stripeAccount = await global.api.administrator.connect.StripeAccount.get({
+    query: {
+      stripeid: stripeAccount.id
+    }
+  })
+}
+
+const waitForWebhook = util.promisify((webhookType, matching, callback) => {
+  Log.info('waitForWebhook', webhookType)
+  async function wait () {
+    if (global.testEnded) {
+      return
+    }
+    if (!global.webhooks || !global.webhooks.length) {
+      return setTimeout(wait, 1000)
+    }
+    for (const received of global.webhooks) {
+      if (received.type !== webhookType) {
+        continue
+      }
+      if (matching(received)) {
+        return callback()
+      }
+    }
+    return setTimeout(wait, 1000)
+  }
+  return setTimeout(wait, 1000)
+})
+
+const TestStripeAccounts = module.exports = {
+  'success_id_scan_front.png': {
+    filename: 'id_scan_front.png',
+    name: 'id_scan_front.png',
+    path: path.join(__dirname, '/test-documentid-success.png')
+  },
+  'fail_id_scan_front.png': {
+    filename: 'id_scan_front.png',
+    name: 'id_scan_front.png',
+    path: path.join(__dirname, '/test-documentid-failed.png')
+  },
+  'success_id_scan_back.png': {
+    filename: 'id_scan_back.png',
+    name: 'id_scan_back.png',
+    path: path.join(__dirname, '/test-documentid-success.png')
+  },
+  'fail_id_scan_back.png': {
+    filename: 'id_scan_back.png',
+    name: 'id_scan_back.png',
+    path: path.join(__dirname, '/test-documentid-failed.png')
+  },
+  waitForAccountField,
+  waitForAccountFieldToLeave,
+  waitForPersonField,
+  waitForPersonFieldToLeave,
+  waitForWebhook,
   createAccountData,
+  createAccountUploadData,
   createBankingData,
   createPersonData,
-  createUploadData,
+  createPersonUploadData,
   createSubmittedIndividual: async (country, existingUser) => {
     country = country || 'US'
     global.webhooks = []
-    const user = await module.exports.createIndividualReadyForSubmission(country, existingUser)
+    const user = await TestStripeAccounts.createIndividualReadyForSubmission(country, existingUser)
     await TestHelper.submitStripeAccount(user)
-    await TestHelper.waitForPayoutsEnabled(user)
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.stripeAccount.stripeid &&
+             stripeEvent.data.object.payouts_enabled === true
+    })
     return user
   },
   createSubmittedCompany: async (country, existingUser) => {
     country = country || 'US'
-    const user = await module.exports.createCompanyReadyForSubmission(country, existingUser)
+    const user = await TestStripeAccounts.createCompanyReadyForSubmission(country, existingUser)
     await TestHelper.submitStripeAccount(user)
-    await TestHelper.waitForPayoutsEnabled(user)
+    await waitForWebhook('account.updated', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.stripeAccount.stripeid &&
+             stripeEvent.data.object.payouts_enabled === true
+    })
     return user
   },
   createIndividualReadyForSubmission: async (country, existingUser) => {
@@ -28,17 +240,21 @@ module.exports = {
       country: country,
       business_type: 'individual'
     })
-    await TestHelper.waitForCurrentlyDueFields(user, 'individual.dob.day')
+    await waitForAccountField(user, 'individual.dob.day')
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
     await TestHelper.updateStripeAccount(user, accountData)
+    await waitForAccountFieldToLeave(user, 'individual.dob.day')
+    await waitForAccountField(user, 'external_account')
     const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
     await TestHelper.createExternalAccount(user, bankingData)
+    await waitForAccountFieldToLeave(user, 'external_account')
     if (country !== 'US') {
-      await TestHelper.waitForCurrentlyDueFields(user, 'individual.verification.document')
-      const uploadData = createUploadData(user.stripeAccount.stripeObject)
+      await waitForAccountField(user, 'individual.verification.document')
+      const uploadData = createAccountUploadData(user.stripeAccount.stripeObject)
       await TestHelper.updateStripeAccount(user, {}, uploadData)
+      await waitForAccountFieldToLeave(user, 'individual.verification.document')
     }
-    await TestHelper.waitForCurrentlyDueFields(user, false)
+    await waitForAccountField(user, false)
     return user
   },
   createCompanyReadyForSubmission: async (country, existingUser) => {
@@ -53,43 +269,52 @@ module.exports = {
       await TestHelper.updateStripeAccount(user, accountData)
     }
     await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_executive': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': '0'
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
     })
-    await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'first_name')
+    await waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    global.webhooks = []
+    await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
-    await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `representative.`)
-    await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `${user.representative.personid}.`)
-    // await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', 'verification_document')
-    const representativeUploadData = createUploadData(user.representative.stripeObject)
-    if (representativeUploadData) {
-      await TestHelper.updatePerson(user, user.representative, {}, representativeUploadData)
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'representative', false)
+    await waitForPersonField(user, 'representative', 'verification.document')
+    global.webhooks = []
+    const uploadData = createPersonUploadData(user.representative.stripeObject)
+    if (uploadData && Object.keys(uploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+      await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+      global.webhooks = []
     }
     if (user.stripeAccount.requiresOwners) {
+      await waitForAccountField(user, 'company.owners_provided')
       await TestHelper.submitCompanyOwners(user)
-      await TestHelper.waitForVerificationFieldsToLeave(user, 'relationship_owner')
+      await waitForAccountFieldToLeave(user, 'company.owners_provided')
     }
     if (user.stripeAccount.requiresDirectors) {
+      await waitForAccountField(user, 'company.directors_provided')
       await TestHelper.submitCompanyDirectors(user)
-      await TestHelper.waitForVerificationFieldsToLeave(user, 'relationship_director')
+      await waitForAccountFieldToLeave(user, 'company.directors_provided')
     }
     if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
       await TestHelper.submitCompanyExecutives(user)
-      await TestHelper.waitForVerificationFieldsToLeave(user, 'relationship_executive')
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
     }
     const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
     if (bankingData) {
       await TestHelper.createExternalAccount(user, bankingData)
+      await waitForAccountFieldToLeave(user, 'external_account')
     }
-    const uploadData = createUploadData(user.stripeAccount.stripeObject)
-    if (uploadData && Object.keys(uploadData).length) {
-      await TestHelper.updateStripeAccount(user, {}, uploadData)
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.waitForCurrentlyDueFields(user, false)
+    await waitForAccountField(user, false)
     return user
   },
   createCompanyWithOwners: async (country, numOwners, existingUser) => {
@@ -102,9 +327,9 @@ module.exports = {
     if (numOwners && user.stripeAccount.requiresOwners) {
       for (let i = 0, len = numOwners; i < len; i++) {
         await TestHelper.createPerson(user, {
-          'relationship_owner': true,
-          'relationship_title': 'Shareholder',
-          'relationship_percent_ownership': (i + 1)
+          relationship_owner: true,
+          relationship_title: 'Shareholder',
+          relationship_percent_ownership: (i + 1)
         })
       }
     }
@@ -120,9 +345,9 @@ module.exports = {
     if (numDirectors && user.stripeAccount.requiresDirectors) {
       for (let i = 0, len = numDirectors; i < len; i++) {
         await TestHelper.createPerson(user, {
-          'relationship_director': true,
-          'relationship_title': 'Director',
-          'relationship_percent_ownership': '0'
+          relationship_director: true,
+          relationship_title: 'Director',
+          relationship_percent_ownership: '0'
         })
       }
     }
@@ -138,9 +363,9 @@ module.exports = {
     if (numExecutives && user.stripeAccount.requiresExecutives) {
       for (let i = 0, len = numExecutives; i < len; i++) {
         await TestHelper.createPerson(user, {
-          'relationship_executive': true,
-          'relationship_title': 'VP',
-          'relationship_percent_ownership': '0'
+          relationship_executive: 'true',
+          relationship_title: 'VP',
+          relationship_percent_ownership: '0'
         })
       }
     }
@@ -153,14 +378,23 @@ module.exports = {
       country: country,
       business_type: 'company'
     })
-    await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': 0
+    user.representative = await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: 0
     })
+    const firstNameField = country === 'JP' ? 'first_name_kana' : 'first_name'
+    await waitForPersonField(user, 'representative', firstNameField)
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
-    const representativeUploadData = createUploadData(user.representative.stripeObject)
-    await TestHelper.updatePerson(user, user.representative, representativeData, representativeUploadData)
+    await TestHelper.updatePerson(user, user.representative, representativeData)
+    await waitForPersonFieldToLeave(user, 'representative', firstNameField)
+    await waitForPersonField(user, 'representative', 'verification.document')
+    const uploadData = createPersonUploadData(user.representative.stripeObject)
+    if (uploadData && Object.keys(uploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+      await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+    }
     return user
   },
   createCompanyMissingRepresentative: async (country, existingUser) => {
@@ -170,20 +404,32 @@ module.exports = {
       country: country,
       business_type: 'company'
     })
-    const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
-    await TestHelper.updateStripeAccount(user, accountData, createUploadData(user.stripeAccount.stripeObject))
+    global.webhooks = []
     if (user.stripeAccount.requiresOwners) {
+      await waitForAccountField(user, 'company.owners_provided')
       await TestHelper.submitCompanyOwners(user)
+      await waitForAccountFieldToLeave(user, 'company.owners_provided')
     }
     if (user.stripeAccount.requiresDirectors) {
+      await waitForAccountField(user, 'company.directors_provided')
       await TestHelper.submitCompanyDirectors(user)
+      await waitForAccountFieldToLeave(user, 'company.directors_provided')
     }
     if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
       await TestHelper.submitCompanyExecutives(user)
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
     }
     const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
-    await TestHelper.createExternalAccount(user, bankingData)
-    await TestHelper.updateStripeAccount(user, {}, createUploadData(user.stripeAccount.stripeObject))
+    if (bankingData) {
+      await TestHelper.createExternalAccount(user, bankingData)
+      await waitForAccountFieldToLeave(user, 'external_account')
+    }
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
+    }
     return user
   },
   createCompanyMissingPaymentDetails: async (country, existingUser) => {
@@ -194,33 +440,50 @@ module.exports = {
       business_type: 'company'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
-    await TestHelper.updateStripeAccount(user, accountData, createUploadData(user.stripeAccount.stripeObject))
+    await TestHelper.updateStripeAccount(user, accountData)
     await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_executive': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': 0
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: 0
     })
+    await waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    global.webhooks = []
+    await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
-    await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `representative.first_name`)
-    await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `${user.representative.personid}.first_name`)
-    const uploadData = createUploadData(user.stripeAccount.stripeObject)
-    if (uploadData && Object.keys(uploadData).length) {
-      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
-      await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `representative.`)
-      await TestHelper.waitForCurrentlyDueFieldsToLeave(user, `${user.representative.personid}.`)
+    if (country !== 'US') {
+      await waitForPersonField(user, 'representative', 'verification.document')
+      global.webhooks = []
+      const uploadData = createPersonUploadData(user.representative.stripeObject)
+      if (uploadData && Object.keys(uploadData).length) {
+        await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+        await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+        global.webhooks = []
+      }
     }
     if (user.stripeAccount.requiresOwners) {
+      await waitForAccountField(user, 'company.owners_provided')
       await TestHelper.submitCompanyOwners(user)
+      await waitForAccountFieldToLeave(user, 'company.owners_provided')
     }
     if (user.stripeAccount.requiresDirectors) {
+      await waitForAccountField(user, 'company.directors_provided')
       await TestHelper.submitCompanyDirectors(user)
+      await waitForAccountFieldToLeave(user, 'company.directors_provided')
     }
     if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
       await TestHelper.submitCompanyExecutives(user)
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
     }
-    await TestHelper.updateStripeAccount(user, {}, createUploadData(user.stripeAccount.stripeObject))
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
+    }
     return user
   },
   createCompanyMissingOwners: async (country, existingUser) => {
@@ -230,26 +493,51 @@ module.exports = {
       country: country,
       business_type: 'company'
     })
-    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
-    await TestHelper.createExternalAccount(user, bankingData)
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
-    await TestHelper.updateStripeAccount(user, accountData, createUploadData(user.stripeAccount.stripeObject))
+    if (accountData) {
+      await TestHelper.updateStripeAccount(user, accountData)
+    }
     await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_executive': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': 0
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
     })
+    await waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    global.webhooks = []
+    await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
-    const representativeUploadData = createUploadData(user.representative.stripeObject)
-    await TestHelper.updatePerson(user, user.representative, representativeData, representativeUploadData)
+    await TestHelper.updatePerson(user, user.representative, representativeData)
+    await waitForPersonField(user, 'representative', 'verification.document')
+    global.webhooks = []
+    const uploadData = createPersonUploadData(user.representative.stripeObject)
+    if (uploadData && Object.keys(uploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+      await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+      global.webhooks = []
+    }
     if (user.stripeAccount.requiresDirectors) {
+      await waitForAccountField(user, 'company.directors_provided')
       await TestHelper.submitCompanyDirectors(user)
+      await waitForAccountFieldToLeave(user, 'company.directors_provided')
     }
     if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
       await TestHelper.submitCompanyExecutives(user)
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
     }
-    await TestHelper.updateStripeAccount(user, {}, createUploadData(user.stripeAccount.stripeObject))
+    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
+    if (bankingData) {
+      await TestHelper.createExternalAccount(user, bankingData)
+      await waitForAccountFieldToLeave(user, 'external_account')
+    }
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
+    }
     return user
   },
   createCompanyMissingCompanyDetails: async (country, existingUser) => {
@@ -259,25 +547,51 @@ module.exports = {
       country: country,
       business_type: 'company'
     })
-    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
-    await TestHelper.createExternalAccount(user, bankingData)
     await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_executive': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': 0
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
     })
+    await waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    global.webhooks = []
+    await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
-    const representativeUploadData = createUploadData(user.representative.stripeObject)
-    await TestHelper.updatePerson(user, user.representative, representativeData, representativeUploadData)
+    await TestHelper.updatePerson(user, user.representative, representativeData)
+    await waitForPersonField(user, 'representative', 'verification.document')
+    global.webhooks = []
+    const uploadData = createPersonUploadData(user.representative.stripeObject)
+    if (uploadData && Object.keys(uploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+      await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+      global.webhooks = []
+    }
     if (user.stripeAccount.requiresOwners) {
+      await waitForAccountField(user, 'company.owners_provided')
       await TestHelper.submitCompanyOwners(user)
+      await waitForAccountFieldToLeave(user, 'company.owners_provided')
     }
     if (user.stripeAccount.requiresDirectors) {
+      await waitForAccountField(user, 'company.directors_provided')
       await TestHelper.submitCompanyDirectors(user)
+      await waitForAccountFieldToLeave(user, 'company.directors_provided')
     }
     if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
       await TestHelper.submitCompanyExecutives(user)
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
+    }
+    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
+    if (bankingData) {
+      await TestHelper.createExternalAccount(user, bankingData)
+      await waitForAccountFieldToLeave(user, 'external_account')
+    }
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
     return user
   },
@@ -288,23 +602,51 @@ module.exports = {
       country: country,
       business_type: 'company'
     })
-    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
-    await TestHelper.createExternalAccount(user, bankingData)
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
-    await TestHelper.updateStripeAccount(user, accountData, createUploadData(user.stripeAccount.stripeObject))
-    await TestHelper.createPerson(user, {
-      'relationship_representative': 'true',
-      'relationship_executive': 'true',
-      'relationship_title': 'SVP Testing',
-      'relationship_percent_ownership': 0
-    })
-    const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
-    const representativeUploadData = createUploadData(user.representative.stripeObject)
-    await TestHelper.updatePerson(user, user.representative, representativeData, representativeUploadData)
-    if (user.stripeAccount.requiresOwners) {
-      await TestHelper.submitCompanyOwners(user)
+    if (accountData) {
+      await TestHelper.updateStripeAccount(user, accountData)
     }
-    await TestHelper.updateStripeAccount(user, {}, createUploadData(user.stripeAccount.stripeObject))
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    global.webhooks = []
+    await waitForPersonField(user, 'representative', 'first_name')
+    const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
+    await TestHelper.updatePerson(user, user.representative, representativeData)
+    await waitForPersonField(user, 'representative', 'verification.document')
+    global.webhooks = []
+    const uploadData = createPersonUploadData(user.representative.stripeObject)
+    if (uploadData && Object.keys(uploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, uploadData)
+      await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+      global.webhooks = []
+    }
+    if (user.stripeAccount.requiresOwners) {
+      await waitForAccountField(user, 'company.owners_provided')
+      await TestHelper.submitCompanyOwners(user)
+      await waitForAccountFieldToLeave(user, 'company.owners_provided')
+    }
+    if (user.stripeAccount.requiresExecutives) {
+      await waitForAccountField(user, 'company.executives_provided')
+      await TestHelper.submitCompanyExecutives(user)
+      await waitForAccountFieldToLeave(user, 'company.executives_provided')
+    }
+    const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
+    if (bankingData) {
+      await TestHelper.createExternalAccount(user, bankingData)
+      await waitForAccountFieldToLeave(user, 'external_account')
+    }
+    const companyUploadFiles = createAccountUploadData(user.stripeAccount.stripeObject)
+    if (companyUploadFiles && Object.keys(companyUploadFiles).length) {
+      await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
+      await waitForAccountFieldToLeave(user, 'company.verification.document')
+    }
     return user
   },
   createIndividualMissingPaymentDetails: async (country, existingUser) => {
@@ -315,7 +657,7 @@ module.exports = {
       business_type: 'individual'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
-    await TestHelper.updateStripeAccount(user, accountData, createUploadData(user.stripeAccount.stripeObject))
+    await TestHelper.updateStripeAccount(user, accountData, createAccountUploadData(user.stripeAccount.stripeObject))
     return user
   },
   createIndividualMissingIndividualDetails: async (country, existingUser) => {
@@ -331,19 +673,60 @@ module.exports = {
   }
 }
 
-function createUploadData (stripeAccountOrPerson) {
+function createAccountUploadData (stripeAccountOrPerson) {
   const requirements = stripeAccountOrPerson.requirements.currently_due.concat(stripeAccountOrPerson.requirements.eventually_due)
   const payload = {}
   for (const field of requirements) {
     const pseudonym = field.split('.').join('_')
     switch (field) {
-      case 'verification.document':
-      case 'verification.additional_document':
       case 'individual.verification.document':
       case 'individual.verification.additional_document':
-        payload[`${pseudonym}_front`] = TestHelper['success_id_scan_front.png']
-        payload[`${pseudonym}_back`] = TestHelper['success_id_scan_back.png']
+      case 'company.verification.document':
+        payload[`${pseudonym}_front`] = TestStripeAccounts['success_id_scan_front.png']
+        payload[`${pseudonym}_back`] = TestStripeAccounts['success_id_scan_back.png']
         continue
+    }
+  }
+  if (Object.keys(payload).length) {
+    return payload
+  }
+}
+
+function createPersonUploadData (stripeAccountOrPerson, person) {
+  const requirements = stripeAccountOrPerson.requirements.currently_due.concat(stripeAccountOrPerson.requirements.eventually_due)
+  const payload = {}
+  for (const field of requirements) {
+    if (field.startsWith('person_')) {
+      const trimmed = field.substring(field.indexOf('.') + 1)
+      const pseudonym = trimmed.split('.').join('_')
+      switch (trimmed) {
+        case 'verification.document':
+        case 'verification.additional_document':
+          payload[`${pseudonym}_front`] = TestStripeAccounts['success_id_scan_front.png']
+          payload[`${pseudonym}_back`] = TestStripeAccounts['success_id_scan_back.png']
+          continue
+      }
+    }
+    const pseudonym = field.split('.').join('_')
+    switch (field) {
+      case 'verification.document':
+      case 'verification.additional_document':
+        payload[`${pseudonym}_front`] = TestStripeAccounts['success_id_scan_front.png']
+        payload[`${pseudonym}_back`] = TestStripeAccounts['success_id_scan_back.png']
+        continue
+    }
+  }
+  if (person) {
+    const requirements2 = person.requirements.currently_due.concat(person.requirements.eventually_due)
+    for (const field of requirements2) {
+      const pseudonym = field.split('.').join('_')
+      switch (field) {
+        case 'verification.document':
+        case 'verification.additional_document':
+          payload[`${pseudonym}_front`] = TestStripeAccounts['success_id_scan_front.png']
+          payload[`${pseudonym}_back`] = TestStripeAccounts['success_id_scan_back.png']
+          continue
+      }
     }
   }
   if (Object.keys(payload).length) {
@@ -374,7 +757,7 @@ function createAccountData (identity, country, stripeAccount, prefilled) {
     }
     switch (field) {
       case 'business_profile.mcc':
-        payload[pseudonym] = prefilled[field] || testData.mcc[Math.floor(Math.random() * testData.mcc.length)].code
+        payload[pseudonym] = prefilled[field] || testData.mcc[Math.floor(Math.random() * testData.mcc.length)].code.toString()
         continue
       case 'business_profile.product_description':
         payload[pseudonym] = prefilled[field] || 'test product description'
@@ -432,7 +815,11 @@ function createAccountData (identity, country, stripeAccount, prefilled) {
         // TODO: required by SG, unsure if requires value
         continue
       case 'individual.id_number':
-        payload[pseudonym] = prefilled[field] || '00000000000'
+        if (country === 'HK') {
+          payload[pseudonym] = prefilled[field] || 'AA000000A'
+        } else {
+          payload[pseudonym] = prefilled[field] || '00000000000'
+        }
         continue
       case 'individual.political_exposure':
         payload[pseudonym] = prefilled[field] || 'existing'
@@ -537,7 +924,11 @@ function createPersonData (identity, country, person, prefilled) {
         // TODO: required by SG, unsure if requires value
         continue
       case 'id_number':
-        payload[pseudonym] = prefilled[field] || '00000000000'
+        if (country === 'HK') {
+          payload[pseudonym] = prefilled[field] || 'AA000000A'
+        } else {
+          payload[pseudonym] = prefilled[field] || '00000000000'
+        }
         continue
       case 'political_exposure':
         payload[pseudonym] = prefilled[field] || 'existing'

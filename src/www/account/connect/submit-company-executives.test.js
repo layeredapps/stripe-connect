@@ -105,8 +105,8 @@ describe('/account/connect/submit-company-executives', function () {
       const user = await TestStripeAccounts.createCompanyWithExecutives('DE', 1)
       const executiveData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.executive.stripeObject)
       const documents = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       }
       await TestHelper.updatePerson(user, user.executive, executiveData, documents)
       const req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
@@ -123,16 +123,17 @@ describe('/account/connect/submit-company-executives', function () {
     it('should submit executives (screenshots)', async () => {
       const user = await TestStripeAccounts.createCompanyWithExecutives('DE', 1)
       const executiveData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.executive.stripeObject)
-      const documents = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png'],
-        verification_additional_document_back: TestHelper['success_id_scan_back.png'],
-        verification_additional_document_front: TestHelper['success_id_scan_front.png']
-      }
+      await TestStripeAccounts.waitForPersonField(user, 'executive', 'first_name')
       await TestHelper.updatePerson(user, user.executive, executiveData)
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'executive', 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'executive', 'verification.document')
+      const documents = {
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png']
+      }
       await TestHelper.updatePerson(user, user.executive, {}, documents)
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'executive', false)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'executive', 'verification.document')
       const req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session

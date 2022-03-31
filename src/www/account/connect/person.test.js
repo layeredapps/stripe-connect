@@ -51,7 +51,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show person is representative', async () => {
-      const user = await TestStripeAccounts.createCompanyWithRepresentative()
+      const user = await TestStripeAccounts.createCompanyWithRepresentative('DE')
       const req = TestHelper.createRequest(`/account/connect/person?personid=${user.representative.personid}`)
       req.account = user.account
       req.session = user.session

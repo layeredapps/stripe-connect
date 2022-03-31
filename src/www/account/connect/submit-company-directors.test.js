@@ -105,8 +105,8 @@ describe('/account/connect/submit-company-directors', function () {
       const user = await TestStripeAccounts.createCompanyWithDirectors('DE', 1)
       const directorData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.director.stripeObject)
       const documents = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       }
       await TestHelper.updatePerson(user, user.director, directorData, documents)
       const req = TestHelper.createRequest(`/account/connect/submit-company-directors?stripeid=${user.stripeAccount.stripeid}`)
@@ -124,8 +124,8 @@ describe('/account/connect/submit-company-directors', function () {
       const user = await TestStripeAccounts.createCompanyWithDirectors('DE', 1)
       const directorData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.director.stripeObject)
       const documents = {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png']
       }
       await TestHelper.updatePerson(user, user.director, directorData, documents)
       const req = TestHelper.createRequest(`/account/connect/submit-company-directors?stripeid=${user.stripeAccount.stripeid}`)

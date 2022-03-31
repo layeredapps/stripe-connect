@@ -219,7 +219,7 @@ describe('/api/user/connect/create-person', () => {
         assert.strictEqual(errorMessage, 'invalid-relationship_title')
       })
 
-      it('invalid posted relationship.title', async () => {
+      it('invalid posted relationship_title', async () => {
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -251,7 +251,7 @@ describe('/api/user/connect/create-person', () => {
   })
 
   describe('receives', () => {
-    it('optional posted relationship.representative', async () => {
+    it('optional posted relationship_representative', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'US',
@@ -269,7 +269,7 @@ describe('/api/user/connect/create-person', () => {
       assert.strictEqual(person.stripeObject.relationship.representative, true)
     })
 
-    it('optionally-required posted relationship.executive', async () => {
+    it('optionally-required posted relationship_executive', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'FR',
@@ -287,7 +287,7 @@ describe('/api/user/connect/create-person', () => {
       assert.strictEqual(person.stripeObject.relationship.executive, true)
     })
 
-    it('optional posted relationship.director', async () => {
+    it('optional posted relationship_director', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'GB',
@@ -305,7 +305,7 @@ describe('/api/user/connect/create-person', () => {
       assert.strictEqual(person.stripeObject.relationship.director, true)
     })
 
-    it('optional posted relationship.owner', async () => {
+    it('optional posted relationship_owner', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'GB',
@@ -323,7 +323,7 @@ describe('/api/user/connect/create-person', () => {
       assert.strictEqual(person.stripeObject.relationship.owner, true)
     })
 
-    it('required posted relationship.percent_ownership', async () => {
+    it('required posted relationship_percent_ownership', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'GB',
@@ -341,7 +341,7 @@ describe('/api/user/connect/create-person', () => {
       assert.strictEqual(person.stripeObject.relationship.percent_ownership, 0.1)
     })
 
-    it('required posted relationship.title', async () => {
+    it('required posted relationship_title', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
         country: 'GB',

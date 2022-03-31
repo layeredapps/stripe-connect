@@ -96,19 +96,15 @@ describe('/account/connect/submit-company-owners', function () {
       const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
       const ownerData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.owner.stripeObject)
       await TestHelper.updatePerson(user, user.owner, ownerData)
-      await TestHelper.waitForAccountRequirement(user, `${user.owner.personid}.verification.document`)
-      await TestHelper.waitForPersonRequirement(user, user.owner.personid, 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.additional_document')
       await TestHelper.updatePerson(user, user.owner, null, {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png']
       })
-      await TestHelper.waitForAccountRequirement(user, `${user.owner.personid}.verification.additional_document`)
-      await TestHelper.waitForPersonRequirement(user, user.owner.personid, 'verification.additional_document')
-      await TestHelper.updatePerson(user, user.owner, null, {
-        verification_additional_document_back: TestHelper['success_id_scan_back.png'],
-        verification_additional_document_front: TestHelper['success_id_scan_front.png']
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'owner', false)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'owner', 'verification.document')
       const req = TestHelper.createRequest(`/account/connect/submit-company-owners?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
@@ -124,19 +120,15 @@ describe('/account/connect/submit-company-owners', function () {
       const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
       const ownerData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.owner.stripeObject)
       await TestHelper.updatePerson(user, user.owner, ownerData)
-      await TestHelper.waitForAccountRequirement(user, `${user.owner.personid}.verification.document`)
-      await TestHelper.waitForPersonRequirement(user, user.owner.personid, 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.document')
+      await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.additional_document')
       await TestHelper.updatePerson(user, user.owner, null, {
-        verification_document_back: TestHelper['success_id_scan_back.png'],
-        verification_document_front: TestHelper['success_id_scan_front.png']
+        verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png'],
+        verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png']
       })
-      await TestHelper.waitForAccountRequirement(user, `${user.owner.personid}.verification.additional_document`)
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'owner', 'verification.additional_document')
-      await TestHelper.updatePerson(user, user.owner, null, {
-        verification_additional_document_back: TestHelper['success_id_scan_back.png'],
-        verification_additional_document_front: TestHelper['success_id_scan_front.png']
-      })
-      await TestHelper.waitForPersonCurrentlyDueFields(user, 'owner', false)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'owner', 'verification.document')
       const req = TestHelper.createRequest(`/account/connect/submit-company-owners?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session

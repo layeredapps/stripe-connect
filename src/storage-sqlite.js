@@ -19,8 +19,9 @@ module.exports = async () => {
   class CountrySpec extends Model {}
   CountrySpec.init({
     countryid: {
-      type: DataTypes.STRING,
-      primaryKey: true
+      type: DataTypes.STRING(2),
+      primaryKey: true,
+      allowNull: false
     },
     object: {
       type: DataTypes.VIRTUAL,
@@ -47,8 +48,9 @@ module.exports = async () => {
   class Person extends Model {}
   Person.init({
     personid: {
-      type: DataTypes.STRING,
-      primaryKey: true
+      type: DataTypes.STRING(32),
+      primaryKey: true,
+      allowNull: false
     },
     object: {
       type: DataTypes.VIRTUAL,
@@ -56,9 +58,9 @@ module.exports = async () => {
         return 'person'
       }
     },
-    accountid: DataTypes.UUID,
+    accountid: DataTypes.STRING(32),
     stripeid: DataTypes.TEXT,
-    token: DataTypes.TEXT,
+    tokenUpdate: DataTypes.DATE,
     stripeObject: {
       type: DataTypes.TEXT,
       get () {
@@ -78,8 +80,9 @@ module.exports = async () => {
   class StripeAccount extends Model {}
   StripeAccount.init({
     stripeid: {
-      type: DataTypes.STRING,
-      primaryKey: true
+      type: DataTypes.STRING(32),
+      primaryKey: true,
+      allowNull: false
     },
     object: {
       type: DataTypes.VIRTUAL,
@@ -87,7 +90,8 @@ module.exports = async () => {
         return 'stripeAccount'
       }
     },
-    accountid: DataTypes.UUID,
+    accountid: DataTypes.STRING(32),
+    tokenUpdate: DataTypes.DATE,
     stripeObject: {
       type: DataTypes.TEXT,
       get () {
@@ -117,8 +121,9 @@ module.exports = async () => {
   class Payout extends Model {}
   Payout.init({
     payoutid: {
-      type: DataTypes.STRING,
-      primaryKey: true
+      type: DataTypes.STRING(32),
+      primaryKey: true,
+      allowNull: false
     },
     object: {
       type: DataTypes.VIRTUAL,
@@ -138,13 +143,13 @@ module.exports = async () => {
         this.setDataValue('stripeObject', JSON.stringify(value))
       }
     },
-    accountid: DataTypes.UUID,
+    accountid: DataTypes.STRING(32),
     stripeid: DataTypes.TEXT
   }, {
     sequelize,
     modelName: 'payout'
   })
-  await sequelize.sync()
+  await sequelize.sync({ force: true, alter: true })
   return {
     sequelize,
     flush: async () => {

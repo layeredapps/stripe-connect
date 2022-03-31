@@ -57,7 +57,7 @@ module.exports = {
       personInfo.relationship.representative = true
     }
     if (req.body.relationship_executive === 'true') {
-      if (!stripeAccount.requiresExecutives) {
+      if (!personInfo.relationship.representative && !stripeAccount.requiresExecutives) {
         throw new Error('invalid-stripe-account')
       }
       personInfo.relationship.executive = req.body.relationship_executive || false

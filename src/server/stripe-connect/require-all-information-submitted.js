@@ -11,7 +11,7 @@ module.exports = {
       req.urlPath.startsWith('/account/') ||
       req.urlPath.startsWith('/administrator/') ||
       req.urlPath.startsWith('/api/')) {
-    return
+      return
     }
     const queryWas = req.query
     req.query = {

@@ -48,58 +48,58 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { individual_dob_day: '-1', individual_dob_month: '1', individual_dob_year: 2000 }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_dob_day'] = error.message
       }
       req.body = { individual_dob_day: '', individual_dob_month: '-1', individual_dob_year: 2000 }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['missing-individual_dob_day'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '-1', individual_dob_year: 2000 }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_dob_month'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '', individual_dob_year: 2000 }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['missing-individual_dob_month'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '1', individual_dob_year: 'invalid' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_dob_year'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '1', individual_dob_year: '' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['missing-individual_dob_year'] = error.message
       }
       // invalid individual email
       req.body = { individual_email: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_email'] = error.message
       }
       // invalid individual phone
       req.body = { individual_phone: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_phone'] = error.message
       }
       // invalid individual country
       req.body = { individual_address_country: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_address_country'] = error.message
       }
@@ -113,7 +113,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { individual_address_state: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_address_state'] = error.message
       }
@@ -127,14 +127,14 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { individual_id_number: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_id_number'] = error.message
       }
       // political exposure
       req.body = { individual_political_exposure: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_political_exposure'] = error.message
       }
@@ -146,9 +146,9 @@ describe('/api/user/connect/update-stripe-account', function () {
       req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      req.body = { individual_nationalite: '-1' }
+      req.body = { individual_nationality: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_nationality'] = error.message
       }
@@ -162,7 +162,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { individual_ssn_last_4: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_ssn_last_4'] = error.message
       }
@@ -176,7 +176,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { company_address_state: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_state'] = error.message
       }
@@ -190,14 +190,14 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { company_address_country: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_country'] = error.message
       }
       // invalid company registration number
       req.body = { individual_registration_number: '-1' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-individual_registration_number'] = error.message
       }
@@ -212,37 +212,37 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { company_address_kana_city: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kana_city'] = error.message
       }
       req.body = { company_address_kana_line1: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kana_line1'] = error.message
       }
       req.body = { company_address_kana_postal_code: 'invalid' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kana_postal_code'] = error.message
       }
       req.body = { company_address_kana_state: 'x', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kana_state'] = error.message
       }
       req.body = { company_address_kana_town: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kana_town'] = error.message
       }
       req.body = { company_name_kana: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_name_kana'] = error.message
       }
@@ -253,37 +253,37 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user.session
       req.body = { company_address_kanji_city: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kanji_city'] = error.message
       }
       req.body = { company_address_kanji_line1: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kanji_line1'] = error.message
       }
       req.body = { company_address_kanji_postal_code: 'invalid' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kanji_postal_code'] = error.message
       }
       req.body = { company_address_kanji_state: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kanji_state'] = error.message
       }
       req.body = { company_address_kanji_town: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_address_kanji_town'] = error.message
       }
       req.body = { company_name_kanji: 'invalid' }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults['invalid-company_name_kanji'] = error.message
       }
@@ -294,7 +294,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user2.session
       req.body = { email: 'email@address.com' }
       try {
-        await req.patch(req)
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults.invalidAccount = error.message
       }
@@ -305,7 +305,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req.session = user3.session
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), 'US', user3.stripeAccount.stripeObject)
       try {
-        await req.patch(req)
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults.invalidStripeAccount = error.message
       }
@@ -315,11 +315,16 @@ describe('/api/user/connect/update-stripe-account', function () {
         country: 'GB',
         business_type: 'company'
       })
+      req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
       req.body = {}
+      req.uploads = {
+        company_verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+        company_verification_document_back: TestStripeAccounts['success_id_scan_back.png']
+      }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults.missingToken = error.message
       }
@@ -327,7 +332,7 @@ describe('/api/user/connect/update-stripe-account', function () {
         token: 'xxxx'
       }
       try {
-        await req.patch()
+        await req.route.api.patch(req)
       } catch (error) {
         cachedResults.invalidToken = error.message
       }
@@ -341,7 +346,7 @@ describe('/api/user/connect/update-stripe-account', function () {
         req.body = {}
         let errorMessage
         try {
-          await req.patch(req)
+          await req.patch()
         } catch (error) {
           errorMessage = error.message
         }
@@ -356,7 +361,7 @@ describe('/api/user/connect/update-stripe-account', function () {
         req.body = {}
         let errorMessage
         try {
-          await req.patch(req)
+          await req.patch()
         } catch (error) {
           errorMessage = error.message
         }
@@ -445,14 +450,14 @@ describe('/api/user/connect/update-stripe-account', function () {
     })
 
     describe('invalid-company_address_country', () => {
-      it('invalid posted company_address.country', async () => {
+      it('invalid posted company_address_country', async () => {
         const errorMessage = cachedResults['invalid-company_address_country']
         assert.strictEqual(errorMessage, 'invalid-company_address_country')
       })
     })
 
     describe('invalid-company_address_state', () => {
-      it('invalid posted company_address.state', async () => {
+      it('invalid posted company_address_state', async () => {
         const errorMessage = cachedResults['invalid-company_address_state']
         assert.strictEqual(errorMessage, 'invalid-company_address_state')
       })
@@ -793,19 +798,19 @@ describe('/api/user/connect/update-stripe-account', function () {
       const stripeAccountNow = cachedResponses.company_registration_number
       assert.strictEqual(stripeAccountNow.company.registration_number, '00000000000')
     })
-    it('optionally-required posted company_address.line1', async () => {
+    it('optionally-required posted company_address_line1', async () => {
       const stripeAccountNow = cachedResponses.company_address_line1
       assert.strictEqual(stripeAccountNow.company.address.line1, '123 Park Lane')
     })
-    it('optionally-required posted company_address.city', async () => {
+    it('optionally-required posted company_address_city', async () => {
       const stripeAccountNow = cachedResponses.company_address_city
       assert.strictEqual(stripeAccountNow.company.address.city, 'Vienna')
     })
-    it('optionally-required posted company_address.state', async () => {
+    it('optionally-required posted company_address_state', async () => {
       const stripeAccountNow = cachedResponses.company_address_state
       assert.strictEqual(stripeAccountNow.company.address.state, 'QLD')
     })
-    it('optionally-required posted company_address.postal_code', async () => {
+    it('optionally-required posted company_address_postal_code', async () => {
       const stripeAccountNow = cachedResponses.company_address_postal_code
       assert.strictEqual(stripeAccountNow.company.address.postal_code, '1020')
     })
@@ -892,21 +897,36 @@ describe('/api/user/connect/update-stripe-account', function () {
       global.stripeJS = 3
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
+        country: 'DE',
+        business_type: 'individual'
       })
+      await TestStripeAccounts.waitForAccountField(user, 'individual.first_name')
+      await TestHelper.updateStripeAccount(user, TestStripeAccounts.createAccountData(user.profile, 'DE', user.stripeAccount.stripeObject))
+      await TestStripeAccounts.waitForAccountField(user, 'individual.verification.document')
       const req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      req.body = TestStripeAccounts.createAccountData(user.profile, 'US', user.stripeAccount.stripeObject)
+      req.uploads = TestStripeAccounts.createAccountUploadData(user.stripeAccount.stripeObject)
+      req.waitAfter = async (page) => {
+        while (true) {
+          try {
+            const url = await page.url()
+            if (url.indexOf('message=success') > -1) {
+              break
+            }
+          } catch (error) {
+          }
+          await page.waitForTimeout(100)
+        }
+      }
       await req.post()
       const stripeAccountNow = await global.api.administrator.connect.StripeAccount.get({
         query: {
           stripeid: user.stripeAccount.stripeid
         }
       })
-      assert.strictEqual(user.stripeAccount.stripeObject.metadata.tokenUpdate, undefined)
-      assert.notStrictEqual(stripeAccountNow.stripeObject.metadata.tokenUpdate, undefined)
+      assert.notStrictEqual(stripeAccountNow.tokenUpdate, null)
+      assert.notStrictEqual(stripeAccountNow.tokenUpdate, undefined)
     })
   })
 })

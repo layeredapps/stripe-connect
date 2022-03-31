@@ -1,5 +1,6 @@
 const connect = require('../../../../index.js')
 const dashboard = require('@layeredapps/dashboard')
+const navbar = require('./navbar-stripe-account.js')
 const formatStripeObject = require('../../../stripe-object.js')
 
 module.exports = {
@@ -24,6 +25,7 @@ async function beforeRequest (req) {
 async function renderPage (req, res, messageTemplate) {
   messageTemplate = messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.stripeAccount, 'stripeAccount')
+  navbar.setup(doc, req.data.stripeAccount)
   const removeElements = []
   if (global.stripeJS !== 3) {
     removeElements.push('stripe-v3', 'connect-v3', 'handler-v3')
@@ -40,7 +42,7 @@ async function renderPage (req, res, messageTemplate) {
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
     if (messageTemplate === 'success') {
-      removeElements.push('business-profile-container', 'company-container', 'individual-container')
+      removeElements.push('submit-form')
       for (const id of removeElements) {
         const element = doc.getElementById(id)
         element.parentNode.removeChild(element)
@@ -63,11 +65,11 @@ async function renderPage (req, res, messageTemplate) {
     removeElements.push('company-kana-kanji-container', 'company-address-kana-container', 'company-address-kanji-container')
   }
   if (req.data.stripeAccount.business_type === 'individual') {
-    removeElements.push('company-container')
+    removeElements.push('company-address-container', 'company-container')
   } else {
     removeElements.push('individual-container')
   }
-  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due) 
+  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due)
   let requireAddress = false
   for (const field of requirements) {
     requireAddress = field.indexOf(`${req.data.stripeAccount.business_type}.address`) > -1
@@ -80,7 +82,7 @@ async function renderPage (req, res, messageTemplate) {
   } else {
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.line1`) === -1) {
       removeElements.push(
-        `${req.data.stripeAccount.business_type}_address_line1-container`, 
+        `${req.data.stripeAccount.business_type}_address_line1-container`,
         `${req.data.stripeAccount.business_type}_address_line2-container`
       )
     }
@@ -179,7 +181,7 @@ async function submitForm (req, res) {
   if (req.query && req.query.message === 'success') {
     return renderPage(req, res)
   }
-  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due) 
+  const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due)
   for (const field of requirements) {
     const pseudonym = field.split('.').join('_')
     if (!req.body[pseudonym]) {

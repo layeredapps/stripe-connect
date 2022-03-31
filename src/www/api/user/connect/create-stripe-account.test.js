@@ -42,7 +42,7 @@ describe('/api/user/connect/create-stripe-account', () => {
         req.account = user2.account
         req.session = user2.session
         req.body = {
-          type: '',
+          business_type: '',
           country: 'US'
         }
         let errorMessage
@@ -55,14 +55,14 @@ describe('/api/user/connect/create-stripe-account', () => {
       })
     })
 
-    describe('invalid-type', () => {
-      it('missing posted type', async () => {
+    describe('invalid-business_type', () => {
+      it('missing posted business_type', async () => {
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/create-stripe-account?accountid=${user.account.accountid}`)
         req.account = user.account
         req.session = user.session
         req.body = {
-          type: '',
+          business_type: '',
           country: 'US'
         }
         let errorMessage
@@ -71,16 +71,16 @@ describe('/api/user/connect/create-stripe-account', () => {
         } catch (error) {
           errorMessage = error.message
         }
-        assert.strictEqual(errorMessage, 'invalid-type')
+        assert.strictEqual(errorMessage, 'invalid-business_type')
       })
 
-      it('invalid posted type', async () => {
+      it('invalid posted business_type', async () => {
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/create-stripe-account?accountid=${user.account.accountid}`)
         req.account = user.account
         req.session = user.session
         req.body = {
-          type: 'invalid',
+          business_type: 'invalid',
           country: 'US'
         }
         let errorMessage
@@ -89,7 +89,7 @@ describe('/api/user/connect/create-stripe-account', () => {
         } catch (error) {
           errorMessage = error.message
         }
-        assert.strictEqual(errorMessage, 'invalid-type')
+        assert.strictEqual(errorMessage, 'invalid-business_type')
       })
     })
 

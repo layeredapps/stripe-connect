@@ -35,22 +35,6 @@ describe('/administrator/connect/delete-stripe-account', function () {
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
-
-    it('should present the Stripe account table', async () => {
-      const administrator = await TestHelper.createOwner()
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const req = TestHelper.createRequest(`/administrator/connect/delete-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = administrator.account
-      req.session = administrator.session
-      const result = await req.get()
-      const doc = TestHelper.extractDoc(result.html)
-      const row = doc.getElementById(user.stripeAccount.stripeid)
-      assert.strictEqual(row.tag, 'tr')
-    })
   })
 
   describe('submit', () => {
