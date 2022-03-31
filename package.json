@@ -38,7 +38,6 @@
     "debug": "node main.js --debug-brk=5858",
     "start": "node main.js",
     "test": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js .",
-    "write-tests": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js . > tests.txt",
     "test-sqlite": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js .",
     "test-sqlite-node-cache": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing CACHE=node STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js .",
     "test-sqlite-redis-cache": "npm install sqlite3 redis --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing CACHE=redis STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js .",

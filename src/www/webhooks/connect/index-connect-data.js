@@ -30,9 +30,6 @@ module.exports = {
     if (!stripeEvent) {
       return res.end()
     }
-    if (stripeEvent.data && stripeEvent.data.object && stripeEvent.data.object.id) {
-      await dashboard.StorageCache.remove(stripeEvent.data.object.id)
-    }
     Log.info('stripe event', stripeEvent.type)
     res.statusCode = 200
     switch (stripeEvent.type) {
@@ -62,6 +59,9 @@ module.exports = {
       setTimeout(() => {
         global.webhooks.unshift(stripeEvent)
       }, 20000)
+    }
+    if (stripeEvent.data && stripeEvent.data.object && stripeEvent.data.object.id) {
+      await dashboard.StorageCache.remove(stripeEvent.data.object.id)
     }
     return res.end()
   }
