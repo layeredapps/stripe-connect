@@ -29,7 +29,7 @@ jobs:
         export SCREENSHOT_PATH=`pwd`/documentation/screenshots
         npm install -D --silent --no-audit --no-fund &>/dev/null 
         npm install sqlite3 --silent --no-save --no-audit --no-fund &>/dev/null 
-        ./node_modules/.bin/mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js . 2>&1 | tee tests.txt
+        ./node_modules/.bin/mocha --ignore 'node_modules/**/*' --timeout 960000 --slow 960000 --recursive --extension .test.js . 2>&1 | tee tests.txt
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
           exit 1
