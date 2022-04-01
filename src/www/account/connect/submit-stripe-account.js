@@ -17,7 +17,7 @@ async function beforeRequest (req) {
   if (!stripeAccount) {
     throw new Error('invalid-stripeid')
   }
-  let owners, directors
+  let owners, directors, executives
   if (stripeAccount.business_type === 'company') {
     if (stripeAccount.requiresOwners && !stripeAccount.company.owners_provided) {
       req.error = req.error || 'invalid-company-owners'
@@ -33,6 +33,7 @@ async function beforeRequest (req) {
       const persons = await global.api.user.connect.Persons.get(req)
       owners = []
       directors = []
+      executives = []
       if (!persons || !persons.length) {
         req.error = req.error || 'invalid-company-representative'
       } else {
@@ -48,10 +49,15 @@ async function beforeRequest (req) {
             if (person.requirements.currently_due.length) {
               req.error = req.error || 'invalid-company-owners'
             }
-          } else {
+          } else if (person.relationship.director) {
             directors.push(person)
             if (person.requirements.currently_due.length) {
               req.error = req.error || 'invalid-company-directors'
+            }
+          } else {
+            executives.push(person)
+            if (person.requirements.currently_due.length) {
+              req.error = req.error || 'invalid-company-executives'
             }
           }
         }
@@ -73,7 +79,7 @@ async function beforeRequest (req) {
       }
     }
   }
-  req.data = { stripeAccount, owners, directors }
+  req.data = { stripeAccount, owners, directors, executives }
 }
 
 async function renderPage (req, res, messageTemplate) {
@@ -84,7 +90,7 @@ async function renderPage (req, res, messageTemplate) {
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
     if (messageTemplate === 'success' || req.error) {
-      removeElements.push('submit-form', 'owners-container', 'directors-container')
+      removeElements.push('submit-form', 'owners-container', 'directors-container', 'executives-container')
       for (const id of removeElements) {
         const element = doc.getElementById(id)
         element.parentNode.removeChild(element)
@@ -93,13 +99,16 @@ async function renderPage (req, res, messageTemplate) {
     }
   }
   if (req.data.stripeAccount.business_type !== 'company') {
-    removeElements.push('company-representative-option', 'company-company-owners-option', 'company-directors-option')
+    removeElements.push('company-representative-option', 'company-company-owners-option', 'company-directors-option', 'company-executives-option')
   } else {
     if (req.data.owners && req.data.owners.length) {
-      dashboard.HTML.renderTable(doc, req.data.owners, 'owner-row', 'owners-table')
+      dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
     }
     if (req.data.directors && req.data.directors.length) {
-      dashboard.HTML.renderTable(doc, req.data.directors, 'director-row', 'directors-table')
+      dashboard.HTML.renderTable(doc, req.data.directors, 'person-row', 'directors-table')
+    }
+    if (req.data.executives && req.data.executives.length) {
+      dashboard.HTML.renderTable(doc, req.data.executives, 'person-row', 'executives-table')
     }
   }
   for (const id of removeElements) {

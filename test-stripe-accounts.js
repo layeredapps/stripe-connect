@@ -214,7 +214,6 @@ const TestStripeAccounts = module.exports = {
   createPersonUploadData,
   createSubmittedIndividual: async (country, existingUser) => {
     country = country || 'US'
-    global.webhooks = []
     const user = await TestStripeAccounts.createIndividualReadyForSubmission(country, existingUser)
     await TestHelper.submitStripeAccount(user)
     await waitForWebhook('account.updated', (stripeEvent) => {
@@ -277,17 +276,14 @@ const TestStripeAccounts = module.exports = {
     await waitForWebhook('person.created', (stripeEvent) => {
       return stripeEvent.data.object.id === user.representative.personid
     })
-    global.webhooks = []
     await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
     await waitForPersonField(user, 'representative', 'verification.document')
-    global.webhooks = []
     const uploadData = createPersonUploadData(user.representative.stripeObject)
     if (uploadData && Object.keys(uploadData).length) {
       await TestHelper.updatePerson(user, user.representative, {}, uploadData)
       await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
-      global.webhooks = []
     }
     if (user.stripeAccount.requiresOwners) {
       await waitForAccountField(user, 'company.owners_provided')
@@ -404,7 +400,6 @@ const TestStripeAccounts = module.exports = {
       country: country,
       business_type: 'company'
     })
-    global.webhooks = []
     if (user.stripeAccount.requiresOwners) {
       await waitForAccountField(user, 'company.owners_provided')
       await TestHelper.submitCompanyOwners(user)
@@ -450,18 +445,15 @@ const TestStripeAccounts = module.exports = {
     await waitForWebhook('person.created', (stripeEvent) => {
       return stripeEvent.data.object.id === user.representative.personid
     })
-    global.webhooks = []
     await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
     if (country !== 'US') {
       await waitForPersonField(user, 'representative', 'verification.document')
-      global.webhooks = []
       const uploadData = createPersonUploadData(user.representative.stripeObject)
       if (uploadData && Object.keys(uploadData).length) {
         await TestHelper.updatePerson(user, user.representative, {}, uploadData)
         await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
-        global.webhooks = []
       }
     }
     if (user.stripeAccount.requiresOwners) {
@@ -506,17 +498,14 @@ const TestStripeAccounts = module.exports = {
     await waitForWebhook('person.created', (stripeEvent) => {
       return stripeEvent.data.object.id === user.representative.personid
     })
-    global.webhooks = []
     await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
     await waitForPersonField(user, 'representative', 'verification.document')
-    global.webhooks = []
     const uploadData = createPersonUploadData(user.representative.stripeObject)
     if (uploadData && Object.keys(uploadData).length) {
       await TestHelper.updatePerson(user, user.representative, {}, uploadData)
       await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
-      global.webhooks = []
     }
     if (user.stripeAccount.requiresDirectors) {
       await waitForAccountField(user, 'company.directors_provided')
@@ -556,17 +545,14 @@ const TestStripeAccounts = module.exports = {
     await waitForWebhook('person.created', (stripeEvent) => {
       return stripeEvent.data.object.id === user.representative.personid
     })
-    global.webhooks = []
     await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
     await waitForPersonField(user, 'representative', 'verification.document')
-    global.webhooks = []
     const uploadData = createPersonUploadData(user.representative.stripeObject)
     if (uploadData && Object.keys(uploadData).length) {
       await TestHelper.updatePerson(user, user.representative, {}, uploadData)
       await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
-      global.webhooks = []
     }
     if (user.stripeAccount.requiresOwners) {
       await waitForAccountField(user, 'company.owners_provided')
@@ -615,17 +601,14 @@ const TestStripeAccounts = module.exports = {
     await waitForWebhook('person.created', (stripeEvent) => {
       return stripeEvent.data.object.id === user.representative.personid
     })
-    global.webhooks = []
     await waitForPersonField(user, 'representative', 'first_name')
     const representativeData = createPersonData(TestHelper.nextIdentity(), country, user.representative.stripeObject)
     await TestHelper.updatePerson(user, user.representative, representativeData)
     await waitForPersonField(user, 'representative', 'verification.document')
-    global.webhooks = []
     const uploadData = createPersonUploadData(user.representative.stripeObject)
     if (uploadData && Object.keys(uploadData).length) {
       await TestHelper.updatePerson(user, user.representative, {}, uploadData)
       await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
-      global.webhooks = []
     }
     if (user.stripeAccount.requiresOwners) {
       await waitForAccountField(user, 'company.owners_provided')

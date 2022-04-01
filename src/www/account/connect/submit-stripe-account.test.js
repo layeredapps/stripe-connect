@@ -4,69 +4,137 @@ const TestHelper = require('../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
-describe.only('/account/connect/submit-stripe-account', function () {
+describe('/account/connect/submit-stripe-account', function () {
   const cachedResponses = {}
   before(async () => {
-    console.log(1)
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
-    const user = await TestStripeAccounts.createCompanyReadyForSubmission('NZ')
-    console.log(2)
-    // before
+    // individual account
+    const user = await TestHelper.createUser()
+    await TestHelper.createStripeAccount(user, {
+      country: 'NZ',
+      business_type: 'individual'
+    })
     let req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
     req.session = user.session
-    cachedResponses.before = await req.route.api.before(req)
-    console.log(3)
-    // missing payment details
-    const user2 = await TestStripeAccounts.createIndividualMissingPaymentDetails('NZ')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user2.stripeAccount.stripeid}`)
-    req.account = user2.account
-    req.session = user2.session
-    cachedResponses.missingPayment = await req.get()
-    console.log(4)
-    // missing owners
-    const user3 = await TestStripeAccounts.createCompanyMissingOwners('DE')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user3.stripeAccount.stripeid}`)
-    req.account = user3.account
-    req.session = user3.session
-    cachedResponses.missingOwners = await req.get()
-    console.log(5)
-    // missing directors
-    const user4 = await TestStripeAccounts.createCompanyMissingDirectors('DE')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user4.stripeAccount.stripeid}`)
-    req.account = user4.account
-    req.session = user4.session
-    cachedResponses.missingDirectors = await req.get()
-    console.log(6)
-    // missing representative
-    const user5 = await TestStripeAccounts.createCompanyMissingRepresentative('DE')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user5.stripeAccount.stripeid}`)
-    req.account = user5.account
-    req.session = user5.session
-    cachedResponses.missingRepresentative = await req.get()
-    console.log(7)
-    // missing company information
-    const user6 = await TestStripeAccounts.createCompanyMissingCompanyDetails('DE')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user6.stripeAccount.stripeid}`)
-    req.account = user6.account
-    req.session = user6.session
-    cachedResponses.missingCompanyInformation = await req.get()
-    console.log(8)
-    // missing individual information
-    const user7 = await TestStripeAccounts.createIndividualMissingIndividualDetails('DE')
-    req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user7.stripeAccount.stripeid}`)
-    req.account = user7.account
-    req.session = user7.session
+    // 1) missing payment information
+    cachedResponses.missingIndividualPayment = await req.get()
+    const individualBankingData = TestStripeAccounts.createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
+    await TestHelper.createExternalAccount(user, individualBankingData)
+    await TestStripeAccounts.waitForAccountFieldToLeave(user, 'external_account')
+    // 2) missing information
     cachedResponses.missingIndividualInformation = await req.get()
-    console.log(9)
-    // company ready to submit
+    const individualAccountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
+    await TestHelper.updateStripeAccount(user, individualAccountData)
+    // 3) ready to submit
+    cachedResponses.individualForm = await req.get()
+    // 4) submitted
+    cachedResponses.individualSubmit = await req.post()
+    // company account
+    await TestHelper.createStripeAccount(user, {
+      country: 'DE',
+      business_type: 'company'
+    })
+    // 1) missing representative
     req = TestHelper.createRequest(`/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
     req.session = user.session
+    cachedResponses.missingRepresentative = await req.get()
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: 0
+    })
+    await TestStripeAccounts.waitForWebhook('person.created', (stripeEvent) => {
+      return stripeEvent.data.object.id === user.representative.personid
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
+    const representativeData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    await TestHelper.updatePerson(user, user.representative, representativeData)
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+    const representativeUploadData = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
+    if (representativeUploadData && Object.keys(representativeUploadData).length) {
+      await TestHelper.updatePerson(user, user.representative, {}, representativeUploadData)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'representative', 'verification.document')
+    }
+    // 2) missing owner submission
+    cachedResponses.missingOwners = await req.get()
+    // 3) missing owner information
+    await TestHelper.createPerson(user, {
+      relationship_owner: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '9'
+    })
+    cachedResponses.missingOwnerInformation = await req.get()
+    const ownerData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.owner.stripeObject)
+    await TestHelper.updatePerson(user, user.owner, ownerData)
+    await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.document')
+    const ownerUploadData = TestStripeAccounts.createPersonUploadData(user.owner.stripeObject)
+    if (ownerUploadData && Object.keys(ownerUploadData).length) {
+      await TestHelper.updatePerson(user, user.owner, {}, ownerUploadData)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'owner', 'verification.document')
+    }
+    await TestHelper.submitCompanyOwners(user)
+    // 4) missing director submission
+    cachedResponses.missingDirectors = await req.get()
+    // 5) missing director information
+    await TestStripeAccounts.waitForAccountField(user, 'company.directors_provided')
+    await TestHelper.createPerson(user, {
+      relationship_director: 'true',
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: 0
+    })
+    cachedResponses.missingDirectorInformation = await req.get()
+    const directorData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.director.stripeObject)
+    await TestHelper.updatePerson(user, user.director, directorData)
+    await TestStripeAccounts.waitForPersonField(user, 'director', 'verification.document')
+    const directorUploadData = TestStripeAccounts.createPersonUploadData(user.director.stripeObject)
+    if (directorUploadData && Object.keys(directorUploadData).length) {
+      await TestHelper.updatePerson(user, user.director, {}, directorUploadData)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'director', 'verification.document')
+    }
+    await TestStripeAccounts.waitForAccountField(user, 'company.directors_provided')
+    await TestHelper.submitCompanyDirectors(user)
+    await TestStripeAccounts.waitForAccountFieldToLeave(user, 'company.directors_provided')
+    // 6) missing executive submission
+    cachedResponses.missingExecutives = await req.get()
+    // 7) missing executive information
+    await TestStripeAccounts.waitForAccountField(user, 'company.directors_provided')
+    await TestHelper.createPerson(user, {
+      relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: 0
+    })
+    cachedResponses.missingExecutiveInformation = await req.get()
+    const executiveData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.executive.stripeObject)
+    await TestHelper.updatePerson(user, user.executive, executiveData)
+    await TestStripeAccounts.waitForPersonField(user, 'executive', 'verification.document')
+    const executiveUploadData = TestStripeAccounts.createPersonUploadData(user.executive.stripeObject)
+    if (executiveUploadData && Object.keys(executiveUploadData).length) {
+      await TestHelper.updatePerson(user, user.executive, {}, executiveUploadData)
+      await TestStripeAccounts.waitForPersonFieldToLeave(user, 'executive', 'verification.document')
+    }
+    await TestStripeAccounts.waitForAccountField(user, 'company.executives_provided')
+    await TestHelper.submitCompanyExecutives(user)
+    await TestStripeAccounts.waitForAccountFieldToLeave(user, 'company.executives_provided')
+    // 5) missing payment information
+    cachedResponses.missingCompanyPayment = await req.get()
+    const companyBankingData = TestStripeAccounts.createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
+    await TestHelper.createExternalAccount(user, companyBankingData)
+    await TestStripeAccounts.waitForAccountFieldToLeave(user, 'external_account')
+    // 6) missing information
+    cachedResponses.missingCompanyInformation = await req.get()
+    const companyAccountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
+    await TestHelper.updateStripeAccount(user, companyAccountData)
+    // 7) ready to submit
+    await req.route.api.before(req)
+    cachedResponses.before = req.data
     cachedResponses.companyForm = await req.get()
-    console.log(10)
-    // company submit
+    // 8) submitted
     req.filename = __filename
     req.screenshots = [
       { hover: '#account-menu-container' },
@@ -76,13 +144,6 @@ describe.only('/account/connect/submit-stripe-account', function () {
       { fill: '#submit-form' }
     ]
     cachedResponses.companySubmit = await req.post()
-    console.log(11)
-    // individual ready to submit
-    await TestStripeAccounts.createIndividualReadyForSubmission('NZ', user)
-    req.account = user.account
-    req.session = user.session
-    cachedResponses.individualForm = await req.get()
-    cachedResponses.individualSubmit = await req.post()
   })
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
@@ -108,15 +169,31 @@ describe.only('/account/connect/submit-stripe-account', function () {
   })
 
   describe('view', () => {
-    it('should reject registration that hasn\'t submitted payment details', async () => {
-      const result = cachedResponses.missingPayment
+    it('should reject individual that hasn\'t submitted payment details', async () => {
+      const result = cachedResponses.missingIndividualPayment
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-payment-details')
     })
 
-    it('should reject company that hasn\'t submitted company owners', async () => {
+    it('should reject company that hasn\'t submitted payment details', async () => {
+      const result = cachedResponses.missingCompanyPayment
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-payment-details')
+    })
+
+    it('should reject company that has missing owner information', async () => {
+      const result = cachedResponses.missingOwnerInformation
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-company-owners')
+    })
+
+    it('should reject company that hasn\'t submitted owners', async () => {
       const result = cachedResponses.missingOwners
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -124,7 +201,15 @@ describe.only('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-owners')
     })
 
-    it('should reject company that hasn\'t submitted company directors', async () => {
+    it('should reject company that has missing director information', async () => {
+      const result = cachedResponses.missingDirectorInformation
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-company-directors')
+    })
+
+    it('should reject company that hasn\'t submitted directors', async () => {
       const result = cachedResponses.missingDirectors
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -132,12 +217,20 @@ describe.only('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-directors')
     })
 
-    it('should reject company that hasn\'t submitted representative information', async () => {
-      const result = cachedResponses.missingRepresentative
+    it('should reject company that has missing executive information', async () => {
+      const result = cachedResponses.missingExecutiveInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
-      assert.strictEqual(message.attr.template, 'invalid-company-representative')
+      assert.strictEqual(message.attr.template, 'invalid-company-executives')
+    })
+
+    it('should reject company that hasn\'t submitted executives', async () => {
+      const result = cachedResponses.missingExecutives
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-company-executives')
     })
 
     it('should reject company that hasn\'t submitted information', async () => {
