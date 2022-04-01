@@ -37,7 +37,7 @@ describe('/account/connect/submit-company-executives', function () {
       cachedResponses.notRequired = error.message
     }
     // bind
-    await TestStripeAccounts.createCompanyWithExecutives('DE', 1, user) 
+    await TestStripeAccounts.createCompanyWithExecutives('DE', 1, user)
     req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
     req.session = user.session

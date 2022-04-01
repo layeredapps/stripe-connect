@@ -24,8 +24,8 @@ const stripeKey = {
   apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 }
 
-const wait = util.promisify((callback) => {
-  return setTimeout(callback, 100)
+const wait = util.promisify((quantity, callback) => {
+  return setTimeout(callback, quantity || 100)
 })
 
 module.exports = {
@@ -310,7 +310,6 @@ async function deleteOldStripeAccounts () {
       accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
       break
     } catch (error) {
-      console.log(1111, error)
     }
   }
   while (accounts.data && accounts.data.length) {
@@ -326,7 +325,6 @@ async function deleteOldStripeAccounts () {
             )
           }
         } catch (error) {
-          console.log(22222, error)
         }
       }
       try {
@@ -337,7 +335,6 @@ async function deleteOldStripeAccounts () {
     try {
       accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
     } catch (error) {
-      console.log(33333, error)
     }
   }
 }
@@ -349,6 +346,7 @@ async function createStripeAccount (user, body) {
   req.account = user.account
   req.body = body
   user.stripeAccount = await req.post()
+  await wait(10000)
   return user.stripeAccount
 }
 
@@ -379,7 +377,7 @@ async function createExternalAccount (user, body) {
       }
     } catch (error) {
     }
-    await wait()
+    await wait(10000)
   }
 }
 
@@ -398,6 +396,7 @@ async function createPerson (user, body) {
   } else if (body && body.relationship_executive) {
     user.executive = person
   }
+  await wait(10000)
   return person
 }
 
@@ -433,7 +432,7 @@ async function createPayout (user) {
       return user.payout
     } catch (error) {
     }
-    await wait()
+    await wait(10000)
   }
 }
 
@@ -454,7 +453,7 @@ async function submitCompanyOwners (user) {
       }
     } catch (error) {
     }
-    await wait()
+    await wait(10000)
   }
 }
 
@@ -475,7 +474,7 @@ async function submitCompanyDirectors (user) {
       }
     } catch (error) {
     }
-    await wait()
+    await wait(10000)
   }
 }
 
@@ -496,7 +495,7 @@ async function submitCompanyExecutives (user) {
       }
     } catch (error) {
     }
-    await wait()
+    await wait(10000)
   }
 }
 
@@ -513,7 +512,7 @@ async function submitStripeAccount (user) {
     try {
       user.stripeAccount = await global.api.user.connect.StripeAccount.get(req2)
       if (user.stripeAccount.stripeObject.requirements.pending_verification.length) {
-        return wait()
+        return wait(10000)
       }
       return user.stripeAccount
     } catch (error) {

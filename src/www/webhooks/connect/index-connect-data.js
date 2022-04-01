@@ -58,7 +58,7 @@ module.exports = {
       global.webhooks = global.webhooks || []
       setTimeout(() => {
         global.webhooks.unshift(stripeEvent)
-      }, 20000)
+      }, 10000)
     }
     if (stripeEvent.data && stripeEvent.data.object && stripeEvent.data.object.id) {
       await dashboard.StorageCache.remove(stripeEvent.data.object.id)
