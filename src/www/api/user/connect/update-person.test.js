@@ -237,7 +237,7 @@ describe('/api/user/connect/update-person', function () {
     for (const field in req.body) {
       cachedResponses[field] = cachedResponses[field] || result.stripeObject
     }
-    // returns 
+    // returns
     await TestHelper.createStripeAccount(user3, {
       country: 'AT',
       business_type: 'company'
