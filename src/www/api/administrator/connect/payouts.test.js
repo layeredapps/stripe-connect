@@ -14,16 +14,12 @@ describe('/api/administrator/connect/payouts', function () {
     await TestHelper.setupBeforeEach()
     const administrator = await TestHelper.createOwner()
     let user = await TestStripeAccounts.createSubmittedIndividual('NZ')
-    for (let i = 0, len = global.pageSize + 1; i < len; i++) {
+    for (let i = 0, len = global.pageSize; i < len; i++) {
       await TestHelper.createPayout(user)
       cachedPayouts.unshift(user.payout.payoutid)
     }
     user = await TestStripeAccounts.createSubmittedIndividual('NZ')
     const stripeid = user.stripeAccount.stripeid
-    await TestHelper.createPayout(user)
-    cachedPayouts.unshift(user.payout.payoutid)
-    accountPayouts.unshift(user.payout.payoutid)
-    stripeAccountPayouts.unshift(user.payout.payoutid)
     await TestHelper.createPayout(user)
     cachedPayouts.unshift(user.payout.payoutid)
     accountPayouts.unshift(user.payout.payoutid)

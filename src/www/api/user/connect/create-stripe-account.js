@@ -11,7 +11,7 @@ module.exports = {
       throw new Error('invalid-account')
     }
     if (!req.body || (req.body.business_type !== 'individual' && req.body.business_type !== 'company')) {
-      throw new Error('invalid-type')
+      throw new Error('invalid-business_type')
     }
     if (!req.body.country || !connect.countrySpecIndex[req.body.country]) {
       throw new Error('invalid-country')
