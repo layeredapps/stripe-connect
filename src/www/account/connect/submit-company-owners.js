@@ -38,6 +38,7 @@ async function beforeRequest (req) {
         owners.push(person)
         if (person.requirements.currently_due.length) {
           req.error = req.error || 'invalid-company-owners'
+          break
         }
       }
     }

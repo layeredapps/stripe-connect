@@ -74,14 +74,21 @@ module.exports = {
       }
       personInfo.relationship.owner = req.body.relationship_owner || false
     }
-    const person = await stripeCache.execute('accounts', 'createPerson', req.query.stripeid, personInfo, req.stripeKey)
-    await connect.Storage.Person.create({
-      personid: person.id,
-      accountid: req.account.accountid,
-      stripeid: stripeAccount.stripeid,
-      stripeObject: person
-    })
-    req.query.personid = person.id
-    return global.api.user.connect.Person.get(req)
+    try {
+      const person = await stripeCache.execute('accounts', 'createPerson', req.query.stripeid, personInfo, req.stripeKey)
+      await connect.Storage.Person.create({
+        personid: person.id,
+        accountid: req.account.accountid,
+        stripeid: stripeAccount.stripeid,
+        stripeObject: person
+      })
+      req.query.personid = person.id
+      return global.api.user.connect.Person.get(req)
+    } catch (error) {
+      if (error.message.startsWith('invalid-')) {
+        throw new Error(error.message.split('.').join('_'))
+      }
+      throw error
+    }
   }
 }

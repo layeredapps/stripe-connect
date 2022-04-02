@@ -47,14 +47,22 @@ describe('/account/connect/submit-company-owners', function () {
     cachedResponses.requiresInformation = await req.get()
     // shows owners
     const ownerData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.owner.stripeObject)
-    const documents = {
+    await TestHelper.updatePerson(user, user.owner, ownerData)
+    await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.document')
+    await TestStripeAccounts.waitForPersonField(user, 'owner', 'verification.additional_document')
+    const ownerUploads = {
       verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
-      verification_document_front: TestStripeAccounts['success_id_scan_front.png']
+      verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+      verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png'],
+      verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png']
     }
-    await TestHelper.updatePerson(user, user.owner, ownerData, documents)
+    await TestHelper.updatePerson(user, user.owner, {}, ownerUploads)
+    await TestStripeAccounts.waitForPersonFieldToLeave(user, 'owner', 'verification.document')
+    await TestStripeAccounts.waitForPersonFieldToLeave(user, 'owner', 'verification.additional_document')
     cachedResponses.formWithOwners = await req.get()
     // submit owners
     req.filename = __filename
+    req.body = {}
     req.screenshots = [
       { hover: '#account-menu-container' },
       { click: '/account/connect' },

@@ -9,7 +9,6 @@ describe('/administrator/connect/stripe-accounts', function () {
   before(async () => {
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
-    global.delayDiskWrites = true
     const administrator = await TestHelper.createOwner()
     for (let i = 0, len = global.pageSize + 2; i < len; i++) {
       const user = await TestHelper.createUser()

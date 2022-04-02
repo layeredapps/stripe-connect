@@ -22,20 +22,27 @@ module.exports = {
       country: req.body.country,
       requested_capabilities: ['card_payments', 'transfers']
     }
-    const stripeAccount = await stripeCache.execute('accounts', 'create', accountInfo, req.stripeKey)
-    const allRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
-    const requiresOwners = allRequirements.indexOf('owners.last_name') > -1
-    const requiresDirectors = allRequirements.indexOf('directors.last_name') > -1
-    const requiresExecutives = allRequirements.indexOf('executives.last_name') > -1
-    await connect.Storage.StripeAccount.create({
-      stripeid: stripeAccount.id,
-      accountid: req.query.accountid,
-      stripeObject: stripeAccount,
-      requiresOwners,
-      requiresDirectors,
-      requiresExecutives
-    })
-    req.query.stripeid = stripeAccount.id
-    return global.api.user.connect.StripeAccount.get(req)
+    try {
+      const stripeAccount = await stripeCache.execute('accounts', 'create', accountInfo, req.stripeKey)
+      const allRequirements = stripeAccount.requirements.currently_due.concat(stripeAccount.requirements.eventually_due)
+      const requiresOwners = allRequirements.indexOf('owners.last_name') > -1
+      const requiresDirectors = allRequirements.indexOf('directors.last_name') > -1
+      const requiresExecutives = allRequirements.indexOf('executives.last_name') > -1
+      await connect.Storage.StripeAccount.create({
+        stripeid: stripeAccount.id,
+        accountid: req.query.accountid,
+        stripeObject: stripeAccount,
+        requiresOwners,
+        requiresDirectors,
+        requiresExecutives
+      })
+      req.query.stripeid = stripeAccount.id
+      return global.api.user.connect.StripeAccount.get(req)
+    } catch (error) {
+      if (error.message.startsWith('invalid-')) {
+        throw new Error(error.message.split('.').join('_'))
+      }
+      throw error
+    }
   }
 }

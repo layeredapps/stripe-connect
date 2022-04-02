@@ -12,7 +12,6 @@ describe('/account/connect/persons', function () {
   before(async () => {
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
-    global.delayDiskWrites = true
     const user = await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
       country: 'AT',

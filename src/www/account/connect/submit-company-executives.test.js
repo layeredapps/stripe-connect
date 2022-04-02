@@ -47,14 +47,22 @@ describe('/account/connect/submit-company-executives', function () {
     cachedResponses.requiresInformation = await req.get()
     // shows executives
     const executiveData = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.executive.stripeObject)
-    const documents = {
+    await TestHelper.updatePerson(user, user.executive, executiveData)
+    await TestStripeAccounts.waitForPersonField(user, 'executive', 'verification.document')
+    await TestStripeAccounts.waitForPersonField(user, 'executive', 'verification.additional_document')
+    const executiveUploads = {
       verification_document_back: TestStripeAccounts['success_id_scan_back.png'],
-      verification_document_front: TestStripeAccounts['success_id_scan_front.png']
+      verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
+      verification_additional_document_back: TestStripeAccounts['success_id_scan_back.png'],
+      verification_additional_document_front: TestStripeAccounts['success_id_scan_front.png']
     }
-    await TestHelper.updatePerson(user, user.executive, executiveData, documents)
+    await TestHelper.updatePerson(user, user.executive, {}, executiveUploads)
+    await TestStripeAccounts.waitForPersonFieldToLeave(user, 'executive', 'verification.document')
+    await TestStripeAccounts.waitForPersonFieldToLeave(user, 'executive', 'verification.additional_document')
     cachedResponses.formWithExecutives = await req.get()
     // submit executives
     req.filename = __filename
+    req.body = {}
     req.screenshots = [
       { hover: '#account-menu-container' },
       { click: '/account/connect' },

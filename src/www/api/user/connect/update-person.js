@@ -233,14 +233,21 @@ module.exports = {
     if (req.body.ssn_last_4 && req.body.ssn_last_4.length < 4) {
       throw new Error('invalid-ssn_last_4')
     }
-    const personNow = await stripeCache.execute('accounts', 'updatePerson', person.stripeid, person.personid, updateInfo, req.stripeKey)
-    await connect.Storage.Person.update({
-      stripeObject: personNow
-    }, {
-      where: {
-        personid: req.query.personid
+    try {
+      const personNow = await stripeCache.execute('accounts', 'updatePerson', person.stripeid, person.personid, updateInfo, req.stripeKey)
+      await connect.Storage.Person.update({
+        stripeObject: personNow
+      }, {
+        where: {
+          personid: req.query.personid
+        }
+      })
+    } catch (error) {
+      if (error.message.startsWith('invalid-')) {
+        throw new Error(error.message.split('.').join('_'))
       }
-    })
+      throw error
+    }
     await dashboard.StorageCache.remove(req.query.personid)
     return global.api.user.connect.Person.get(req)
   }

@@ -5,170 +5,298 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/update-person', function () {
-  describe('exceptions', () => {
-    const cachedResults = {}
-    before(async () => {
-      await DashboardTestHelper.setupBeforeEach()
-      await TestHelper.setupBeforeEach()
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'AU',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      // invalid date of birth
-      let req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = { dob_day: '-1', dob_month: '1', dob_year: 2000 }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-dob_day'] = error.message
+  const cachedResponses = {}
+  before(async () => {
+    await DashboardTestHelper.setupBeforeEach()
+    await TestHelper.setupBeforeEach()
+    const user = await TestHelper.createUser()
+    await TestHelper.createStripeAccount(user, {
+      country: 'AU',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    // invalid date of birth
+    let req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = { dob_day: '-1', dob_month: '1', dob_year: 2000 }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-dob_day'] = error.message
+    }
+    req.body = { dob_day: '', dob_month: '-1', dob_year: 2000 }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['missing-dob_day'] = error.message
+    }
+    req.body = { dob_day: '1', dob_month: '-1', dob_year: 2000 }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-dob_month'] = error.message
+    }
+    req.body = { dob_day: '1', dob_month: '', dob_year: 2000 }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['missing-dob_month'] = error.message
+    }
+    req.body = { dob_day: '1', dob_month: '1', dob_year: 'invalid' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-dob_year'] = error.message
+    }
+    req.body = { dob_day: '1', dob_month: '1', dob_year: '' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['missing-dob_year'] = error.message
+    }
+    // invalid percent ownership
+    req.body = { relationship_percent_ownership: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-relationship_percent_ownership'] = error.message
+    }
+    // invalid country
+    req.body = { address_country: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-address_country'] = error.message
+    }
+    // invalid state
+    req.body = { address_state: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-address_state'] = error.message
+    }
+    // invalid id number
+    await TestHelper.createStripeAccount(user, {
+      country: 'HK',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = { id_number: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-id_number'] = error.message
+    }
+    // invalid phone
+    await TestHelper.createStripeAccount(user, {
+      country: 'US',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = { phone: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-phone'] = error.message
+    }
+    // invalid ssn last 4
+    req.body = { ssn_last_4: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-ssn_last_4'] = error.message
+    }
+    // invalid email
+    await TestHelper.createStripeAccount(user, {
+      country: 'AT',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = { email: '-1' }
+    try {
+      await req.patch()
+    } catch (error) {
+      cachedResponses['invalid-email'] = error.message
+    }
+    // invalid account
+    const user2 = await TestHelper.createUser()
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user2.account
+    req.session = user2.session
+    req.body = { email: 'email@address.com' }
+    try {
+      await req.patch(req)
+    } catch (error) {
+      cachedResponses.invalidAccount = error.message
+    }
+    // invalid person
+    const user3 = await TestStripeAccounts.createCompanyReadyForSubmission('DE')
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.representative.personid}`)
+    req.account = user3.account
+    req.session = user3.session
+    req.body = {}
+    try {
+      await req.patch(req)
+    } catch (error) {
+      cachedResponses.invalidPerson = error.message
+    }
+    // receives
+    // most fields are shared by all countries
+    await TestHelper.createStripeAccount(user, {
+      country: 'AT',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'AT', user.representative.stripeObject)
+    req.body.email = 'email@address.com'
+    let result = await req.patch()
+    for (const field in req.body) {
+      cachedResponses[field] = result.stripeObject
+    }
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = {}
+    req.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
+    result = await req.patch()
+    for (const field in req.uploads) {
+      cachedResponses[field] = cachedResponses[field] || result.stripeObject
+    }
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
+    // some fields only by BR
+    await TestHelper.createStripeAccount(user, {
+      country: 'BR',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'BR', user.representative.stripeObject)
+    result = await req.patch()
+    for (const field in req.body) {
+      cachedResponses[field] = cachedResponses[field] || result.stripeObject
+    }
+    // some fields only by US
+    await TestHelper.createStripeAccount(user, {
+      country: 'US',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'US', user.representative.stripeObject)
+    result = await req.patch()
+    for (const field in req.body) {
+      cachedResponses[field] = cachedResponses[field] || result.stripeObject
+    }
+    // returns 
+    await TestHelper.createStripeAccount(user3, {
+      country: 'AT',
+      business_type: 'company'
+    })
+    await TestHelper.createPerson(user3, {
+      relationship_owner: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '10'
+    })
+    // await TestStripeAccounts.waitForPersonField(user3, 'owner', 'first_name')
+    // await TestStripeAccounts.waitForPersonField(user3, 'owner', 'address.state')
+    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.owner.personid}`)
+    req.account = user3.account
+    req.session = user3.session
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'GB', user3.owner.stripeObject)
+    req.filename = __filename
+    req.saveResponse = true
+    cachedResponses.returns = await req.patch()
+    await TestStripeAccounts.waitForPersonFieldToLeave(user3, 'owner', 'first_name')
+    await TestStripeAccounts.waitForPersonFieldToLeave(user3, 'owner', 'address.state')
+    // returns with stripe.js
+    global.stripeJS = 3
+    await TestStripeAccounts.waitForPersonField(user3, 'owner', 'verification.document')
+    await TestStripeAccounts.waitForPersonField(user3, 'owner', 'verification.additional_document')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user3.owner.personid}`)
+    req.account = user3.account
+    req.session = user3.session
+    req.body = {}
+    req.uploads = TestStripeAccounts.createPersonUploadData(user3.owner.stripeObject)
+    req.waitBefore = async (page) => {
+      while (true) {
+        try {
+          const input = await page.$('#verification_additional_document_front')
+          if (input) {
+            break
+          }
+        } catch (error) {
+        }
+        await TestHelper.wait(100)
       }
-      req.body = { dob_day: '', dob_month: '-1', dob_year: 2000 }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['missing-dob_day'] = error.message
+    }
+    req.waitAfter = async (page) => {
+      while (true) {
+        const url = await page.url()
+        if (url.indexOf('/person') > -1) {
+          break
+        }
+        await TestHelper.wait(100)
       }
-      req.body = { dob_day: '1', dob_month: '-1', dob_year: 2000 }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-dob_month'] = error.message
-      }
-      req.body = { dob_day: '1', dob_month: '', dob_year: 2000 }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['missing-dob_month'] = error.message
-      }
-      req.body = { dob_day: '1', dob_month: '1', dob_year: 'invalid' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-dob_year'] = error.message
-      }
-      req.body = { dob_day: '1', dob_month: '1', dob_year: '' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['missing-dob_year'] = error.message
-      }
-      // invalid percent ownership
-      req.body = { relationship_percent_ownership: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-relationship_percent_ownership'] = error.message
-      }
-      // invalid country
-      req.body = { address_country: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-address_country'] = error.message
-      }
-      // invalid state
-      req.body = { address_state: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-address_state'] = error.message
-      }
-      // invalid id number
-      await TestHelper.createStripeAccount(user, {
-        country: 'HK',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = { id_number: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-id_number'] = error.message
-      }
-      // invalid phone
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = { phone: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-phone'] = error.message
-      }
-      // invalid ssn last 4
-      req.body = { ssn_last_4: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-ssn_last_4'] = error.message
-      }
-      // invalid email
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = { email: '-1' }
-      try {
-        await req.patch()
-      } catch (error) {
-        cachedResults['invalid-email'] = error.message
-      }
-      // invalid account
-      const user2 = await TestHelper.createUser()
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user2.account
-      req.session = user2.session
-      req.body = { email: 'email@address.com' }
-      try {
-        await req.patch(req)
-      } catch (error) {
-        cachedResults.invalidAccount = error.message
-      }
-      // invalid person
-      const user3 = await TestStripeAccounts.createCompanyReadyForSubmission('DE')
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.representative.personid}`)
-      req.account = user3.account
-      req.session = user3.session
-      req.body = {}
-      try {
-        await req.patch(req)
-      } catch (error) {
-        cachedResults.invalidPerson = error.message
+    }
+    await req.post()
+    cachedResponses.returnsWithStripeJS = await global.api.administrator.connect.Person.get({
+      query: {
+        personid: user3.owner.personid
       }
     })
+  })
+  describe('exceptions', () => {
     describe('invalid-personid', () => {
       it('missing querystring personid', async () => {
         const user = await TestHelper.createUser()
@@ -203,180 +331,100 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
-        const errorMessage = cachedResults.invalidAccount
+        const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
 
     describe('invalid-person', () => {
       it('ineligible querystring person has no required information', async () => {
-        const errorMessage = cachedResults.invalidPerson
+        const errorMessage = cachedResponses.invalidPerson
         assert.strictEqual(errorMessage, 'invalid-person')
       })
     })
 
     describe('invalid-dob_day', () => {
       it('missing posted dob.day', async () => {
-        const errorMessage = cachedResults['invalid-dob_day']
+        const errorMessage = cachedResponses['invalid-dob_day']
         assert.strictEqual(errorMessage, 'invalid-dob_day')
       })
       it('invalid posted dob.day', async () => {
-        const errorMessage = cachedResults['invalid-dob_day']
+        const errorMessage = cachedResponses['invalid-dob_day']
         assert.strictEqual(errorMessage, 'invalid-dob_day')
       })
     })
     describe('invalid-dob_month', () => {
       it('missing posted dob.month', async () => {
-        const errorMessage = cachedResults['invalid-dob_month']
+        const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
       it('invalid posted dob.month', async () => {
-        const errorMessage = cachedResults['invalid-dob_month']
+        const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
     })
     describe('invalid-dob_year', () => {
       it('missing posted dob.month', async () => {
-        const errorMessage = cachedResults['invalid-dob_month']
+        const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
       it('invalid posted dob.month', async () => {
-        const errorMessage = cachedResults['invalid-dob_month']
+        const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
     })
 
     describe('invalid-relationship_percent_ownership', () => {
       it('invalid posted relationship.percent_ownership', async () => {
-        const errorMessage = cachedResults['invalid-relationship_percent_ownership']
+        const errorMessage = cachedResponses['invalid-relationship_percent_ownership']
         assert.strictEqual(errorMessage, 'invalid-relationship_percent_ownership')
       })
     })
 
     describe('invalid-address_country', () => {
       it('invalid posted address.country', async () => {
-        const errorMessage = cachedResults['invalid-address_country']
+        const errorMessage = cachedResponses['invalid-address_country']
         assert.strictEqual(errorMessage, 'invalid-address_country')
       })
     })
 
     describe('invalid-address_state', () => {
       it('invalid posted address.state', async () => {
-        const errorMessage = cachedResults['invalid-address_state']
+        const errorMessage = cachedResponses['invalid-address_state']
         assert.strictEqual(errorMessage, 'invalid-address_state')
       })
     })
 
     describe('invalid-id_number', () => {
       it('invalid posted id_number', async () => {
-        const errorMessage = cachedResults['invalid-id_number']
+        const errorMessage = cachedResponses['invalid-id_number']
         assert.strictEqual(errorMessage, 'invalid-id_number')
       })
     })
 
     describe('invalid-ssn_last_4', () => {
       it('invalid posted ssn_last_4', async () => {
-        const errorMessage = cachedResults['invalid-ssn_last_4']
+        const errorMessage = cachedResponses['invalid-ssn_last_4']
         assert.strictEqual(errorMessage, 'invalid-ssn_last_4')
       })
     })
 
     describe('invalid-phone', () => {
       it('invalid posted phone', async () => {
-        const errorMessage = cachedResults['invalid-phone']
+        const errorMessage = cachedResponses['invalid-phone']
         assert.strictEqual(errorMessage, 'invalid-phone')
       })
     })
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
-        const errorMessage = cachedResults.invalidAccount
+        const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
   })
 
   describe('receives', () => {
-    const cachedResponses = {}
-    before(async () => {
-      await DashboardTestHelper.setupBeforeEach()
-      await TestHelper.setupBeforeEach()
-      const user = await TestHelper.createUser()
-      // most fields are shared by all countries
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
-      let req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'AT', user.representative.stripeObject)
-      req.body.email = 'email@address.com'
-      let result = await req.patch()
-      for (const field in req.body) {
-        cachedResponses[field] = result.stripeObject
-      }
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = {}
-      req.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
-      result = await req.patch()
-      await TestStripeAccounts.waitForWebhook('person.updated', (stripeEvent) => {
-        if (stripeEvent.data.object.id === user.representative.personid &&
-            stripeEvent.data.object.verification.status === 'pending') {
-          for (const field in req.uploads) {
-            cachedResponses[field] = stripeEvent.data.object
-          }
-          return true
-        }
-      })
-      // some fields only by BR
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'BR', user.representative.stripeObject)
-      result = await req.patch()
-      for (const field in req.body) {
-        cachedResponses[field] = cachedResponses[field] || result.stripeObject
-      }
-      // some fields only by US
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'US', user.representative.stripeObject)
-      result = await req.patch()
-      for (const field in req.body) {
-        cachedResponses[field] = cachedResponses[field] || result.stripeObject
-      }
-    })
     it('optionally-required posted dob_day', async () => {
       const personNow = cachedResponses.dob_day
       assert.strictEqual(personNow.dob.day, 1)
@@ -427,86 +475,32 @@ describe('/api/user/connect/update-person', function () {
     })
     it('optionally-required posted verification_document_front', async () => {
       const personNow = cachedResponses.verification_document_front
-      assert.strictEqual(personNow.verification.status, 'pending')
+      assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_document_back', async () => {
       const personNow = cachedResponses.verification_document_back
-      assert.strictEqual(personNow.verification.status, 'pending')
+      assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_additional_document_front', async () => {
       const personNow = cachedResponses.verification_additional_document_front
-      assert.strictEqual(personNow.verification.status, 'pending')
+      assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_additional_document_back', async () => {
       const personNow = cachedResponses.verification_additional_document_back
-      assert.strictEqual(personNow.verification.status, 'pending')
+      assert.strictEqual(personNow.verification.status, 'unverified')
     })
   })
 
   describe('returns', () => {
     it('object', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'GB',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
-      const req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'GB', user.representative.stripeObject)
-      req.filename = __filename
-      req.saveResponse = true
-      const personNow = await req.patch()
+      const personNow = cachedResponses.returns
       assert.strictEqual(personNow.object, 'person')
     })
   })
 
   describe('configuration', () => {
     it('environment STRIPE_JS', async () => {
-      global.stripeJS = 3
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      await TestHelper.createPerson(user, {
-        relationship_representative: 'true',
-        relationship_executive: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '0'
-      })
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
-      const req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'DE', user.representative.stripeObject)
-      await req.patch()
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
-      await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
-      const req2 = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
-      req2.account = user.account
-      req2.session = user.session
-      req2.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
-      global.webhooks = []
-      req2.waitAfter = async () => {
-        await TestStripeAccounts.waitForWebhook('person.updated', (stripeEvent) => {
-          return stripeEvent.data.object.id === user.representative.personid &&
-                 stripeEvent.data.object.requirements.currently_due.indexOf('first_name') === -1
-        })
-      }
-      await req2.post()
-      const personNow = await global.api.administrator.connect.Person.get({
-        query: {
-          personid: user.representative.personid
-        }
-      })
+      const personNow = cachedResponses.returnsWithStripeJS
       assert.notStrictEqual(personNow.tokenUpdate, null)
       assert.notStrictEqual(personNow.tokenUpdate, undefined)
     })
