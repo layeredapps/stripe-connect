@@ -24,7 +24,7 @@ http://localhost:8000
 | RECEIVES---------------------------------| RETURNS--| CONFIGURATION----------|
 | optional querystring offset (integer)    | array    | environment PAGE_SIZE  |
 | optional querystring limit (integer)     |          |                        |
-| 4) optional querystring all (boolean)    |          |                        |
+| optional querystring all (boolean)       |          |                        |
 | optional querystring accountid (string)  |          |                        |
 | optional querystring stripeid (string)   |          |                        |
 |------------------------------------------|----------|------------------------|
@@ -120,27 +120,25 @@ http://localhost:8000
 |                                                    |          |  * invalid posted relationship_title                      |
 |----------------------------------------------------|----------|-----------------------------------------------------------|
 
-|----------------------------------------------------------------------------------|
-| /api/user/connect/create-stripe-account                                          |
-| RECEIVES------------------------| RETURNS--| EXCEPTIONS--------------------------|
-| required querystring accountid  | object   | invalid-accountid                   |
-|                                 |          |  * invalid-accountid                |
-|                                 |          |  * missing querystring accountid    |
-|                                 |          |  * invalid querystring accountid    |
-|                                 |          | invalid-account                     |
-|                                 |          |  * invalid-account                  |
-|                                 |          |  * ineligible accessing account     |
-|                                 |          | invalid-business_type               |
-|                                 |          |  * invalid-business_type            |
-|                                 |          | 5) missing posted business_type     |
-|                                 |          |  * 5) missing posted business_type  |
-|                                 |          | 6) invalid posted business_type     |
-|                                 |          |  * 6) invalid posted business_type  |
-|                                 |          | invalid-country                     |
-|                                 |          |  * invalid-country                  |
-|                                 |          |  * invalid posted country           |
-|                                 |          |  * invalid posted country           |
-|---------------------------------|----------|-------------------------------------|
+|--------------------------------------------------------------------------------|
+| /api/user/connect/create-stripe-account                                        |
+| RECEIVES------------------------| RETURNS--| EXCEPTIONS------------------------|
+| required posted business_type   | object   | invalid-accountid                 |
+| required querystring accountid  |          |  * invalid-accountid              |
+|                                 |          |  * missing querystring accountid  |
+|                                 |          |  * invalid querystring accountid  |
+|                                 |          | invalid-account                   |
+|                                 |          |  * invalid-account                |
+|                                 |          |  * ineligible accessing account   |
+|                                 |          | invalid-business_type             |
+|                                 |          |  * invalid-business_type          |
+|                                 |          |  * missing posted business_type   |
+|                                 |          |  * invalid posted business_type   |
+|                                 |          | invalid-country                   |
+|                                 |          |  * invalid-country                |
+|                                 |          |  * invalid posted country         |
+|                                 |          |  * invalid posted country         |
+|---------------------------------|----------|-----------------------------------|
 
 |-------------------------------------------------------------------------------------------------|
 | /api/user/connect/delete-person                                                                 |

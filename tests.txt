@@ -327,7 +327,7 @@
       ✔ should present the form without executives
       ✔ should present the form with executives
     submit
-      1) should submit executives (screenshots)
+      ✔ should submit executives (screenshots)
       ✔ should submit without executives
 
   /account/connect/submit-company-owners
@@ -342,7 +342,7 @@
       ✔ should present the form without owners
       ✔ should present the form with completed owners
     submit
-      2) should submit owners (screenshots)
+      ✔ should submit owners (screenshots)
       ✔ should submit without owners
 
   /account/connect/submit-stripe-account
@@ -382,7 +382,11 @@
       ✔ should have row for each Stripe account (screenshots)
 
   /administrator/connect/payout
-    3) "before all" hook in "/administrator/connect/payout"
+    before
+      ✔ should reject invalid payoutid
+      ✔ should bind data to req
+    view
+      ✔ should have row for payout (screenshots)
 
   /administrator/connect/payouts
     before
@@ -439,7 +443,7 @@
     receives
       ✔ optional querystring offset (integer)
       ✔ optional querystring limit (integer)
-      4) optional querystring all (boolean)
+      ✔ optional querystring all (boolean)
       ✔ optional querystring accountid (string)
       ✔ optional querystring stripeid (string)
     returns
@@ -541,8 +545,8 @@
       invalid-account
         ✔ ineligible accessing account
       invalid-business_type
-        5) missing posted business_type
-        6) invalid posted business_type
+        ✔ missing posted business_type
+        ✔ invalid posted business_type
       invalid-country
         ✔ invalid posted country
         ✔ invalid posted country
@@ -948,94 +952,5 @@
       ✔ environment STRIPE_JS
 
 
-  577 passing (58m)
-  6 failing
-
-  1) /account/connect/submit-company-executives
-       submit
-         should submit executives (screenshots):
-
-      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-+ actual - expected
-
-+ 'invalid-company-executives'
-- 'success'
-      + expected - actual
-
-      -invalid-company-executives
-      +success
-      
-      at Context.<anonymous> (src/www/account/connect/submit-company-executives.test.js:139:14)
-      at processImmediate (internal/timers.js:464:21)
-
-  2) /account/connect/submit-company-owners
-       submit
-         should submit owners (screenshots):
-     TypeError: Cannot read property 'html' of undefined
-      at Context.<anonymous> (src/www/account/connect/submit-company-owners.test.js:136:48)
-      at processImmediate (internal/timers.js:464:21)
-
-  3) /administrator/connect/payout
-       "before all" hook in "/administrator/connect/payout":
-     Error: Timeout of 960000ms exceeded. For async tests and hooks, ensure "done()" is called; if returning a Promise, ensure it resolves. (/home/runner/work/stripe-connect/stripe-connect/src/www/administrator/connect/payout.test.js)
-      at listOnTimeout (internal/timers.js:557:17)
-      at processTimers (internal/timers.js:500:7)
-
-  4) /api/administrator/connect/payouts
-       receives
-         optional querystring all (boolean):
-
-      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-
-7 !== 6
-
-      + expected - actual
-
-      -7
-      +6
-      
-      at Context.<anonymous> (src/www/api/administrator/connect/payouts.test.js:80:14)
-      at processImmediate (internal/timers.js:464:21)
-
-  5) /api/user/connect/create-stripe-account
-       exceptions
-         invalid-business_type
-           missing posted business_type:
-
-      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-+ actual - expected
-
-+ 'invalid-type'
-- 'invalid-business_type'
-           ^
-      + expected - actual
-
-      -invalid-type
-      +invalid-business_type
-      
-      at Context.<anonymous> (src/www/api/user/connect/create-stripe-account.test.js:74:16)
-      at runMicrotasks (<anonymous>)
-      at processTicksAndRejections (internal/process/task_queues.js:95:5)
-
-  6) /api/user/connect/create-stripe-account
-       exceptions
-         invalid-business_type
-           invalid posted business_type:
-
-      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
-+ actual - expected
-
-+ 'invalid-type'
-- 'invalid-business_type'
-           ^
-      + expected - actual
-
-      -invalid-type
-      +invalid-business_type
-      
-      at Context.<anonymous> (src/www/api/user/connect/create-stripe-account.test.js:92:16)
-      at runMicrotasks (<anonymous>)
-      at processTicksAndRejections (internal/process/task_queues.js:95:5)
-
-
+  585 passing (42m)
 
