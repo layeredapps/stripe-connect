@@ -1,0 +1,181 @@
+@layeredapps/dashboard 0.0.6
+http://localhost:8000
+
+Administrator menu:
+@layeredapps/stripe-connect/src/www/administrator/connect "Stripe Connect <span translate="yes">module</span>"
+/administrator "Dashboard administration"
+
+Account menu:
+@layeredapps/stripe-connect/src/www/account/connect "Stripe Connect <span translate="yes">accounts</span>"
+/account "My account"
+
+Special HTML files:
+@layeredapps/dashboard/template.html
+@layeredapps/dashboard/error.html
+@layeredapps/dashboard/redirect.html
+
+Dashboard modules:
+@layeredapps/maxmind-geoip (1.0.2)
+
+Server handlers:
+/src/server/stripe-connect/bind-stripekey.js
+/src/server/maxmind-geoip/bind-country.js
+
+URL -------------------------------------------------- AUTH - TEMPLATE - HTTP REQUESTS - NODEJS ----------------------- HTML ---------------------
+/                                                      GUEST  FULLSCREEN                 static-page                    /src/www                  
+/account                                                                 GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/change-password                                                 GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/change-username                                                 GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/connect                                                         GET             /src/www                       /src/www                  
+/account/connect/create-person                                           GET POST        /src/www                       /src/www                  
+/account/connect/create-stripe-account                                   GET POST        /src/www                       /src/www                  
+/account/connect/delete-person                                           GET POST        /src/www                       /src/www                  
+/account/connect/delete-stripe-account                                   GET POST        /src/www                       /src/www                  
+/account/connect/edit-payment-information                                GET POST        /src/www                       /src/www                  
+/account/connect/edit-person                                             GET POST        /src/www                       /src/www                  
+/account/connect/edit-stripe-account                                     GET POST        /src/www                       /src/www                  
+/account/connect/person                                                  GET             /src/www                       /src/www                  
+/account/connect/persons                                                 GET             /src/www                       /src/www                  
+/account/connect/stripe-account                                          GET             /src/www                       /src/www                  
+/account/connect/stripe-accounts                                         GET             /src/www                       /src/www                  
+/account/connect/submit-company-directors                                GET POST        /src/www                       /src/www                  
+/account/connect/submit-company-executives                               GET POST        /src/www                       /src/www                  
+/account/connect/submit-company-owners                                   GET POST        /src/www                       /src/www                  
+/account/connect/submit-stripe-account                                   GET POST        /src/www                       /src/www                  
+/account/create-profile                                                  GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/create-reset-code                                               GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/delete-account                                                  GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/delete-account-complete                       GUEST  FULLSCREEN GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/delete-profile                                                  GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/delete-reset-code                                               GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/edit-profile                                                    GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/end-all-sessions                                                GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/end-session                                                     GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/profile                                                         GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/profiles                                                        GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/register                                      GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/reset-account                                 GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/reset-code                                                      GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/reset-codes                                                     GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/restore-account                               GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/session                                                         GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/sessions                                                        GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/set-default-profile                                             GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/signin                                        GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/signout                                       GUEST  FULLSCREEN GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/account/signout-complete                              GUEST  FULLSCREEN                 static-page                    @layeredapps/dashboard    
+/account/verify                                        GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator                                                                           static-page                    @layeredapps/dashboard    
+/administrator/account                                                   GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/account-profiles                                          GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/account-reset-codes                                       GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/account-sessions                                          GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/accounts                                                  GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/administrators                                            GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/assign-administrator                                      GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/connect                                                   GET             /src/www                       /src/www                  
+/administrator/connect/delete-stripe-account                             GET POST        /src/www                       /src/www                  
+/administrator/connect/payout                                            GET             /src/www                       /src/www                  
+/administrator/connect/payouts                                           GET             /src/www                       /src/www                  
+/administrator/connect/reject-stripe-account                             GET POST        /src/www                       /src/www                  
+/administrator/connect/stripe-account                                    GET             /src/www                       /src/www                  
+/administrator/connect/stripe-accounts                                   GET             /src/www                       /src/www                  
+/administrator/create-reset-code                                         GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/delete-account                                            GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/delete-schedule                                           GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/profile                                                   GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/profiles                                                  GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/reset-code                                                GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/reset-codes                                               GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/reset-session-key                                         GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/revoke-administrator                                      GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/schedule-account-delete                                   GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/session                                                   GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/sessions                                                  GET             @layeredapps/dashboard         @layeredapps/dashboard    
+/administrator/transfer-ownership                                        GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/api/administrator/account                                               GET             @layeredapps/dashboard                                   
+/api/administrator/accounts                                              GET             @layeredapps/dashboard                                   
+/api/administrator/accounts-count                                        GET             @layeredapps/dashboard                                   
+/api/administrator/administrator-accounts                                GET             @layeredapps/dashboard                                   
+/api/administrator/administrator-accounts-count                          GET             @layeredapps/dashboard                                   
+/api/administrator/connect/delete-stripe-account                         DELETE          /src/www                                                 
+/api/administrator/connect/payout                                        GET             /src/www                                                 
+/api/administrator/connect/payouts                                       GET             /src/www                                                 
+/api/administrator/connect/payouts-count                                 GET             /src/www                                                 
+/api/administrator/connect/person                                        GET             /src/www                                                 
+/api/administrator/connect/persons                                       GET             /src/www                                                 
+/api/administrator/connect/persons-count                                 GET             /src/www                                                 
+/api/administrator/connect/set-stripe-account-rejected                   PATCH           /src/www                                                 
+/api/administrator/connect/stripe-account                                GET             /src/www                                                 
+/api/administrator/connect/stripe-accounts                               GET             /src/www                                                 
+/api/administrator/connect/stripe-accounts-count                         GET             /src/www                                                 
+/api/administrator/create-reset-code                                     POST            @layeredapps/dashboard                                   
+/api/administrator/delete-account                                        DELETE          @layeredapps/dashboard                                   
+/api/administrator/deleted-accounts                                      GET             @layeredapps/dashboard                                   
+/api/administrator/deleted-accounts-count                                GET             @layeredapps/dashboard                                   
+/api/administrator/profile                                               GET             @layeredapps/dashboard                                   
+/api/administrator/profiles                                              GET             @layeredapps/dashboard                                   
+/api/administrator/profiles-count                                        GET             @layeredapps/dashboard                                   
+/api/administrator/reset-account-administrator                           PATCH           @layeredapps/dashboard                                   
+/api/administrator/reset-code                                            GET             @layeredapps/dashboard                                   
+/api/administrator/reset-codes                                           GET             @layeredapps/dashboard                                   
+/api/administrator/reset-codes-count                                     GET             @layeredapps/dashboard                                   
+/api/administrator/reset-session-key                                     PATCH           @layeredapps/dashboard                                   
+/api/administrator/session                                               GET             @layeredapps/dashboard                                   
+/api/administrator/sessions                                              GET             @layeredapps/dashboard                                   
+/api/administrator/sessions-count                                        GET             @layeredapps/dashboard                                   
+/api/administrator/set-account-administrator                             PATCH           @layeredapps/dashboard                                   
+/api/administrator/set-account-deleted                                   PATCH           @layeredapps/dashboard                                   
+/api/administrator/set-owner-account                                     PATCH           @layeredapps/dashboard                                   
+/api/user/account                                                        GET             @layeredapps/dashboard                                   
+/api/user/connect/country-spec                                           GET             /src/www                                                 
+/api/user/connect/country-specs                                          GET             /src/www                                                 
+/api/user/connect/country-specs-count                                    GET             /src/www                                                 
+/api/user/connect/create-person                                          POST            /src/www                                                 
+/api/user/connect/create-stripe-account                                  POST            /src/www                                                 
+/api/user/connect/delete-person                                          DELETE          /src/www                                                 
+/api/user/connect/delete-stripe-account                                  DELETE          /src/www                                                 
+/api/user/connect/payout                                                 GET             /src/www                                                 
+/api/user/connect/payouts                                                GET             /src/www                                                 
+/api/user/connect/payouts-count                                          GET             /src/www                                                 
+/api/user/connect/person                                                 GET             /src/www                                                 
+/api/user/connect/persons                                                GET             /src/www                                                 
+/api/user/connect/persons-count                                          GET             /src/www                                                 
+/api/user/connect/set-company-directors-submitted                        PATCH           /src/www                                                 
+/api/user/connect/set-company-executives-submitted                       PATCH           /src/www                                                 
+/api/user/connect/set-company-owners-submitted                           PATCH           /src/www                                                 
+/api/user/connect/set-stripe-account-submitted                           PATCH           /src/www                                                 
+/api/user/connect/stripe-account                                         GET             /src/www                                                 
+/api/user/connect/stripe-accounts                                        GET             /src/www                                                 
+/api/user/connect/stripe-accounts-count                                  GET             /src/www                                                 
+/api/user/connect/update-payment-information                             PATCH           /src/www                                                 
+/api/user/connect/update-person                                          PATCH           /src/www                                                 
+/api/user/connect/update-stripe-account                                  PATCH           /src/www                                                 
+/api/user/create-account                               GUEST             POST            @layeredapps/dashboard                                   
+/api/user/create-profile                                                 POST            @layeredapps/dashboard                                   
+/api/user/create-reset-code                                              POST            @layeredapps/dashboard                                   
+/api/user/create-session                               GUEST             POST            @layeredapps/dashboard                                   
+/api/user/delete-profile                                                 DELETE          @layeredapps/dashboard                                   
+/api/user/delete-reset-code                                              DELETE          @layeredapps/dashboard                                   
+/api/user/geoip/country                                GUEST             GET             @layeredapps/maxmind-geoip                               
+/api/user/profile                                                        GET             @layeredapps/dashboard                                   
+/api/user/profiles                                                       GET             @layeredapps/dashboard                                   
+/api/user/profiles-count                                                 GET             @layeredapps/dashboard                                   
+/api/user/reset-account-deleted                        GUEST             PATCH           @layeredapps/dashboard                                   
+/api/user/reset-account-password                       GUEST             PATCH           @layeredapps/dashboard                                   
+/api/user/reset-code                                                     GET             @layeredapps/dashboard                                   
+/api/user/reset-codes                                                    GET             @layeredapps/dashboard                                   
+/api/user/reset-codes-count                                              GET             @layeredapps/dashboard                                   
+/api/user/reset-session-key                                              PATCH           @layeredapps/dashboard                                   
+/api/user/session                                                        GET             @layeredapps/dashboard                                   
+/api/user/sessions                                                       GET             @layeredapps/dashboard                                   
+/api/user/sessions-count                                                 GET             @layeredapps/dashboard                                   
+/api/user/set-account-deleted                                            PATCH           @layeredapps/dashboard                                   
+/api/user/set-account-password                                           PATCH           @layeredapps/dashboard                                   
+/api/user/set-account-profile                                            PATCH           @layeredapps/dashboard                                   
+/api/user/set-account-username                                           PATCH           @layeredapps/dashboard                                   
+/api/user/set-session-ended                                              PATCH           @layeredapps/dashboard                                   
+/api/user/set-session-verified                                           PATCH           @layeredapps/dashboard                                   
+/api/user/update-profile                                                 PATCH           @layeredapps/dashboard                                   
+/home                                                                                    static-page                    /src/www                  
+/webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
