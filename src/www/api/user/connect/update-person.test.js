@@ -473,7 +473,7 @@ describe('/api/user/connect/update-person', function () {
       global.stripeJS = 3
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
-        country: 'DE',
+        country: 'AT',
         business_type: 'company'
       })
       await TestHelper.createPerson(user, {

@@ -52,17 +52,15 @@ module.exports = {
         await updateStripeAccount(stripeEvent, req.stripeKey)
         break
     }
-    // for testing we stash the webhooks for analysis but
-    // since ngrok throttles requests we delay to space things out
-    if (global.testNumber) {
-      global.webhooks = global.webhooks || []
-      setTimeout(() => {
-        global.webhooks.unshift(stripeEvent)
-      }, 10000)
-    }
     if (stripeEvent.data && stripeEvent.data.object && stripeEvent.data.object.id) {
       await dashboard.StorageCache.remove(stripeEvent.data.object.id)
     }
+    // for testing we stash the webhooks for analysis
+    if (global.testNumber) {
+      global.webhooks = global.webhooks || []
+      global.webhooks.unshift(stripeEvent)
+    }
+
     return res.end()
   }
 }

@@ -346,7 +346,6 @@ async function createStripeAccount (user, body) {
   req.account = user.account
   req.body = body
   user.stripeAccount = await req.post()
-  await wait(10000)
   return user.stripeAccount
 }
 
@@ -377,7 +376,7 @@ async function createExternalAccount (user, body) {
       }
     } catch (error) {
     }
-    await wait(10000)
+    await wait(100)
   }
 }
 
@@ -396,7 +395,6 @@ async function createPerson (user, body) {
   } else if (body && body.relationship_executive) {
     user.executive = person
   }
-  await wait(10000)
   return person
 }
 
@@ -432,7 +430,7 @@ async function createPayout (user) {
       return user.payout
     } catch (error) {
     }
-    await wait(10000)
+    await wait(100)
   }
 }
 
@@ -453,7 +451,7 @@ async function submitCompanyOwners (user) {
       }
     } catch (error) {
     }
-    await wait(10000)
+    await wait(100)
   }
 }
 
@@ -474,7 +472,7 @@ async function submitCompanyDirectors (user) {
       }
     } catch (error) {
     }
-    await wait(10000)
+    await wait(100)
   }
 }
 
@@ -495,7 +493,7 @@ async function submitCompanyExecutives (user) {
       }
     } catch (error) {
     }
-    await wait(10000)
+    await wait(100)
   }
 }
 
@@ -511,11 +509,11 @@ async function submitStripeAccount (user) {
   while (true) {
     try {
       user.stripeAccount = await global.api.user.connect.StripeAccount.get(req2)
-      if (user.stripeAccount.stripeObject.requirements.pending_verification.length) {
-        return wait(10000)
+      if (!user.stripeAccount.stripeObject.requirements.pending_verification.length) {
+        return user.stripeAccount
       }
-      return user.stripeAccount
     } catch (error) {
     }
+    await wait(100)
   }
 }

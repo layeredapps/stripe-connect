@@ -17,7 +17,7 @@ module.exports = {
     }
     if (stripeAccount.stripeObject.business_type === 'company') {
       if (stripeAccount.requiresOwners && !stripeAccount.stripeObject.company.owners_provided) {
-        throw new Error('invalid-owner')
+        throw new Error('invalid-company-owner')
       }
       if (stripeAccount.requiresDirectors && !stripeAccount.stripeObject.company.directors_provided) {
         throw new Error('invalid-company-director')

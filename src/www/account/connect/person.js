@@ -23,12 +23,17 @@ async function renderPage (req, res) {
   if (!req.data.person.requirements.currently_due.length) {
     removeElements.push('requires-information')
   }
-  if (req.data.person.relationship.representative) {
-    removeElements.push('director', 'owner')
-  } else if (req.data.person.relationship.owner) {
-    removeElements.push('director', 'representative')
-  } else {
-    removeElements.push('owner', 'representative')
+  if (!req.data.person.relationship.representative) {
+    removeElements.push('representative')
+  }
+  if (!req.data.person.relationship.owner) {
+    removeElements.push('owner')
+  }
+  if (!req.data.person.relationship.director) {
+    removeElements.push('director')
+  }
+  if (!req.data.person.relationship.executive) {
+    removeElements.push('executive')
   }
   for (const id of removeElements) {
     const element = doc.getElementById(id)

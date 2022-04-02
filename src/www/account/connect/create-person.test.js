@@ -1,8 +1,72 @@
 /* eslint-env mocha */
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
+const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
-describe('/account/connect/create-person', () => {
+describe('/account/connect/create-person', function () {
+  const cachedResponses = {}
+  before(async () => {
+    await DashboardTestHelper.setupBeforeEach()
+    await TestHelper.setupBeforeEach()
+    const user = await TestHelper.createUser()
+    // no director
+    await TestHelper.createStripeAccount(user, {
+      country: 'US',
+      business_type: 'company'
+    })
+    let req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResponses.viewNoDirector = await req.get()
+    // view
+    await TestHelper.createStripeAccount(user, {
+      country: 'GB',
+      business_type: 'company'
+    })
+    req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
+    req.account = user.account
+    req.session = user.session
+    cachedResponses.view = await req.get()
+    // submit
+    req.body = {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '10'
+    }
+    req.filename = __filename
+    req.screenshots = [
+      { hover: '#account-menu-container' },
+      { click: '/account/connect' },
+      { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
+      { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
+      { click: `/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}` },
+      { fill: '#submit-form' }
+    ]
+    cachedResponses.submit = cachedResponses.createRepresentative = await req.post()
+    // create director
+    delete (req.screenshots)
+    delete (req.filename)
+    req.body = {
+      relationship_director: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '10'
+    }
+    cachedResponses.createDirector = await req.post()
+    // create executive
+    req.body = {
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '10'
+    }
+    cachedResponses.createExecutive = await req.post()
+    // create owner
+    req.body = {
+      relationship_owner: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '10'
+    }
+    cachedResponses.createOwner = await req.post()
+  })
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -39,15 +103,7 @@ describe('/account/connect/create-person', () => {
 
   describe('view', () => {
     it('should present the form', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'GB',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      const result = await req.get()
+      const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
@@ -55,15 +111,7 @@ describe('/account/connect/create-person', () => {
 
     // TODO: needs test for removing executive
     it('should remove director option', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      const result = await req.get()
+      const result = cachedResponses.viewNoDirector
       const doc = TestHelper.extractDoc(result.html)
       const option = doc.getElementById('relationship_director')
       assert.strictEqual(option, undefined)
@@ -88,47 +136,20 @@ describe('/account/connect/create-person', () => {
 
   describe('submit', () => {
     it('should create representative (screenshots)', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'AT',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = {
-        relationship_representative: 'true',
-        relationship_title: 'SVP Testing',
-        relationship_percent_ownership: '10'
-      }
-      req.filename = __filename
-      req.screenshots = [
-        { hover: '#account-menu-container' },
-        { click: '/account/connect' },
-        { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}` },
-        { fill: '#submit-form' }
-      ]
-      const result = await req.post()
+      const result = cachedResponses.submit
       assert.strictEqual(result.redirect.startsWith('/account/connect/person?personid='), true)
     })
 
     it('should create director', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = {
-        relationship_director: 'true',
-        relationship_title: 'Chairperson',
-        relationship_percent_ownership: '0'
-      }
-      const result = await req.post()
+      const result = cachedResponses.createDirector
+      const doc = TestHelper.extractDoc(result.html)
+      const personsTable = doc.getElementById('persons-table')
+      assert.notStrictEqual(personsTable, undefined)
+      assert.notStrictEqual(personsTable, null)
+    })
+
+    it('should create representative', async () => {
+      const result = cachedResponses.createRepresentative
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
       assert.notStrictEqual(personsTable, undefined)
@@ -136,20 +157,7 @@ describe('/account/connect/create-person', () => {
     })
 
     it('should create executive', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = {
-        relationship_executive: 'true',
-        relationship_title: 'Chairperson',
-        relationship_percent_ownership: '0'
-      }
-      const result = await req.post()
+      const result = cachedResponses.createExecutive
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
       assert.notStrictEqual(personsTable, undefined)
@@ -157,20 +165,7 @@ describe('/account/connect/create-person', () => {
     })
 
     it('should create owner', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'company'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = {
-        relationship_owner: 'true',
-        relationship_title: 'Shareholder',
-        relationship_percent_ownership: '7'
-      }
-      const result = await req.post()
+      const result = cachedResponses.createOwner
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
       assert.notStrictEqual(personsTable, undefined)

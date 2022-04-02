@@ -22,7 +22,7 @@
             <label class="field-label"><input type="checkbox" id="relationship_representative" name="relationship_representative" value="true"> Representative (must be executive)</label>
             <label class="field-label" id="executive-container"><input type="checkbox" id="relationship_executive" name="relationship_executive" value="true"> Company executive</label>
             <label class="field-label" id="director-container"><input type="checkbox" id="relationship_director" name="relationship_director" value="true"> Company director</label>
-            <label class="field-label" id="owner-container"><input type="checkbox" id="relationship_owner" name="relationship_owner" value="true"> Beneficial owner</label>
+            <label class="field-label" id="owner-container"><input type="checkbox" id="relationship_owner" name="relationship_owner" value="true"> Company owner</label>
           </div>
           <div class="input-fields">
             <label class="field-label" for="relationship_title" translate="yes">Job, role or relationship title</label>
@@ -52,7 +52,7 @@
         Error! An error occurred creating the registration
       </div>
     </template>
-    <template id="invalid-owner">
+    <template id="invalid-company-owner">
       <div class="error message" translate="yes">
         Your Stripe account does not require company owner information
       </div>

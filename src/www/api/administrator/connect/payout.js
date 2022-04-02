@@ -16,9 +16,6 @@ module.exports = {
       if (!payoutInfo) {
         throw new Error('invalid-payoutid')
       }
-      if (payoutInfo.dataValues.accountid !== req.account.accountid) {
-        throw new Error('invalid-account')
-      }
       payout = {}
       for (const field of payoutInfo._options.attributes) {
         payout[field] = payoutInfo.get(field)
