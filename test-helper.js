@@ -5,7 +5,6 @@ global.maximumStripeRetries = 0
 global.testConfiguration = global.testConfiguration || {}
 global.testConfiguration.stripeJS = false
 global.testConfiguration.maximumStripeRetries = 0
-global.testConfiguration.webhooks = []
 
 const util = require('util')
 const ngrok = require('ngrok')
@@ -34,6 +33,7 @@ module.exports = {
   createPerson,
   createStripeAccount,
   deleteOldWebhooks,
+  rotateWebhook,
   setupBefore,
   setupBeforeEach,
   setupWebhook,
@@ -74,12 +74,16 @@ let webhookRotation = 0
 
 async function setupBeforeEach () {
   await connect.Storage.flush()
+  await rotateWebhook()
+}
+
+async function rotateWebhook () {
   if (!global.webhooks) {
     global.webhooks = []
   } else if (global.webhooks && global.webhooks.length > 0) {
     webhookRotation += global.webhooks.length
     global.webhooks = []
-    if (webhookRotation >= 10) {
+    if (webhookRotation >= 20) {
       webhookRotation = 0
       await stripe.webhookEndpoints.del(webhook.id, stripeKey)
       webhook = null
@@ -94,7 +98,7 @@ async function setupWebhook () {
     return
   }
   let newAddress
-  ngrok.kill()
+  await ngrok.kill()
   tunnel = null
   while (!tunnel) {
     try {
@@ -108,6 +112,7 @@ async function setupWebhook () {
       newAddress = tunnel
       break
     } catch (error) {
+      await wait()
       continue
     }
   }
@@ -285,7 +290,7 @@ after(async () => {
     await deleteOldWebhooks()
     webhook = null
   }
-  ngrok.kill()
+  await ngrok.kill()
 })
 
 async function deleteOldWebhooks () {
