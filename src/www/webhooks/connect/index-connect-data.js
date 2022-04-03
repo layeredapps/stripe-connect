@@ -128,6 +128,13 @@ async function updateStripeAccount (stripeEvent, stripeKey) {
 }
 
 async function updatePayout (stripeEvent, stripeKey) {
+  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
+    apiKey: stripeKey.apiKey,
+    stripeAccount: stripeEvent.account
+  })
+  if (!stripeObject) {
+    return
+  }
   let stripeAccount
   try {
     stripeAccount = await global.api.administrator.connect.StripeAccount.get({
@@ -140,13 +147,6 @@ async function updatePayout (stripeEvent, stripeKey) {
     return
   }
   if (!stripeAccount) {
-    return
-  }
-  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
-    apiKey: stripeKey.apiKey,
-    stripeAccount: stripeEvent.account
-  })
-  if (!stripeObject) {
     return
   }
   await upsert(connect.Storage.Payout, 'payoutid', stripeObject.id, {
