@@ -8,12 +8,13 @@
       "/src/server/stripe-connect/bind-stripekey.js"
     ]
   },
-  "dependencies": {
-    "@layeredapps/maxmind-geoip": "latest",
-    "stripe": "^8.127.0"
-  },
   "peerDependencies": {
     "@layeredapps/dashboard": "latest"
+  },
+  "dependencies": {
+    "@layeredapps/dashboard": "latest",
+    "@layeredapps/maxmind-geoip": "latest",
+    "stripe": "^8.127.0"
   },
   "devDependencies": {
     "@faker-js/faker": "latest",
