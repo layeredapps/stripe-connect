@@ -74,7 +74,6 @@ let webhookRotation = 0
 
 async function setupBeforeEach () {
   await connect.Storage.flush()
-  await global.gc()
   if (!global.webhooks) {
     global.webhooks = []
   } else if (global.webhooks && global.webhooks.length > 0) {
