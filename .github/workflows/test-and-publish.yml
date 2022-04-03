@@ -23,8 +23,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
     - name: Increase version
-      run: |
-        npm version patch
+      run: npm version patch
     - name: Run test suite
       run: |
         export RESPONSE_PATH=`pwd`/documentation
