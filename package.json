@@ -9,11 +9,11 @@
     ]
   },
   "dependencies": {
-    "@layeredapps/maxmind-geoip": "github:layeredapps/maxmind-geoip",
+    "@layeredapps/maxmind-geoip": "latest",
     "stripe": "^8.127.0"
   },
   "peerDependencies": {
-    "@layeredapps/dashboard": "@layeredapps/dashboard"
+    "@layeredapps/dashboard": "latest"
   },
   "devDependencies": {
     "@layeredapps/dashboard": "latest",
