@@ -47,9 +47,7 @@ jobs:
         SCREENSHOT_LANGUAGES: en
         NODE_OPTIONS: --preserve-symlinks
     - name: Generate supporting text files
-      run: |
-        npm install @layeredapps/dashboard --no-save
-        node main.js
+      run: node main.js
       env:
         NODE_ENV: testing
         EXIT_ON_START: true
@@ -79,7 +77,7 @@ jobs:
         publish_dir: documentation
         keep_files: true
         publish_branch: master
-    - name: Pass or fail tets
+    - name: Pass or fail tests
       run: |
         TESTS=`cat tests.txt`
         if [[ "$TESTS" == *" 1)"* ]]; then
