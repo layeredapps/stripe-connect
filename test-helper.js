@@ -70,9 +70,21 @@ async function setupBefore () {
   global.sitemap['/api/substitute-failed-document-back'] = helperRoutes.substituteFailedDocumentBack
 }
 
+let webhookRotation = 0
+
 async function setupBeforeEach () {
-  global.webhooks = []
   await connect.Storage.flush()
+  if (!global.webhooks) {
+    global.webhooks = []
+  } else if (global.webhooks && global.webhooks.length > 0) {
+    webhookRotation += global.webhooks.length
+    if (webhookRotation >= 10) {
+      webhookRotation = 0
+      await stripe.webhookEndpoints.del(webhook.id, stripeKey)
+      webhook = null
+      await setupWebhook()
+    }
+  }
 }
 
 let webhook, tunnel, data
