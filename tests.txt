@@ -443,7 +443,7 @@
     receives
       ✔ optional querystring offset (integer)
       ✔ optional querystring limit (integer)
-      ✔ optional querystring all (boolean)
+      1) optional querystring all (boolean)
       ✔ optional querystring accountid (string)
       ✔ optional querystring stripeid (string)
     returns
@@ -952,5 +952,24 @@
       ✔ environment STRIPE_JS
 
 
-  585 passing (52m)
+  584 passing (51m)
+  1 failing
+
+  1) /api/administrator/connect/payouts
+       receives
+         optional querystring all (boolean):
+
+      AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+5 !== 4
+
+      + expected - actual
+
+      -5
+      +4
+      
+      at Context.<anonymous> (src/www/api/administrator/connect/payouts.test.js:76:14)
+      at processImmediate (internal/timers.js:464:21)
+
+
 
