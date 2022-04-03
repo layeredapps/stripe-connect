@@ -24,7 +24,7 @@ http://localhost:8000
 | RECEIVES---------------------------------| RETURNS--| CONFIGURATION----------|
 | optional querystring offset (integer)    | array    | environment PAGE_SIZE  |
 | optional querystring limit (integer)     |          |                        |
-| 1) optional querystring all (boolean)    |          |                        |
+| optional querystring all (boolean)       |          |                        |
 | optional querystring accountid (string)  |          |                        |
 | optional querystring stripeid (string)   |          |                        |
 |------------------------------------------|----------|------------------------|
