@@ -10,7 +10,12 @@ module.exports = async () => {
     logging: true,
     dialect: 'db2',
     host: prefixedHost,
-    port: prefixedPort
+    port: prefixedPort,
+    pool: {
+      max: process.env.CONNECT_MAX_CONNECTIONS || process.env.MAX_CONNECTIONS || 10,
+      min: 0,
+      idle: process.env.CONNECT_IDLE_CONNECTION_LIMIT || process.env.IDLE_CONNECTION_LIMIT || 10000
+    }
   })
   class CountrySpec extends Model {}
   CountrySpec.init({

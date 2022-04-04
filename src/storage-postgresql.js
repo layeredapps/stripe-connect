@@ -1,7 +1,7 @@
 const { Sequelize, Model, DataTypes } = require('sequelize')
 
 module.exports = async () => {
-  const prefixedDatabaseURL = process.env.CONNECT_DATABASE_URL || process.env.DATABASE_URL
+  const prefixedDatabaseURL = process.env.CONNECT_POSTGRESQL_DATABASE_URL || process.env.POSTGRESQL_DATABASE_URL
   const sequelize = new Sequelize(prefixedDatabaseURL, {
     logging: false
   })
@@ -10,7 +10,12 @@ module.exports = async () => {
     countryid: {
       type: DataTypes.STRING(2),
       primaryKey: true,
-      allowNull: false
+      allowNull: false,
+      pool: {
+        max: process.env.CONNECT_MAX_CONNECTIONS || process.env.MAX_CONNECTIONS || 10,
+        min: 0,
+        idle: process.env.CONNECT_IDLE_CONNECTION_LIMIT || process.env.IDLE_CONNECTION_LIMIT || 10000
+      }
     },
     object: {
       type: DataTypes.VIRTUAL,
