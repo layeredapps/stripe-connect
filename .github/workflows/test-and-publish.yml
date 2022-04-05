@@ -75,7 +75,7 @@ jobs:
         personal_token: ${{ secrets.DEPLOY_TOKEN }}
         publish_dir: documentation
         keep_files: true
-        publish_branch: master
+        publish_branch: main
     - name: Pass or fail tests
       run: |
         TESTS=`cat tests.txt`
