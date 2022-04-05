@@ -3,7 +3,6 @@
 #### Index
 
 - [Introduction](#introduction)
-- [Module contents](#module-contents)
 - [Import this module](#import-this-module)
 - [Setting up your Stripe credentials](#setting-up-your-stripe-credentials)
 - [Storage engine](#storage-engine)
@@ -18,20 +17,6 @@ Dashboard bundles everything a web app needs, all the "boilerplate" like signing
 The Stripe Connect module adds a complete "custom" integration of Stripe's Connect API, allowing your users to provide personal or company information and receive payouts on your platform.  A UI is provided for users to create and manage their registrations, and a basic administrator UI is provided for oversight.  When a user has completed a Stripe account registration and it has been approved by Stripe their status will be changed to `payouts_enabled` and your application can use this property to control access to your platform functionality.
 
 Currently only automatic payouts are supported.  Countries that are "in beta" support by Stripe are not supported and need to be added as they become generally available.  The [Stripe API documentation](https://stripe.com/docs/api) supplements this documentation.
-
-# Module contents 
-
-Dashboard modules can add pages and API routes.  For more details check the `sitemap.txt` and `api.txt` or `env.txt` also contained in the online documentation.
-
-| Content type             |     |
-|--------------------------|-----|
-| Proxy scripts            |     |
-| Server scripts           | Yes |
-| Content scripts          |     |
-| User pages               | Yes |
-| User API routes          | Yes | 
-| Administrator pages      | Yes |
-| Administrator API routes | Yes | 
 
 ## Import this module
 
@@ -59,10 +44,14 @@ You will need to retrieve various keys from [Stripe](https://stripe.com).  Durin
 
 ## Storage engine
 
-By default this module will share whatever storage you use for Dashboard.  You can specify an alternate storage module to use instead, or the same module with a separate database.
+By default this module will share whatever storage you use for Dashboard.  You can specify nothing, specify an alternate storage backend, or specify the same type with a separate database.
 
-    CONNECT_STORAGE=@layeredapps/storage-mongodb
-    CONNECT_MONGODB_URL=mongo://localhost:27017/connect
+    CONNECT_STORAGE=mysql
+    CONNECT_MYSQL_HOST=localhost
+    CONNECT_MYSQL_PORT=3306
+    CONNECT_MYSQL_DATABASE=connect
+    CONNECT_MYSQL_USERNAME=user
+    CONNECT_MYSQL_PASSWORD=password
 
 ### Access the API
 
