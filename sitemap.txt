@@ -15,7 +15,7 @@ Special HTML files:
 @layeredapps/dashboard/redirect.html
 
 Dashboard modules:
-@layeredapps/maxmind-geoip (1.0.9)
+@layeredapps/maxmind-geoip (1.0.11)
 
 Server handlers:
 /src/server/stripe-connect/bind-stripekey.js
