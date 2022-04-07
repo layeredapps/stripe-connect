@@ -6,7 +6,6 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ]
@@ -24,7 +23,6 @@
     "receives": [],
     "exceptions": {
       "invalid-payoputid": [
-        "invalid-payoputid",
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ]
@@ -74,12 +72,10 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-reason": [
-        "invalid-reason",
         "missing posted reason",
         "invalid posted reason"
       ]
@@ -97,7 +93,6 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ]
@@ -132,7 +127,6 @@
     ],
     "exceptions": {
       "invalid-accountid": [
-        "invalid-accountid",
         "invalid querystring accountid"
       ]
     },
@@ -205,28 +199,23 @@
     ],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individuals",
         "ineligible stripe account does not require directors",
         "ineligible stripe account does not require owners",
         "ineligible stripe account does not require executives"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-relationship_percent_ownership": [
-        "invalid-relationship_percent_ownership",
         "missing posted relationship.percent_ownership",
         "invalid posted relationship.percent_ownership"
       ],
       "invalid-relationship_title": [
-        "invalid-relationship_title",
         "missing posted relationship.title",
         "invalid posted relationship_title"
       ]
@@ -244,21 +233,17 @@
     "receives": [],
     "exceptions": {
       "invalid-accountid": [
-        "invalid-accountid",
         "missing querystring accountid",
         "invalid querystring accountid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-business_type": [
-        "invalid-business_type",
         "missing posted business_type",
         "invalid posted business_type"
       ],
       "invalid-country": [
-        "invalid-country",
         "invalid posted country",
         "invalid posted country"
       ]
@@ -276,16 +261,13 @@
     "receives": [],
     "exceptions": {
       "invalid-personid": [
-        "invalid-personid",
         "missing querystring personid",
         "invalid querystring personid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-person": [
-        "invalid-person",
         "ineligible querystring person is representative"
       ]
     },
@@ -302,12 +284,10 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -324,12 +304,10 @@
     "receives": [],
     "exceptions": {
       "invalid-payoutid": [
-        "invalid-payoutid",
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -346,12 +324,10 @@
     "receives": [],
     "exceptions": {
       "invalid-payoutid": [
-        "invalid-payoutid",
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -373,12 +349,10 @@
     ],
     "exceptions": {
       "invalid-payoutid": [
-        "invalid-payoutid",
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -397,12 +371,10 @@
     "receives": [],
     "exceptions": {
       "invalid-personid": [
-        "invalid-personid",
         "missing querystring personid",
         "invalid querystring personid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -419,16 +391,13 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individual"
       ]
     },
@@ -449,16 +418,13 @@
     ],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individual"
       ]
     },
@@ -477,17 +443,14 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individual",
         "ineligible company directors are submitted"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -504,17 +467,14 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individual",
         "ineligible company executives are submitted"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -531,17 +491,14 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account for individual",
         "ineligible company owners are submitted"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -551,16 +508,6 @@
     ],
     "configuration": []
   },
-  "✔ object (company)": {
-    "url": "✔ object (company)",
-    "verb": "",
-    "auth": "",
-    "receives": [],
-    "exceptions": {},
-    "redacts": [],
-    "returns": [],
-    "configuration": []
-  },
   "/api/user/connect/stripe-account": {
     "url": "/api/user/connect/stripe-account",
     "verb": "get",
@@ -568,12 +515,10 @@
     "receives": [],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -590,12 +535,10 @@
     "receives": [],
     "exceptions": {
       "invalid-payoutid": [
-        "invalid-payoutid",
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -616,12 +559,10 @@
     ],
     "exceptions": {
       "invalid-accountid": [
-        "invalid-accountid",
         "missing querystring accountid",
         "invalid querystring accountid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ]
     },
@@ -653,66 +594,53 @@
     ],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-account_holder_type": [
-        "invalid-account_holder_type",
         "missing querystring account_holder_type",
         "invalid querystring account_holder_type"
       ],
       "invalid-currency": [
-        "invalid-currency",
         "missing querystring currency",
         "invalid querystring currency"
       ],
       "invalid-iban": [
-        "invalid-iban",
         "missing querystring iban",
         "invalid querystring iban"
       ],
       "invalid-account_number": [
-        "invalid-account_number",
         "missing querystring account_number",
         "invalid querystring account_number"
       ],
       "invalid-bsb_number": [
-        "invalid-bsb_number",
         "missing querystring bsb_number",
         "invalid querystring bsb_number"
       ],
       "invalid-institution_number": [
-        "invalid-institution_number",
         "missing querystring institution_number",
         "invalid querystring institution_number"
       ],
       "invalid-transit_number": [
-        "invalid-transit_number",
         "missing querystring transit_number",
         "invalid querystring transit_number"
       ],
       "invalid-sort_code": [
-        "invalid-sort_code",
         "missing querystring sort_code",
         "invalid querystring sort_code"
       ],
       "invalid-clearing_code": [
-        "invalid-clearing_code",
         "missing querystring clearing_code",
         "invalid querystring clearing_code"
       ],
       "invalid-bank_code": [
-        "invalid-bank_code",
         "missing querystring bank_code",
         "invalid querystring bank_code"
       ],
       "invalid-routing_number": [
-        "invalid-routing_number",
         "missing querystring routing_number",
         "invalid querystring routing_number"
       ]
@@ -747,57 +675,44 @@
     ],
     "exceptions": {
       "invalid-personid": [
-        "invalid-personid",
         "missing querystring personid",
         "invalid querystring personid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account",
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-person": [
-        "invalid-person",
         "ineligible querystring person has no required information"
       ],
       "invalid-dob_day": [
-        "invalid-dob_day",
         "missing posted dob.day",
         "invalid posted dob.day"
       ],
       "invalid-dob_month": [
-        "invalid-dob_month",
         "missing posted dob.month",
         "invalid posted dob.month"
       ],
       "invalid-dob_year": [
-        "invalid-dob_year",
         "missing posted dob.month",
         "invalid posted dob.month"
       ],
       "invalid-relationship_percent_ownership": [
-        "invalid-relationship_percent_ownership",
         "invalid posted relationship.percent_ownership"
       ],
       "invalid-address_country": [
-        "invalid-address_country",
         "invalid posted address.country"
       ],
       "invalid-address_state": [
-        "invalid-address_state",
         "invalid posted address.state"
       ],
       "invalid-id_number": [
-        "invalid-id_number",
         "invalid posted id_number"
       ],
       "invalid-ssn_last_4": [
-        "invalid-ssn_last_4",
         "invalid posted ssn_last_4"
       ],
       "invalid-phone": [
-        "invalid-phone",
         "invalid posted phone"
       ]
     },
@@ -858,71 +773,55 @@
     ],
     "exceptions": {
       "invalid-stripeid": [
-        "invalid-stripeid",
         "missing querystring stripeid",
         "invalid querystring stripeid"
       ],
       "invalid-account": [
-        "invalid-account",
         "ineligible accessing account"
       ],
       "invalid-stripe-account": [
-        "invalid-stripe-account",
         "ineligible stripe account"
       ],
       "invalid-individual_dob_day": [
-        "invalid-individual_dob_day",
         "missing posted individual_dob_day",
         "invalid posted individual_dob_day"
       ],
       "invalid-individual_dob_month": [
-        "invalid-individual_dob_month",
         "missing posted individual_dob_month",
         "invalid posted individual_dob_month"
       ],
       "invalid-individual_dob_year": [
-        "invalid-individual_dob_year",
         "missing posted individual_dob_month",
         "invalid posted individual_dob_month"
       ],
       "invalid-individual_address_country": [
-        "invalid-individual_address_country",
         "invalid posted individual_address_country"
       ],
       "invalid-individual_address_state": [
-        "invalid-individual_address_state",
         "invalid posted individual_address_state"
       ],
       "invalid-individual_id_number": [
-        "invalid-individual_id_number",
         "invalid posted individual_id_number"
       ],
       "invalid-individual_ssn_last_4": [
-        "invalid-individual_ssn_last_4",
         "invalid posted individual_ssn_last_4"
       ],
       "invalid-individual_phone": [
-        "invalid-individual_phone",
         "invalid posted individual_phone"
       ],
       "invalid-company_address_country": [
-        "invalid-company_address_country",
         "invalid posted company_address_country"
       ],
       "invalid-company_address_state": [
-        "invalid-company_address_state",
         "invalid posted company_address_state"
       ],
       "invalid-company_address_kana_city": [
-        "invalid-company_address_kana_city",
         "invalid posted company_address_kana_city"
       ],
       "invalid-company_address_kana_town": [
-        "invalid-company_address_kana_town",
         "invalid posted company_address_kana_town"
       ],
       "invalid-token": [
-        "invalid-token",
         "missing posted token",
         "invalid posted token"
       ]
