@@ -75,14 +75,14 @@ let webhookRotation = 0
 async function setupBeforeEach () {
   await connect.Storage.flush()
   await rotateWebhook()
+  global.webhooks = []
 }
 
 async function rotateWebhook () {
   if (!global.webhooks) {
     global.webhooks = []
-  } else if (global.webhooks && global.webhooks.length > 0) {
+  } else if (global.webhooks.length > 0) {
     webhookRotation += global.webhooks.length
-    global.webhooks = []
     if (webhookRotation >= 20) {
       webhookRotation = 0
       await stripe.webhookEndpoints.del(webhook.id, stripeKey)
