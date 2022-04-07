@@ -12,6 +12,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       if (cachedResponses && cachedResponses.finished) {
         return
       }
+      cachedResponses = {}
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -577,6 +578,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       if (cachedResponses && cachedResponses.finished) {
         return
       }
+      cachedResponses = {}
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()

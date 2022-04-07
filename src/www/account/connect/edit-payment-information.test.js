@@ -40,6 +40,7 @@ describe('/account/connect/edit-payment-information', function () {
       if (cachedResponses && cachedResponses.finished) {
         return
       }
+      cachedResponses = {}
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -106,6 +107,7 @@ describe('/account/connect/edit-payment-information', function () {
       req.account = user.account
       req.session = user.session
       cachedResponses.routing_number = await req.get()
+      cachedResponses.finished = true
     }
     it('should present the form', async () => {
       const user = await TestHelper.createUser()
@@ -242,6 +244,7 @@ describe('/account/connect/edit-payment-information', function () {
       if (cachedResponses && cachedResponses.finished) {
         return
       }
+      cachedResponses = {}
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -342,6 +345,7 @@ describe('/account/connect/edit-payment-information', function () {
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.routing_number = 'invalid'
       cachedResponses.invalidRoutingNumber = await req.post()
+      cachedResponses.finished = true
     }
 
     it('reject invalid field account_holder_type', async () => {
