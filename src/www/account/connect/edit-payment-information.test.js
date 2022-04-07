@@ -35,8 +35,11 @@ describe('/account/connect/edit-payment-information', function () {
   })
 
   describe('view', async () => {
-    const cachedResults = {}
-    before(async () => {
+    const cachedResponses = {}
+    beforeEach(async () => {
+      if (Object.keys(cachedResponses).length) {
+        return
+      }
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -48,7 +51,7 @@ describe('/account/connect/edit-payment-information', function () {
       let req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.account_holder_type = cachedResults.currency = cachedResults.iban = await req.get()
+      cachedResponses.account_holder_type = cachedResponses.currency = cachedResponses.iban = await req.get()
       // account number, bsb number
       await TestHelper.createStripeAccount(user, {
         country: 'AU',
@@ -57,7 +60,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.account_number = cachedResults.bsb_number = await req.get()
+      cachedResponses.account_number = cachedResponses.bsb_number = await req.get()
       // intiitution number, transit number
       await TestHelper.createStripeAccount(user, {
         country: 'CA',
@@ -66,7 +69,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.institution_number = cachedResults.transit_number = await req.get()
+      cachedResponses.institution_number = cachedResponses.transit_number = await req.get()
       // sort code
       await TestHelper.createStripeAccount(user, {
         country: 'GB',
@@ -75,7 +78,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.sort_code = await req.get()
+      cachedResponses.sort_code = await req.get()
       // branch code, clearing code
       await TestHelper.createStripeAccount(user, {
         country: 'HK',
@@ -84,7 +87,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.branch_code = cachedResults.clearing_code = await req.get()
+      cachedResponses.branch_code = cachedResponses.clearing_code = await req.get()
       // bank code
       await TestHelper.createStripeAccount(user, {
         country: 'JP',
@@ -93,7 +96,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.bank_code = await req.get()
+      cachedResponses.bank_code = await req.get()
       // routing number
       await TestHelper.createStripeAccount(user, {
         country: 'MY',
@@ -102,7 +105,7 @@ describe('/account/connect/edit-payment-information', function () {
       req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResults.routing_number = await req.get()
+      cachedResponses.routing_number = await req.get()
     })
     it('should present the form', async () => {
       const user = await TestHelper.createUser()
@@ -119,7 +122,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
     it('should have element for field account_holder_type', async () => {
-      const result = cachedResults.account_holder_type
+      const result = cachedResponses.account_holder_type
       const doc = TestHelper.extractDoc(result.html)
       const individual = doc.getElementById('individual')
       assert.notStrictEqual(individual, undefined)
@@ -127,67 +130,67 @@ describe('/account/connect/edit-payment-information', function () {
       assert.notStrictEqual(company, undefined)
     })
     it('should have element for field currency', async () => {
-      const result = cachedResults.currency
+      const result = cachedResponses.currency
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('currency')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field iban', async () => {
-      const result = cachedResults.iban
+      const result = cachedResponses.iban
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('iban')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field account_number', async () => {
-      const result = cachedResults.account_number
+      const result = cachedResponses.account_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('account_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field bsb_number', async () => {
-      const result = cachedResults.bsb_number
+      const result = cachedResponses.bsb_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bsb_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field institution_number', async () => {
-      const result = cachedResults.institution_number
+      const result = cachedResponses.institution_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('institution_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field transit_number', async () => {
-      const result = cachedResults.transit_number
+      const result = cachedResponses.transit_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('transit_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field sort_code', async () => {
-      const result = cachedResults.sort_code
+      const result = cachedResponses.sort_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('sort_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field branch_code', async () => {
-      const result = cachedResults.branch_code
+      const result = cachedResponses.branch_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('branch_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field clearing_code', async () => {
-      const result = cachedResults.clearing_code
+      const result = cachedResponses.clearing_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('clearing_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field bank_code', async () => {
-      const result = cachedResults.bank_code
+      const result = cachedResponses.bank_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bank_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field routing_number', async () => {
-      const result = cachedResults.routing_number
+      const result = cachedResponses.routing_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('routing_number')
       assert.notStrictEqual(field, undefined)
@@ -222,8 +225,11 @@ describe('/account/connect/edit-payment-information', function () {
   })
 
   describe('errors', async () => {
-    const cachedResults = {}
-    before(async () => {
+    const cachedResponses = {}
+    beforeEach(async () => {
+      if (Object.keys(cachedResponses).length) {
+        return
+      }
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -237,15 +243,15 @@ describe('/account/connect/edit-payment-information', function () {
       // account holder type
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.account_holder_type = 'invalid'
-      cachedResults.invalidAccountHolderType = await req.post()
+      cachedResponses.invalidAccountHolderType = await req.post()
       // currency
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.currency = 'invalid'
-      cachedResults.invalidCurrency = await req.post()
+      cachedResponses.invalidCurrency = await req.post()
       // iban
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.iban = 'invalid'
-      cachedResults.invalidIBAN = await req.post()
+      cachedResponses.invalidIBAN = await req.post()
       // account number
       await TestHelper.createStripeAccount(user, {
         country: 'AU',
@@ -256,11 +262,11 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.account_number = 'invalid'
-      cachedResults.invalidAccountNumber = await req.post()
+      cachedResponses.invalidAccountNumber = await req.post()
       // bsb number
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.bsb_number = 'invalid'
-      cachedResults.invalidBSBNumber = await req.post()
+      cachedResponses.invalidBSBNumber = await req.post()
       // intiitution number
       await TestHelper.createStripeAccount(user, {
         country: 'CA',
@@ -271,11 +277,11 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.institution_number = 'invalid'
-      cachedResults.invalidInstitutionNumber = await req.post()
+      cachedResponses.invalidInstitutionNumber = await req.post()
       // transit number
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.transit_number = 'invalid'
-      cachedResults.invalidTransitNumber = await req.post()
+      cachedResponses.invalidTransitNumber = await req.post()
       // sort code
       await TestHelper.createStripeAccount(user, {
         country: 'GB',
@@ -286,7 +292,7 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.sort_code = 'invalid'
-      cachedResults.invalidSortCode = await req.post()
+      cachedResponses.invalidSortCode = await req.post()
       // branch code
       await TestHelper.createStripeAccount(user, {
         country: 'HK',
@@ -297,11 +303,11 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.branch_code = 'invalid'
-      cachedResults.invalidBranchCode = await req.post()
+      cachedResponses.invalidBranchCode = await req.post()
       // clearing code
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.clearing_code = 'invalid'
-      cachedResults.invalidClearingCode = await req.post()
+      cachedResponses.invalidClearingCode = await req.post()
       // bank code
       await TestHelper.createStripeAccount(user, {
         country: 'JP',
@@ -312,7 +318,7 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.bank_code = 'invalid'
-      cachedResults.invalidBankCode = await req.post()
+      cachedResponses.invalidBankCode = await req.post()
       // routing number
       await TestHelper.createStripeAccount(user, {
         country: 'MY',
@@ -323,81 +329,81 @@ describe('/account/connect/edit-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.routing_number = 'invalid'
-      cachedResults.invalidRoutingNumber = await req.post()
+      cachedResponses.invalidRoutingNumber = await req.post()
     })
 
     it('reject invalid field account_holder_type', async () => {
-      const result = cachedResults.invalidAccountHolderType
+      const result = cachedResponses.invalidAccountHolderType
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_holder_type')
     })
     it('reject invalid field currency', async () => {
-      const result = cachedResults.invalidCurrency
+      const result = cachedResponses.invalidCurrency
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-currency')
     })
     it('reject invalid field iban', async () => {
-      const result = cachedResults.invalidIBAN
+      const result = cachedResponses.invalidIBAN
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-iban')
     })
     it('reject invalid field account_number', async () => {
-      const result = cachedResults.invalidAccountNumber
+      const result = cachedResponses.invalidAccountNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_number')
     })
     it('reject invalid field bsb_number', async () => {
-      const result = cachedResults.invalidBSBNumber
+      const result = cachedResponses.invalidBSBNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bsb_number')
     })
     it('reject invalid field institution_number', async () => {
-      const result = cachedResults.invalidInstitutionNumber
+      const result = cachedResponses.invalidInstitutionNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-institution_number')
     })
     it('reject invalid field transit_number', async () => {
-      const result = cachedResults.invalidTransitNumber
+      const result = cachedResponses.invalidTransitNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-transit_number')
     })
     it('reject invalid field sort_code', async () => {
-      const result = cachedResults.invalidSortCode
+      const result = cachedResponses.invalidSortCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-sort_code')
     })
     it('reject invalid field clearing_code', async () => {
-      const result = cachedResults.invalidClearingCode
+      const result = cachedResponses.invalidClearingCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-clearing_code')
     })
     it('reject invalid field bank_code', async () => {
-      const result = cachedResults.invalidBankCode
+      const result = cachedResponses.invalidBankCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bank_code')
     })
     it('reject invalid field routing_number', async () => {
-      const result = cachedResults.invalidRoutingNumber
+      const result = cachedResponses.invalidRoutingNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]

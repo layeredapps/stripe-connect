@@ -9,7 +9,10 @@ describe('/account/connect/persons', function () {
   let cachedRepresentative
   const cachedDirectors = []
   const cachedOwners = []
-  before(async () => {
+  beforeEach(async () => {
+    if (Object.keys(cachedResponses).length) {
+      return
+    }
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()

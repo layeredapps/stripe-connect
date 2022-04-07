@@ -9,7 +9,10 @@ describe('/api/administrator/connect/payouts', function () {
   const cachedPayouts = []
   const accountPayouts = []
   const stripeAccountPayouts = []
-  before(async () => {
+  beforeEach(async () => {
+    if (Object.keys(cachedResponses).length) {
+      return
+    }
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const administrator = await TestHelper.createOwner()

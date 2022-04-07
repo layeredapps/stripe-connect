@@ -6,7 +6,10 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/account/connect/set-stripe-account-submitted', function () {
   const cachedResponses = {}
-  before(async () => {
+  beforeEach(async () => {
+    if (Object.keys(cachedResponses).length) {
+      return
+    }
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()

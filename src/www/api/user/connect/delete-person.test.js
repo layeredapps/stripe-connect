@@ -6,7 +6,10 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/api/user/connect/delete-person', () => {
   const cachedResponses = {}
-  before(async () => {
+  beforeEach(async () => {
+    if (Object.keys(cachedResponses).length) {
+      return
+    }
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestStripeAccounts.createCompanyWithDirectors('DE', 1)

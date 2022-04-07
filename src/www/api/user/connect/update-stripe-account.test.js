@@ -7,8 +7,11 @@ const testData = require('../../../../../test-data.json')
 
 describe('/api/user/connect/update-stripe-account', function () {
   describe('exceptions', async () => {
-    const cachedResults = {}
-    before(async () => {
+    const cachedResponses = {}
+    beforeEach(async () => {
+      if (Object.keys(cachedResponses).length) {
+        return
+      }
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
@@ -24,14 +27,14 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.patch()
       } catch (error) {
-        cachedResults['invalid-business_profile_mcc'] = error.message
+        cachedResponses['invalid-business_profile_mcc'] = error.message
       }
       // invalid business profile url
       req.body = { business_profile_url: 'asdf' }
       try {
         await req.patch()
       } catch (error) {
-        cachedResults['invalid-business_profile_url'] = error.message
+        cachedResponses['invalid-business_profile_url'] = error.message
       }
       // TODO: unclear what limits are
       // invalid business profile product description
@@ -39,7 +42,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       // try {
       //   await req.patch()
       // } catch (error) {
-      //   cachedResults['invalid-business_profile_product_description'] = ''
+      //   cachedResponses['invalid-business_profile_product_description'] = ''
       // }
       //
       // invalid individual date of birth
@@ -50,58 +53,58 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_dob_day'] = error.message
+        cachedResponses['invalid-individual_dob_day'] = error.message
       }
       req.body = { individual_dob_day: '', individual_dob_month: '-1', individual_dob_year: 2000 }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['missing-individual_dob_day'] = error.message
+        cachedResponses['missing-individual_dob_day'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '-1', individual_dob_year: 2000 }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_dob_month'] = error.message
+        cachedResponses['invalid-individual_dob_month'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '', individual_dob_year: 2000 }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['missing-individual_dob_month'] = error.message
+        cachedResponses['missing-individual_dob_month'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '1', individual_dob_year: 'invalid' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_dob_year'] = error.message
+        cachedResponses['invalid-individual_dob_year'] = error.message
       }
       req.body = { individual_dob_day: '1', individual_dob_month: '1', individual_dob_year: '' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['missing-individual_dob_year'] = error.message
+        cachedResponses['missing-individual_dob_year'] = error.message
       }
       // invalid individual email
       req.body = { individual_email: '-1' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_email'] = error.message
+        cachedResponses['invalid-individual_email'] = error.message
       }
       // invalid individual phone
       req.body = { individual_phone: '-1' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_phone'] = error.message
+        cachedResponses['invalid-individual_phone'] = error.message
       }
       // invalid individual country
       req.body = { individual_address_country: '-1' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_address_country'] = error.message
+        cachedResponses['invalid-individual_address_country'] = error.message
       }
       // invalid individual state
       await TestHelper.createStripeAccount(user, {
@@ -115,7 +118,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_address_state'] = error.message
+        cachedResponses['invalid-individual_address_state'] = error.message
       }
       // individual id number
       await TestHelper.createStripeAccount(user, {
@@ -129,14 +132,14 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_id_number'] = error.message
+        cachedResponses['invalid-individual_id_number'] = error.message
       }
       // political exposure
       req.body = { individual_political_exposure: '-1' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_political_exposure'] = error.message
+        cachedResponses['invalid-individual_political_exposure'] = error.message
       }
       // invalid individual nationality
       await TestHelper.createStripeAccount(user, {
@@ -150,7 +153,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_nationality'] = error.message
+        cachedResponses['invalid-individual_nationality'] = error.message
       }
       // invalid individual ssn_last_4
       await TestHelper.createStripeAccount(user, {
@@ -164,7 +167,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_ssn_last_4'] = error.message
+        cachedResponses['invalid-individual_ssn_last_4'] = error.message
       }
       // invalid company state
       await TestHelper.createStripeAccount(user, {
@@ -178,7 +181,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_state'] = error.message
+        cachedResponses['invalid-company_address_state'] = error.message
       }
       // invalid company country
       await TestHelper.createStripeAccount(user, {
@@ -192,14 +195,14 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_country'] = error.message
+        cachedResponses['invalid-company_address_country'] = error.message
       }
       // invalid company registration number
       req.body = { individual_registration_number: '-1' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-individual_registration_number'] = error.message
+        cachedResponses['invalid-individual_registration_number'] = error.message
       }
       // invalid details in kana
       // TODO: kana line1, town and postal code do not throw invalid exceptions
@@ -214,37 +217,37 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kana_city'] = error.message
+        cachedResponses['invalid-company_address_kana_city'] = error.message
       }
       req.body = { company_address_kana_line1: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kana_line1'] = error.message
+        cachedResponses['invalid-company_address_kana_line1'] = error.message
       }
       req.body = { company_address_kana_postal_code: 'invalid' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kana_postal_code'] = error.message
+        cachedResponses['invalid-company_address_kana_postal_code'] = error.message
       }
       req.body = { company_address_kana_state: 'x', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kana_state'] = error.message
+        cachedResponses['invalid-company_address_kana_state'] = error.message
       }
       req.body = { company_address_kana_town: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kana_town'] = error.message
+        cachedResponses['invalid-company_address_kana_town'] = error.message
       }
       req.body = { company_name_kana: 'invalid', company_address_kana_postal_code: testData.addresses.JP.kana_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_name_kana'] = error.message
+        cachedResponses['invalid-company_name_kana'] = error.message
       }
       // invalid details in kanji
       // TODO: kanji line1, town, city, state and postal code do not throw invalid exceptions
@@ -255,37 +258,37 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kanji_city'] = error.message
+        cachedResponses['invalid-company_address_kanji_city'] = error.message
       }
       req.body = { company_address_kanji_line1: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kanji_line1'] = error.message
+        cachedResponses['invalid-company_address_kanji_line1'] = error.message
       }
       req.body = { company_address_kanji_postal_code: 'invalid' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kanji_postal_code'] = error.message
+        cachedResponses['invalid-company_address_kanji_postal_code'] = error.message
       }
       req.body = { company_address_kanji_state: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kanji_state'] = error.message
+        cachedResponses['invalid-company_address_kanji_state'] = error.message
       }
       req.body = { company_address_kanji_town: 'invalid', company_address_kanji_postal_code: testData.addresses.JP.kanji_postal_code }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_address_kanji_town'] = error.message
+        cachedResponses['invalid-company_address_kanji_town'] = error.message
       }
       req.body = { company_name_kanji: 'invalid' }
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults['invalid-company_name_kanji'] = error.message
+        cachedResponses['invalid-company_name_kanji'] = error.message
       }
       // invalid account
       const user2 = await TestHelper.createUser()
@@ -296,7 +299,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults.invalidAccount = error.message
+        cachedResponses.invalidAccount = error.message
       }
       // invalid stripe account
       const user3 = await TestStripeAccounts.createIndividualReadyForSubmission('US')
@@ -307,7 +310,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults.invalidStripeAccount = error.message
+        cachedResponses.invalidStripeAccount = error.message
       }
       // missing and invalid token
       global.stripeJS = 3
@@ -326,7 +329,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults.missingToken = error.message
+        cachedResponses.missingToken = error.message
       }
       req.body = {
         token: 'xxxx'
@@ -334,7 +337,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       try {
         await req.route.api.patch(req)
       } catch (error) {
-        cachedResults.invalidToken = error.message
+        cachedResponses.invalidToken = error.message
       }
     })
     describe('invalid-stripeid', () => {
@@ -371,176 +374,176 @@ describe('/api/user/connect/update-stripe-account', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
-        const errorMessage = cachedResults.invalidAccount
+        const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
 
     describe('invalid-stripe-account', () => {
       it('ineligible stripe account', async () => {
-        const errorMessage = cachedResults.invalidStripeAccount
+        const errorMessage = cachedResponses.invalidStripeAccount
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
     })
 
     describe('invalid-individual_dob_day', () => {
       it('missing posted individual_dob_day', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_day']
+        const errorMessage = cachedResponses['invalid-individual_dob_day']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_day')
       })
       it('invalid posted individual_dob_day', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_day']
+        const errorMessage = cachedResponses['invalid-individual_dob_day']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_day')
       })
     })
     describe('invalid-individual_dob_month', () => {
       it('missing posted individual_dob_month', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_month']
+        const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
       it('invalid posted individual_dob_month', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_month']
+        const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
     })
     describe('invalid-individual_dob_year', () => {
       it('missing posted individual_dob_month', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_month']
+        const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
       it('invalid posted individual_dob_month', async () => {
-        const errorMessage = cachedResults['invalid-individual_dob_month']
+        const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
     })
 
     describe('invalid-individual_address_country', () => {
       it('invalid posted individual_address_country', async () => {
-        const errorMessage = cachedResults['invalid-individual_address_country']
+        const errorMessage = cachedResponses['invalid-individual_address_country']
         assert.strictEqual(errorMessage, 'invalid-individual_address_country')
       })
     })
 
     describe('invalid-individual_address_state', () => {
       it('invalid posted individual_address_state', async () => {
-        const errorMessage = cachedResults['invalid-individual_address_state']
+        const errorMessage = cachedResponses['invalid-individual_address_state']
         assert.strictEqual(errorMessage, 'invalid-individual_address_state')
       })
     })
 
     describe('invalid-individual_id_number', () => {
       it('invalid posted individual_id_number', async () => {
-        const errorMessage = cachedResults['invalid-individual_id_number']
+        const errorMessage = cachedResponses['invalid-individual_id_number']
         assert.strictEqual(errorMessage, 'invalid-individual_id_number')
       })
     })
 
     describe('invalid-individual_ssn_last_4', () => {
       it('invalid posted individual_ssn_last_4', async () => {
-        const errorMessage = cachedResults['invalid-individual_ssn_last_4']
+        const errorMessage = cachedResponses['invalid-individual_ssn_last_4']
         assert.strictEqual(errorMessage, 'invalid-individual_ssn_last_4')
       })
     })
 
     describe('invalid-individual_phone', () => {
       it('invalid posted individual_phone', async () => {
-        const errorMessage = cachedResults['invalid-individual_phone']
+        const errorMessage = cachedResponses['invalid-individual_phone']
         assert.strictEqual(errorMessage, 'invalid-individual_phone')
       })
     })
 
     describe('invalid-company_address_country', () => {
       it('invalid posted company_address_country', async () => {
-        const errorMessage = cachedResults['invalid-company_address_country']
+        const errorMessage = cachedResponses['invalid-company_address_country']
         assert.strictEqual(errorMessage, 'invalid-company_address_country')
       })
     })
 
     describe('invalid-company_address_state', () => {
       it('invalid posted company_address_state', async () => {
-        const errorMessage = cachedResults['invalid-company_address_state']
+        const errorMessage = cachedResponses['invalid-company_address_state']
         assert.strictEqual(errorMessage, 'invalid-company_address_state')
       })
     })
 
     // describe('invalid-company_address_kana_line1', () => {
     //   it(`invalid posted company_address_kana_line1`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kana_line1']
+    //     const errorMessage = cachedResponses['invalid-company_address_kana_line1']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kana_line1')
     //   })
     // })
 
     describe('invalid-company_address_kana_city', () => {
       it('invalid posted company_address_kana_city', async () => {
-        const errorMessage = cachedResults['invalid-company_address_kana_city']
+        const errorMessage = cachedResponses['invalid-company_address_kana_city']
         assert.strictEqual(errorMessage, 'invalid-company_address_kana_city')
       })
     })
 
     describe('invalid-company_address_kana_town', () => {
       it('invalid posted company_address_kana_town', async () => {
-        const errorMessage = cachedResults['invalid-company_address_kana_town']
+        const errorMessage = cachedResponses['invalid-company_address_kana_town']
         assert.strictEqual(errorMessage, 'invalid-company_address_kana_town')
       })
     })
 
     // describe('invalid-company_address_kana_state', () => {
     //   it(`invalid posted company_address_kana_state`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kana_state']
+    //     const errorMessage = cachedResponses['invalid-company_address_kana_state']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kana_state')
     //   })
     // })
 
     // describe('invalid-company_address_kana_postal_code', () => {
     //   it(`invalid posted company_address_kana_postal_code`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kana_postal_code']
+    //     const errorMessage = cachedResponses['invalid-company_address_kana_postal_code']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kana_postal_code')
     //   })
     // })
 
     // describe('invalid-company_address_kanji_line1', () => {
     //   it(`invalid posted company_address_kanji_line1`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kanji_line1']
+    //     const errorMessage = cachedResponses['invalid-company_address_kanji_line1']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kanji_line1')
     //   })
     // })
 
     // describe('invalid-company_address_kanji_city', () => {
     //   it(`invalid posted company_address_kanji_city`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kanji_city']
+    //     const errorMessage = cachedResponses['invalid-company_address_kanji_city']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kanji_city')
     //   })
     // })
 
     // describe('invalid-company_address_kanji_town', () => {
     //   it(`invalid posted company_address_kanji_town`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kanji_town']
+    //     const errorMessage = cachedResponses['invalid-company_address_kanji_town']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kanji_town')
     //   })
     // })
 
     // describe('invalid-company_address_kanji_state', () => {
     //   it(`invalid posted company_address_kanji_state`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kanji_state']
+    //     const errorMessage = cachedResponses['invalid-company_address_kanji_state']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kanji_state')
     //   })
     // })
 
     // describe('invalid-company_address_kanji_postal_code', () => {
     //   it(`invalid posted company_address_kanji_postal_code`, async () => {
-    //     const errorMessage = cachedResults['invalid-company_address_kanji_postal_code']
+    //     const errorMessage = cachedResponses['invalid-company_address_kanji_postal_code']
     //     assert.strictEqual(errorMessage, 'invalid-company_address_kanji_postal_code')
     //   })
     // })
 
     describe('invalid-token', () => {
       it('missing posted token', async () => {
-        const errorMessage = cachedResults.missingToken
+        const errorMessage = cachedResponses.missingToken
         assert.strictEqual(errorMessage, 'invalid-token')
       })
 
       it('invalid posted token', async () => {
-        const errorMessage = cachedResults.invalidToken
+        const errorMessage = cachedResponses.invalidToken
         assert.strictEqual(errorMessage, 'invalid-token')
       })
     })
@@ -548,7 +551,10 @@ describe('/api/user/connect/update-stripe-account', function () {
 
   describe('receives', () => {
     const cachedResponses = {}
-    before(async () => {
+    beforeEach(async () => {
+      if (Object.keys(cachedResponses).length) {
+        return
+      }
       await DashboardTestHelper.setupBeforeEach()
       await TestHelper.setupBeforeEach()
       const user = await TestHelper.createUser()
