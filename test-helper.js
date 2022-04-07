@@ -78,12 +78,12 @@ async function setupBeforeEach () {
   global.webhooks = []
 }
 
-async function rotateWebhook () {
+async function rotateWebhook (remake) {
   if (!global.webhooks) {
     global.webhooks = []
   } else if (global.webhooks.length > 0) {
     webhookRotation += global.webhooks.length
-    if (webhookRotation >= 20) {
+    if (remake || webhookRotation >= 20) {
       webhookRotation = 0
       await stripe.webhookEndpoints.del(webhook.id, stripeKey)
       webhook = null

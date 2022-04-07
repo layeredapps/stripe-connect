@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 
 describe('/account/connect/person', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -82,56 +86,56 @@ describe('/account/connect/person', function () {
       assert.strictEqual(errorMessage, 'invalid-personid')
     })
 
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.person.object, 'person')
     })
   })
 
   describe('view', () => {
-    it('should show table for person (screenshots)', async () => {
-      await bundledData()
+    it('should show table for person (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('persons-table')
       assert.strictEqual(table.tag, 'table')
     })
 
-    it('should show person is representative', async () => {
-      await bundledData()
+    it('should show person is representative', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.representative
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('representative')
       assert.strictEqual(cell.tag, 'tr')
     })
 
-    it('should show person is owner', async () => {
-      await bundledData()
+    it('should show person is owner', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.owner
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('owner')
       assert.strictEqual(cell.tag, 'tr')
     })
 
-    it('should show person is director', async () => {
-      await bundledData()
+    it('should show person is director', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.director
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('director')
       assert.strictEqual(cell.tag, 'tr')
     })
 
-    it('should show person requires additional information', async () => {
-      await bundledData()
+    it('should show person requires additional information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.director
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById('requires-information')
       assert.strictEqual(row.tag, 'tr')
     })
 
-    it('should show no additional information required', async () => {
-      await bundledData()
+    it('should show no additional information required', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.directorComplete
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById('requires-information')

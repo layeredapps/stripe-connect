@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/stripe-account', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -83,21 +87,22 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(errorMessage, 'invalid-stripeid')
     })
 
-    it('should reject other account\'s stripeid', async () => {
+    it('should reject other account\'s stripeid', async function () {
+      await bundledData(this.test.currentRetry())
       const errorMessage = cachedResponses.invalidAccount
       assert.strictEqual(errorMessage, 'invalid-account')
     })
 
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
     })
   })
 
   describe('view', () => {
-    it('should show registration unstarted (screenshots)', async () => {
-      await bundledData()
+    it('should show registration unstarted (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.unstarted
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('account-status')
@@ -105,8 +110,8 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(message.attr.template, 'unstarted-registration')
     })
 
-    it('should show registration completed', async () => {
-      await bundledData()
+    it('should show registration completed', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.registrationComplete
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('account-status')
@@ -114,8 +119,8 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(message.attr.template, 'completed-registration')
     })
 
-    it('should show payment information required', async () => {
-      await bundledData()
+    it('should show payment information required', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.paymentInformationRequired
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('payment-information-status')
@@ -123,8 +128,8 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(message.attr.template, 'no-payment-information')
     })
 
-    it('should show payment information created', async () => {
-      await bundledData()
+    it('should show payment information created', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.hasPaymentInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('payment-information-status')
@@ -132,8 +137,8 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(message.attr.template, 'payment-information')
     })
 
-    it('should show ready to submit', async () => {
-      await bundledData()
+    it('should show ready to submit', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.hasPaymentInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('submission-status')
@@ -141,8 +146,8 @@ describe('/account/connect/stripe-account', function () {
       assert.strictEqual(message.attr.template, 'not-submitted-information')
     })
 
-    it('should show registration is submitted', async () => {
-      await bundledData()
+    it('should show registration is submitted', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submitted
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('submission-status')

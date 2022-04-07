@@ -36,7 +36,10 @@ describe('/account/connect/edit-payment-information', function () {
 
   describe('view', async () => {
     let cachedResponses
-    async function bundledData () {
+    async function bundledData (retryNumber) {
+      if (retryNumber) {
+        cachedResponses = {}
+      }
       if (cachedResponses && cachedResponses.finished) {
         return
       }
@@ -123,8 +126,8 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
-    it('should have element for field account_holder_type', async () => {
-      await bundledData()
+    it('should have element for field account_holder_type', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.account_holder_type
       const doc = TestHelper.extractDoc(result.html)
       const individual = doc.getElementById('individual')
@@ -132,78 +135,78 @@ describe('/account/connect/edit-payment-information', function () {
       const company = doc.getElementById('company')
       assert.notStrictEqual(company, undefined)
     })
-    it('should have element for field currency', async () => {
-      await bundledData()
+    it('should have element for field currency', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.currency
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('currency')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field iban', async () => {
-      await bundledData()
+    it('should have element for field iban', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.iban
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('iban')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field account_number', async () => {
-      await bundledData()
+    it('should have element for field account_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.account_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('account_number')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field bsb_number', async () => {
-      await bundledData()
+    it('should have element for field bsb_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.bsb_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bsb_number')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field institution_number', async () => {
-      await bundledData()
+    it('should have element for field institution_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.institution_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('institution_number')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field transit_number', async () => {
-      await bundledData()
+    it('should have element for field transit_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.transit_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('transit_number')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field sort_code', async () => {
-      await bundledData()
+    it('should have element for field sort_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.sort_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('sort_code')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field branch_code', async () => {
-      await bundledData()
+    it('should have element for field branch_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.branch_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('branch_code')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field clearing_code', async () => {
-      await bundledData()
+    it('should have element for field clearing_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.clearing_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('clearing_code')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field bank_code', async () => {
-      await bundledData()
+    it('should have element for field bank_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.bank_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bank_code')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field routing_number', async () => {
-      await bundledData()
+    it('should have element for field routing_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.routing_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('routing_number')
@@ -240,7 +243,10 @@ describe('/account/connect/edit-payment-information', function () {
 
   describe('errors', async () => {
     let cachedResponses
-    async function bundledData () {
+    async function bundledData (retryNumber) {
+      if (retryNumber) {
+        cachedResponses = {}
+      }
       if (cachedResponses && cachedResponses.finished) {
         return
       }
@@ -348,88 +354,88 @@ describe('/account/connect/edit-payment-information', function () {
       cachedResponses.finished = true
     }
 
-    it('reject invalid field account_holder_type', async () => {
-      await bundledData()
+    it('reject invalid field account_holder_type', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidAccountHolderType
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_holder_type')
     })
-    it('reject invalid field currency', async () => {
-      await bundledData()
+    it('reject invalid field currency', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidCurrency
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-currency')
     })
-    it('reject invalid field iban', async () => {
-      await bundledData()
+    it('reject invalid field iban', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidIBAN
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-iban')
     })
-    it('reject invalid field account_number', async () => {
-      await bundledData()
+    it('reject invalid field account_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidAccountNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_number')
     })
-    it('reject invalid field bsb_number', async () => {
-      await bundledData()
+    it('reject invalid field bsb_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidBSBNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bsb_number')
     })
-    it('reject invalid field institution_number', async () => {
-      await bundledData()
+    it('reject invalid field institution_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidInstitutionNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-institution_number')
     })
-    it('reject invalid field transit_number', async () => {
-      await bundledData()
+    it('reject invalid field transit_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidTransitNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-transit_number')
     })
-    it('reject invalid field sort_code', async () => {
-      await bundledData()
+    it('reject invalid field sort_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidSortCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-sort_code')
     })
-    it('reject invalid field clearing_code', async () => {
-      await bundledData()
+    it('reject invalid field clearing_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidClearingCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-clearing_code')
     })
-    it('reject invalid field bank_code', async () => {
-      await bundledData()
+    it('reject invalid field bank_code', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidBankCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bank_code')
     })
-    it('reject invalid field routing_number', async () => {
-      await bundledData()
+    it('reject invalid field routing_number', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidRoutingNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

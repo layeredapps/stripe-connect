@@ -5,7 +5,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/stripe-accounts', function () {
   let cachedResponses, cachedStripeAccounts
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -41,8 +45,8 @@ describe('/account/connect/stripe-accounts', function () {
     cachedResponses.finished = true
   }
   describe('before', () => {
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccounts.length, cachedStripeAccounts.length)
       assert.strictEqual(data.stripeAccounts[0].id, cachedStripeAccounts[0])
@@ -51,8 +55,8 @@ describe('/account/connect/stripe-accounts', function () {
   })
 
   describe('view', () => {
-    it('should return one page (screenshots)', async () => {
-      await bundledData()
+    it('should return one page (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const companyTable = doc.getElementById('company-accounts-table')

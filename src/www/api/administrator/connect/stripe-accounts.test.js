@@ -6,7 +6,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/administrator/connect/stripe-accounts', function () {
   let cachedResponses, cachedStripeAccounts
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -77,8 +81,8 @@ describe('/api/administrator/connect/stripe-accounts', function () {
   })
 
   describe('receives', function () {
-    it('optional querystring offset (integer)', async () => {
-      await bundledData()
+    it('optional querystring offset (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const offset = 1
       const stripeAccountsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -86,37 +90,37 @@ describe('/api/administrator/connect/stripe-accounts', function () {
       }
     })
 
-    it('optional querystring limit (integer)', async () => {
-      await bundledData()
+    it('optional querystring limit (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const limit = 1
       const stripeAccountsNow = cachedResponses.limit
       assert.strictEqual(stripeAccountsNow.length, limit)
     })
 
-    it('optional querystring all (boolean)', async () => {
-      await bundledData()
+    it('optional querystring all (boolean)', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountsNow = cachedResponses.all
       assert.strictEqual(stripeAccountsNow.length, cachedStripeAccounts.length)
     })
 
-    it('optional querystring accountid (string)', async () => {
-      await bundledData()
+    it('optional querystring accountid (string)', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountsNow = cachedResponses.accountid
       assert.strictEqual(stripeAccountsNow.length, 2)
     })
   })
 
   describe('returns', function () {
-    it('array', async () => {
-      await bundledData()
+    it('array', async function () {
+      await bundledData(this.test.currentRetry())
       const payouts = cachedResponses.returns
       assert.strictEqual(payouts.length, global.pageSize)
     })
   })
 
   describe('configuration', function () {
-    it('environment PAGE_SIZE', async () => {
-      await bundledData()
+    it('environment PAGE_SIZE', async function () {
+      await bundledData(this.test.currentRetry())
       global.pageSize = 3
       const payouts = cachedResponses.pageSize
       assert.strictEqual(payouts.length, global.pageSize)

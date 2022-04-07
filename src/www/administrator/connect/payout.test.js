@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 
 describe('/administrator/connect/payout', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -50,16 +54,16 @@ describe('/administrator/connect/payout', function () {
       assert.strictEqual(errorMessage, 'invalid-payoutid')
     })
 
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.payout.object, 'payout')
     })
   })
 
   describe('view', () => {
-    it('should have row for payout (screenshots)', async () => {
-      await bundledData()
+    it('should have row for payout (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('payouts-table')

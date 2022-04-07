@@ -5,7 +5,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/create-person', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -108,8 +112,8 @@ describe('/account/connect/create-person', function () {
   })
 
   describe('view', () => {
-    it('should present the form', async () => {
-      await bundledData()
+    it('should present the form', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -117,8 +121,8 @@ describe('/account/connect/create-person', function () {
     })
 
     // TODO: needs test for removing executive
-    it('should remove director option', async () => {
-      await bundledData()
+    it('should remove director option', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.viewNoDirector
       const doc = TestHelper.extractDoc(result.html)
       const option = doc.getElementById('relationship_director')
@@ -143,14 +147,14 @@ describe('/account/connect/create-person', function () {
   })
 
   describe('submit', () => {
-    it('should create representative (screenshots)', async () => {
-      await bundledData()
+    it('should create representative (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submit
       assert.strictEqual(result.redirect.startsWith('/account/connect/person?personid='), true)
     })
 
-    it('should create director', async () => {
-      await bundledData()
+    it('should create director', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.createDirector
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -158,8 +162,8 @@ describe('/account/connect/create-person', function () {
       assert.notStrictEqual(personsTable, null)
     })
 
-    it('should create representative', async () => {
-      await bundledData()
+    it('should create representative', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.createRepresentative
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -167,8 +171,8 @@ describe('/account/connect/create-person', function () {
       assert.notStrictEqual(personsTable, null)
     })
 
-    it('should create executive', async () => {
-      await bundledData()
+    it('should create executive', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.createExecutive
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -176,8 +180,8 @@ describe('/account/connect/create-person', function () {
       assert.notStrictEqual(personsTable, null)
     })
 
-    it('should create owner', async () => {
-      await bundledData()
+    it('should create owner', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.createOwner
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')

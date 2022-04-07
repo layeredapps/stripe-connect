@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/account/connect/set-stripe-account-submitted', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -143,8 +147,8 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
-      it('missing querystring stripeid', async () => {
-        await bundledData()
+      it('missing querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/set-stripe-account-submitted')
         req.account = user.account
@@ -158,8 +162,8 @@ describe('/account/connect/set-stripe-account-submitted', function () {
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
 
-      it('invalid querystring stripeid', async () => {
-        await bundledData()
+      it('invalid querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/set-stripe-account-submitted?stripeid=invalid')
         req.account = user.account
@@ -175,81 +179,81 @@ describe('/account/connect/set-stripe-account-submitted', function () {
     })
 
     describe('invalid-stripe-account', () => {
-      it('ineligible Stripe company account is submitted', async () => {
-        await bundledData()
+      it('ineligible Stripe company account is submitted', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyAlreadySubmitted
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
-      it('ineligible Stripe individual account is submitted', async () => {
-        await bundledData()
+      it('ineligible Stripe individual account is submitted', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.individualAlreadySubmitted
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
 
     describe('invalid-payment-details', () => {
-      it('ineligible Stripe company account missing payment details', async () => {
-        await bundledData()
+      it('ineligible Stripe company account missing payment details', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyMissingPaymentDetails
         assert.strictEqual(errorMessage, 'invalid-payment-details')
       })
 
-      it('ineligible Stripe individual account missing payment details', async () => {
-        await bundledData()
+      it('ineligible Stripe individual account missing payment details', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.individualMissingPaymentDetails
         assert.strictEqual(errorMessage, 'invalid-payment-details')
       })
     })
 
     describe('invalid-registration', () => {
-      it('ineligible Stripe company account missing information', async () => {
-        await bundledData()
+      it('ineligible Stripe company account missing information', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyMissingRegistrationDetails
         assert.strictEqual(errorMessage, 'invalid-registration')
       })
 
-      it('ineligible Stripe individual account missing information', async () => {
-        await bundledData()
+      it('ineligible Stripe individual account missing information', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.individualMissingRegistrationDetails
         assert.strictEqual(errorMessage, 'invalid-registration')
       })
     })
 
     describe('invalid-person', () => {
-      it('ineligible company person missing information', async () => {
-        await bundledData()
+      it('ineligible company person missing information', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidPerson
         assert.strictEqual(errorMessage, 'invalid-person')
       })
     })
 
     describe('invalid-company-owner', () => {
-      it('ineligible company owners not submitted', async () => {
-        await bundledData()
+      it('ineligible company owners not submitted', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyMissingOwners
         assert.strictEqual(errorMessage, 'invalid-company-owner')
       })
     })
 
     describe('invalid-director', () => {
-      it('ineligible company directors not submitted', async () => {
-        await bundledData()
+      it('ineligible company directors not submitted', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyMissingDirectors
         assert.strictEqual(errorMessage, 'invalid-company-director')
       })
     })
 
     describe('invalid-executive', () => {
-      it('ineligible company executives not submitted', async () => {
-        await bundledData()
+      it('ineligible company executives not submitted', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.companyMissingExecutives
         assert.strictEqual(errorMessage, 'invalid-company-executive')
       })

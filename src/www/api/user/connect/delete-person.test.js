@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/api/user/connect/delete-person', () => {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -50,8 +54,8 @@ describe('/api/user/connect/delete-person', () => {
 
   describe('exceptions', () => {
     describe('invalid-personid', () => {
-      it('missing querystring personid', async () => {
-        await bundledData()
+      it('missing querystring personid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/delete-person')
         req.account = user.account
@@ -65,8 +69,8 @@ describe('/api/user/connect/delete-person', () => {
         assert.strictEqual(errorMessage, 'invalid-personid')
       })
 
-      it('invalid querystring personid', async () => {
-        await bundledData()
+      it('invalid querystring personid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/delete-person?personid=invalid')
         req.account = user.account
@@ -82,16 +86,16 @@ describe('/api/user/connect/delete-person', () => {
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
 
     describe('invalid-person', () => {
-      it('ineligible querystring person is representative', async () => {
-        await bundledData()
+      it('ineligible querystring person is representative', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidPerson
         assert.strictEqual(errorMessage, 'invalid-person')
       })
@@ -99,8 +103,8 @@ describe('/api/user/connect/delete-person', () => {
   })
 
   describe('returns', () => {
-    it('boolean', async () => {
-      await bundledData()
+    it('boolean', async function () {
+      await bundledData(this.test.currentRetry())
       const deleted = cachedResponses.result
       assert.strictEqual(deleted, true)
     })

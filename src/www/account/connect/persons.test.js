@@ -5,7 +5,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/persons', function () {
   let cachedResponses, cachedRepresentative, cachedPersons, cachedDirectors, cachedOwners
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -95,8 +99,8 @@ describe('/account/connect/persons', function () {
   })
 
   describe('before', () => {
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.owners.length, 2)
       assert.strictEqual(data.directors.length, 2)
@@ -105,24 +109,24 @@ describe('/account/connect/persons', function () {
   })
 
   describe('view', () => {
-    it('should have row for each owner (screenshots)', async () => {
-      await bundledData()
+    it('should have row for each owner (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedOwners[0])
       assert.strictEqual(row.tag, 'tr')
     })
 
-    it('should have row for each director', async () => {
-      await bundledData()
+    it('should have row for each director', async function () {
+      await bundledData(this.test.currentRetry())
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedDirectors[0])
       assert.strictEqual(row.tag, 'tr')
     })
 
-    it('should have row for each representative', async () => {
-      await bundledData()
+    it('should have row for each representative', async function () {
+      await bundledData(this.test.currentRetry())
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedRepresentative.personid)

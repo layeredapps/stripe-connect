@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-company-directors', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -93,20 +97,22 @@ describe('/account/connect/submit-company-directors', function () {
       assert.strictEqual(errorMessage, 'invalid-stripeid')
     })
 
-    it('should reject individual registration', async () => {
+    it('should reject individual registration', async function () {
+      await bundledData(this.test.currentRetry())
       const errorMessage = cachedResponses.individualAccount
       assert.strictEqual(errorMessage, 'invalid-stripe-account')
     })
 
-    it('should reject Stripe account that doesn\'t require directors', async () => {
+    it('should reject Stripe account that doesn\'t require directors', async function () {
+      await bundledData(this.test.currentRetry())
       const errorMessage = cachedResponses.notRequired
       assert.strictEqual(errorMessage, 'invalid-stripe-account')
     })
   })
 
   describe('before', () => {
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
       assert.strictEqual(data.directors.length, 1)
@@ -114,8 +120,8 @@ describe('/account/connect/submit-company-directors', function () {
   })
 
   describe('view', () => {
-    it('should reject if a director requires information', async () => {
-      await bundledData()
+    it('should reject if a director requires information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.requiresInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -123,16 +129,16 @@ describe('/account/connect/submit-company-directors', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-directors')
     })
 
-    it('should present the form without directors', async () => {
-      await bundledData()
+    it('should present the form without directors', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.noDirectors
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
 
-    it('should present the form with directors', async () => {
-      await bundledData()
+    it('should present the form with directors', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.formWithDirectors
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -141,8 +147,8 @@ describe('/account/connect/submit-company-directors', function () {
   })
 
   describe('submit', () => {
-    it('should submit directors (screenshots)', async () => {
-      await bundledData()
+    it('should submit directors (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submitDirectors
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -150,8 +156,8 @@ describe('/account/connect/submit-company-directors', function () {
       assert.strictEqual(message.attr.template, 'success')
     })
 
-    it('should submit without directors', async () => {
-      await bundledData()
+    it('should submit without directors', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submitWithoutDirectors
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

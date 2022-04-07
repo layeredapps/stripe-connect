@@ -6,7 +6,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/stripe-accounts', function () {
   let cachedResponses, cachedStripeAccounts
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -74,8 +78,8 @@ describe('/api/user/connect/stripe-accounts', function () {
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const user2 = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/stripe-accounts?accountid=${user.account.accountid}`)
@@ -93,8 +97,8 @@ describe('/api/user/connect/stripe-accounts', function () {
   })
 
   describe('receives', function () {
-    it('optional querystring offset (integer)', async () => {
-      await bundledData()
+    it('optional querystring offset (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const offset = 1
       const stripeAccountsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -102,8 +106,8 @@ describe('/api/user/connect/stripe-accounts', function () {
       }
     })
 
-    it('optional querystring limit (integer)', async () => {
-      await bundledData()
+    it('optional querystring limit (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const limit = 1
       const stripeAccountsNow = cachedResponses.limit
       assert.strictEqual(stripeAccountsNow.length, limit)
@@ -116,16 +120,16 @@ describe('/api/user/connect/stripe-accounts', function () {
   })
 
   describe('returns', function () {
-    it('array', async () => {
-      await bundledData()
+    it('array', async function () {
+      await bundledData(this.test.currentRetry())
       const accounts = cachedResponses.returns
       assert.strictEqual(accounts.length, global.pageSize)
     })
   })
 
   describe('configuration', function () {
-    it('environment PAGE_SIZE', async () => {
-      await bundledData()
+    it('environment PAGE_SIZE', async function () {
+      await bundledData(this.test.currentRetry())
       global.pageSize = 3
       const accounts = cachedResponses.pageSize
       assert.strictEqual(accounts.length, global.pageSize)

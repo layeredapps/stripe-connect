@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-stripe-account', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -168,16 +172,16 @@ describe('/account/connect/submit-stripe-account', function () {
   })
 
   describe('before', () => {
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
     })
   })
 
   describe('view', () => {
-    it('should reject individual that hasn\'t submitted payment details', async () => {
-      await bundledData()
+    it('should reject individual that hasn\'t submitted payment details', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingIndividualPayment
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -185,8 +189,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-payment-details')
     })
 
-    it('should reject company that hasn\'t submitted payment details', async () => {
-      await bundledData()
+    it('should reject company that hasn\'t submitted payment details', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingCompanyPayment
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -194,8 +198,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-payment-details')
     })
 
-    it('should reject company that has missing owner information', async () => {
-      await bundledData()
+    it('should reject company that has missing owner information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingOwnerInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -203,8 +207,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-owners')
     })
 
-    it('should reject company that hasn\'t submitted owners', async () => {
-      await bundledData()
+    it('should reject company that hasn\'t submitted owners', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingOwners
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -212,8 +216,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-owners')
     })
 
-    it('should reject company that has missing director information', async () => {
-      await bundledData()
+    it('should reject company that has missing director information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingDirectorInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -221,8 +225,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-directors')
     })
 
-    it('should reject company that hasn\'t submitted directors', async () => {
-      await bundledData()
+    it('should reject company that hasn\'t submitted directors', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingDirectors
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -230,8 +234,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-directors')
     })
 
-    it('should reject company that has missing executive information', async () => {
-      await bundledData()
+    it('should reject company that has missing executive information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingExecutiveInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -239,8 +243,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-executives')
     })
 
-    it('should reject company that hasn\'t submitted executives', async () => {
-      await bundledData()
+    it('should reject company that hasn\'t submitted executives', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -248,8 +252,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-executives')
     })
 
-    it('should reject company that hasn\'t submitted information', async () => {
-      await bundledData()
+    it('should reject company that hasn\'t submitted information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingCompanyInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -257,8 +261,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-registration')
     })
 
-    it('should reject individual that hasn\'t submitted information', async () => {
-      await bundledData()
+    it('should reject individual that hasn\'t submitted information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.missingIndividualInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -266,16 +270,16 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'invalid-registration')
     })
 
-    it('should present the form (individual)', async () => {
-      await bundledData()
+    it('should present the form (individual)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.individualForm
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
 
-    it('should present the form (company)', async () => {
-      await bundledData()
+    it('should present the form (company)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.companyForm
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -284,8 +288,8 @@ describe('/account/connect/submit-stripe-account', function () {
   })
 
   describe('submit', () => {
-    it('should submit registration (company) (screenshots)', async () => {
-      await bundledData()
+    it('should submit registration (company) (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.companySubmit
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -293,8 +297,8 @@ describe('/account/connect/submit-stripe-account', function () {
       assert.strictEqual(message.attr.template, 'success')
     })
 
-    it('should submit registration (individual)', async () => {
-      await bundledData()
+    it('should submit registration (individual)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.individualSubmit
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

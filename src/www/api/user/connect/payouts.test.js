@@ -6,7 +6,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/payouts', function () {
   let cachedResponses, cachedPayouts
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -48,8 +52,8 @@ describe('/api/user/connect/payouts', function () {
   }
   describe('exceptions', () => {
     describe('invalid-payoutid', () => {
-      it('missing querystring payoutid', async () => {
-        await bundledData()
+      it('missing querystring payoutid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/payouts')
         req.account = user.account
@@ -63,8 +67,8 @@ describe('/api/user/connect/payouts', function () {
         assert.strictEqual(errorMessage, 'invalid-accountid')
       })
 
-      it('invalid querystring payoutid', async () => {
-        await bundledData()
+      it('invalid querystring payoutid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/payouts?accountid=invalid')
         req.account = user.account
@@ -80,8 +84,8 @@ describe('/api/user/connect/payouts', function () {
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const user2 = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/payouts?accountid=${user.account.accountid}`)
@@ -99,8 +103,8 @@ describe('/api/user/connect/payouts', function () {
   })
 
   describe('receives', function () {
-    it('optional querystring offset (integer)', async () => {
-      await bundledData()
+    it('optional querystring offset (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const offset = 1
       const payoutsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -108,37 +112,37 @@ describe('/api/user/connect/payouts', function () {
       }
     })
 
-    it('optional querystring limit (integer)', async () => {
-      await bundledData()
+    it('optional querystring limit (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const limit = 1
       const payoutsNow = cachedResponses.limit
       assert.strictEqual(payoutsNow.length, limit)
     })
 
-    it('optional querystring all (boolean)', async () => {
-      await bundledData()
+    it('optional querystring all (boolean)', async function () {
+      await bundledData(this.test.currentRetry())
       const payoutsNow = cachedResponses.all
       assert.strictEqual(payoutsNow.length, cachedPayouts.length)
     })
 
-    it('optional querystring stripeid (boolean)', async () => {
-      await bundledData()
+    it('optional querystring stripeid (boolean)', async function () {
+      await bundledData(this.test.currentRetry())
       const payoutsNow = cachedResponses.stripeid
       assert.strictEqual(payoutsNow.length, cachedPayouts.length - 3)
     })
   })
 
   describe('returns', function () {
-    it('array', async () => {
-      await bundledData()
+    it('array', async function () {
+      await bundledData(this.test.currentRetry())
       const payouts = cachedResponses.returns
       assert.strictEqual(payouts.length, global.pageSize)
     })
   })
 
   describe('configuration', function () {
-    it('environment PAGE_SIZE', async () => {
-      await bundledData()
+    it('environment PAGE_SIZE', async function () {
+      await bundledData(this.test.currentRetry())
       global.pageSize = 3
       const payouts = cachedResponses.pageSize
       assert.strictEqual(payouts.length, global.pageSize)

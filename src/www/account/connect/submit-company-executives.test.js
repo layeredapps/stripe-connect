@@ -6,7 +6,11 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-company-executives', function () {
   let cachedResponses
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -101,20 +105,22 @@ describe('/account/connect/submit-company-executives', function () {
       assert.strictEqual(errorMessage, 'invalid-stripeid')
     })
 
-    it('should reject individual registration', async () => {
+    it('should reject individual registration', async function () {
+      await bundledData(this.test.currentRetry())
       const errorMessage = cachedResponses.individualAccount
       assert.strictEqual(errorMessage, 'invalid-stripe-account')
     })
 
-    it('should reject Stripe account that doesn\'t require executives', async () => {
+    it('should reject Stripe account that doesn\'t require executives', async function () {
+      await bundledData(this.test.currentRetry())
       const errorMessage = cachedResponses.notRequired
       assert.strictEqual(errorMessage, 'invalid-stripe-account')
     })
   })
 
   describe('before', () => {
-    it('should bind data to req', async () => {
-      await bundledData()
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
       assert.strictEqual(data.executives.length, 1)
@@ -122,8 +128,8 @@ describe('/account/connect/submit-company-executives', function () {
   })
 
   describe('view', () => {
-    it('should reject if a executive requires information', async () => {
-      await bundledData()
+    it('should reject if a executive requires information', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.requiresInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -131,16 +137,16 @@ describe('/account/connect/submit-company-executives', function () {
       assert.strictEqual(message.attr.template, 'invalid-company-executives')
     })
 
-    it('should present the form without executives', async () => {
-      await bundledData()
+    it('should present the form without executives', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.noExecutives
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
 
-    it('should present the form with executives', async () => {
-      await bundledData()
+    it('should present the form with executives', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.formWithExecutives
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -149,8 +155,8 @@ describe('/account/connect/submit-company-executives', function () {
   })
 
   describe('submit', () => {
-    it('should submit executives (screenshots)', async () => {
-      await bundledData()
+    it('should submit executives (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submitExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -158,8 +164,8 @@ describe('/account/connect/submit-company-executives', function () {
       assert.strictEqual(message.attr.template, 'success')
     })
 
-    it('should submit without executives', async () => {
-      await bundledData()
+    it('should submit without executives', async function () {
+      await bundledData(this.test.currentRetry())
       const result = cachedResponses.submitWithoutExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

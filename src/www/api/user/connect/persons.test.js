@@ -6,7 +6,11 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/persons', function () {
   let cachedResponses, cachedPersons
-  async function bundledData () {
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
     if (cachedResponses && cachedResponses.finished) {
       return
     }
@@ -74,8 +78,8 @@ describe('/api/user/connect/persons', function () {
   })
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
-      it('missing querystring stripeid', async () => {
-        await bundledData()
+      it('missing querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -93,8 +97,8 @@ describe('/api/user/connect/persons', function () {
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
 
-      it('invalid querystring stripeid', async () => {
-        await bundledData()
+      it('invalid querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/persons?stripeid=invalid')
         req.account = user.account
@@ -110,8 +114,8 @@ describe('/api/user/connect/persons', function () {
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -132,8 +136,8 @@ describe('/api/user/connect/persons', function () {
     })
 
     describe('invalid-stripe-account', () => {
-      it('ineligible stripe account for individual', async () => {
-        await bundledData()
+      it('ineligible stripe account for individual', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -154,8 +158,8 @@ describe('/api/user/connect/persons', function () {
   })
 
   describe('receives', function () {
-    it('optional querystring offset (integer)', async () => {
-      await bundledData()
+    it('optional querystring offset (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const offset = 1
       const personsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -163,31 +167,31 @@ describe('/api/user/connect/persons', function () {
       }
     })
 
-    it('optional querystring limit (integer)', async () => {
-      await bundledData()
+    it('optional querystring limit (integer)', async function () {
+      await bundledData(this.test.currentRetry())
       const limit = 1
       const personsNow = cachedResponses.limit
       assert.strictEqual(personsNow.length, limit)
     })
 
-    it('optional querystring all (boolean)', async () => {
-      await bundledData()
+    it('optional querystring all (boolean)', async function () {
+      await bundledData(this.test.currentRetry())
       const personsNow = cachedResponses.all
       assert.strictEqual(personsNow.length, cachedPersons.length)
     })
   })
 
   describe('returns', function () {
-    it('array', async () => {
-      await bundledData()
+    it('array', async function () {
+      await bundledData(this.test.currentRetry())
       const persons = cachedResponses.returns
       assert.strictEqual(persons.length, global.pageSize)
     })
   })
 
   describe('configuration', function () {
-    it('environment PAGE_SIZE', async () => {
-      await bundledData()
+    it('environment PAGE_SIZE', async function () {
+      await bundledData(this.test.currentRetry())
       global.pageSize = 3
       const persons = cachedResponses.pageSize
       assert.strictEqual(persons.length, global.pageSize)

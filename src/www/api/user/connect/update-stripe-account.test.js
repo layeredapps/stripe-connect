@@ -8,7 +8,10 @@ const testData = require('../../../../../test-data.json')
 describe('/api/user/connect/update-stripe-account', function () {
   describe('exceptions', async () => {
     let cachedResponses
-    async function bundledData () {
+    async function bundledData (retryNumber) {
+      if (retryNumber) {
+        cachedResponses = {}
+      }
       if (cachedResponses && cachedResponses.finished) {
         return
       }
@@ -340,11 +343,12 @@ describe('/api/user/connect/update-stripe-account', function () {
       } catch (error) {
         cachedResponses.invalidToken = error.message
       }
+      cachedResponses.finished = true
     }
 
     describe('invalid-stripeid', () => {
-      it('missing querystring stripeid', async () => {
-        await bundledData()
+      it('missing querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account')
         req.account = user.account
@@ -359,8 +363,8 @@ describe('/api/user/connect/update-stripe-account', function () {
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
 
-      it('invalid querystring stripeid', async () => {
-        await bundledData()
+      it('invalid querystring stripeid', async function () {
+        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account?stripeid=invalid')
         req.account = user.account
@@ -377,109 +381,109 @@ describe('/api/user/connect/update-stripe-account', function () {
     })
 
     describe('invalid-account', () => {
-      it('ineligible accessing account', async () => {
-        await bundledData()
+      it('ineligible accessing account', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
     })
 
     describe('invalid-stripe-account', () => {
-      it('ineligible stripe account', async () => {
-        await bundledData()
+      it('ineligible stripe account', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidStripeAccount
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
     })
 
     describe('invalid-individual_dob_day', () => {
-      it('missing posted individual_dob_day', async () => {
-        await bundledData()
+      it('missing posted individual_dob_day', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_day']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_day')
       })
-      it('invalid posted individual_dob_day', async () => {
-        await bundledData()
+      it('invalid posted individual_dob_day', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_day']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_day')
       })
     })
     describe('invalid-individual_dob_month', () => {
-      it('missing posted individual_dob_month', async () => {
-        await bundledData()
+      it('missing posted individual_dob_month', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
-      it('invalid posted individual_dob_month', async () => {
-        await bundledData()
+      it('invalid posted individual_dob_month', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
     })
     describe('invalid-individual_dob_year', () => {
-      it('missing posted individual_dob_month', async () => {
-        await bundledData()
+      it('missing posted individual_dob_month', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
-      it('invalid posted individual_dob_month', async () => {
-        await bundledData()
+      it('invalid posted individual_dob_month', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_dob_month']
         assert.strictEqual(errorMessage, 'invalid-individual_dob_month')
       })
     })
 
     describe('invalid-individual_address_country', () => {
-      it('invalid posted individual_address_country', async () => {
-        await bundledData()
+      it('invalid posted individual_address_country', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_address_country']
         assert.strictEqual(errorMessage, 'invalid-individual_address_country')
       })
     })
 
     describe('invalid-individual_address_state', () => {
-      it('invalid posted individual_address_state', async () => {
-        await bundledData()
+      it('invalid posted individual_address_state', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_address_state']
         assert.strictEqual(errorMessage, 'invalid-individual_address_state')
       })
     })
 
     describe('invalid-individual_id_number', () => {
-      it('invalid posted individual_id_number', async () => {
-        await bundledData()
+      it('invalid posted individual_id_number', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_id_number']
         assert.strictEqual(errorMessage, 'invalid-individual_id_number')
       })
     })
 
     describe('invalid-individual_ssn_last_4', () => {
-      it('invalid posted individual_ssn_last_4', async () => {
-        await bundledData()
+      it('invalid posted individual_ssn_last_4', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_ssn_last_4']
         assert.strictEqual(errorMessage, 'invalid-individual_ssn_last_4')
       })
     })
 
     describe('invalid-individual_phone', () => {
-      it('invalid posted individual_phone', async () => {
-        await bundledData()
+      it('invalid posted individual_phone', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-individual_phone']
         assert.strictEqual(errorMessage, 'invalid-individual_phone')
       })
     })
 
     describe('invalid-company_address_country', () => {
-      it('invalid posted company_address_country', async () => {
-        await bundledData()
+      it('invalid posted company_address_country', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-company_address_country']
         assert.strictEqual(errorMessage, 'invalid-company_address_country')
       })
     })
 
     describe('invalid-company_address_state', () => {
-      it('invalid posted company_address_state', async () => {
-        await bundledData()
+      it('invalid posted company_address_state', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-company_address_state']
         assert.strictEqual(errorMessage, 'invalid-company_address_state')
       })
@@ -493,16 +497,16 @@ describe('/api/user/connect/update-stripe-account', function () {
     // })
 
     describe('invalid-company_address_kana_city', () => {
-      it('invalid posted company_address_kana_city', async () => {
-        await bundledData()
+      it('invalid posted company_address_kana_city', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-company_address_kana_city']
         assert.strictEqual(errorMessage, 'invalid-company_address_kana_city')
       })
     })
 
     describe('invalid-company_address_kana_town', () => {
-      it('invalid posted company_address_kana_town', async () => {
-        await bundledData()
+      it('invalid posted company_address_kana_town', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses['invalid-company_address_kana_town']
         assert.strictEqual(errorMessage, 'invalid-company_address_kana_town')
       })
@@ -558,14 +562,14 @@ describe('/api/user/connect/update-stripe-account', function () {
     // })
 
     describe('invalid-token', () => {
-      it('missing posted token', async () => {
-        await bundledData()
+      it('missing posted token', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.missingToken
         assert.strictEqual(errorMessage, 'invalid-token')
       })
 
-      it('invalid posted token', async () => {
-        await bundledData()
+      it('invalid posted token', async function () {
+        await bundledData(this.test.currentRetry())
         const errorMessage = cachedResponses.invalidToken
         assert.strictEqual(errorMessage, 'invalid-token')
       })
@@ -574,7 +578,10 @@ describe('/api/user/connect/update-stripe-account', function () {
 
   describe('receives', () => {
     let cachedResponses
-    async function bundledData () {
+    async function bundledData (retryNumber) {
+      if (retryNumber) {
+        cachedResponses = {}
+      }
       if (cachedResponses && cachedResponses.finished) {
         return
       }
@@ -717,212 +724,213 @@ describe('/api/user/connect/update-stripe-account', function () {
       for (const field in req.body) {
         cachedResponses[field] = cachedResponses[field] || result.stripeObject
       }
+      cachedResponses.finished = true
     }
-    it('optionally-required posted individual_dob_day', async () => {
-      await bundledData()
+    it('optionally-required posted individual_dob_day', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_dob_day
       assert.strictEqual(stripeAccountNow.individual.dob.day, 1)
     })
-    it('optionally-required posted individual_dob_month', async () => {
-      await bundledData()
+    it('optionally-required posted individual_dob_month', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_dob_month
       assert.strictEqual(stripeAccountNow.individual.dob.month, 1)
     })
-    it('optionally-required posted individual_dob_year', async () => {
-      await bundledData()
+    it('optionally-required posted individual_dob_year', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_dob_year
       assert.strictEqual(stripeAccountNow.individual.dob.year, 1970)
     })
-    it('optionally-required posted individual_email', async () => {
-      await bundledData()
+    it('optionally-required posted individual_email', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_email
       assert.strictEqual(stripeAccountNow.individual.email, 'email@address.com')
     })
-    it('optionally-required posted individual_phone', async () => {
-      await bundledData()
+    it('optionally-required posted individual_phone', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_phone
       assert.strictEqual(stripeAccountNow.individual.phone, '+14567890123')
     })
-    it('optionally-required posted individual_political_exposure', async () => {
-      await bundledData()
+    it('optionally-required posted individual_political_exposure', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_political_exposure
       assert.strictEqual(stripeAccountNow.individual.political_exposure, 'existing')
     })
-    it('optionally-required posted individual_nationality', async () => {
-      await bundledData()
+    it('optionally-required posted individual_nationality', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_nationality
       assert.strictEqual(stripeAccountNow.individual.nationality, 'BR')
     })
-    it('optionally-required posted individual_id_number', async () => {
-      await bundledData()
+    it('optionally-required posted individual_id_number', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_id_number
       assert.strictEqual(stripeAccountNow.individual.id_number_provided, true)
     })
-    it('optionally-required posted individual_ssn_last_4', async () => {
-      await bundledData()
+    it('optionally-required posted individual_ssn_last_4', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_ssn_last_4
       assert.strictEqual(stripeAccountNow.individual.ssn_last_4_provided, true)
     })
-    it('optionally-required posted individual_address_line1', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_line1
       assert.strictEqual(stripeAccountNow.individual.address.line1, '123 Park Lane')
     })
-    it('optionally-required posted individual_address_city', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_city
       assert.strictEqual(stripeAccountNow.individual.address.city, 'Vienna')
     })
-    it('optionally-required posted individual_address_state', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_state
       assert.strictEqual(stripeAccountNow.individual.address.state, 'QLD')
     })
-    it('optionally-required posted individual_address_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_postal_code
       assert.strictEqual(stripeAccountNow.individual.address.postal_code, '1020')
     })
-    it('optionally-required posted individual_address_kana_line1', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kana_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kana_line1
       assert.strictEqual(stripeAccountNow.individual.address_kana.line1, testData.addresses.JP.kana_line1)
     })
-    it('optionally-required posted individual_address_kana_city', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kana_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kana_city
       assert.strictEqual(stripeAccountNow.individual.address_kana.city, testData.addresses.JP.kana_city)
     })
-    it('optionally-required posted individual_address_kana_town', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kana_town', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kana_town
       assert.strictEqual(stripeAccountNow.individual.address_kana.town, testData.addresses.JP.kana_town)
     })
-    it('optionally-required posted individual_address_kana_state', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kana_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kana_state
       assert.strictEqual(stripeAccountNow.individual.address_kana.state, testData.addresses.JP.kana_state)
     })
-    it('optionally-required posted individual_address_kana_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kana_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kana_postal_code
       assert.notStrictEqual(stripeAccountNow.individual.address_kana.postal_code, undefined)
       assert.notStrictEqual(stripeAccountNow.individual.address_kana.postal_code, null)
     })
-    it('optionally-required posted individual_address_kanji_line1', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kanji_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kanji_line1
       assert.strictEqual(stripeAccountNow.individual.address_kanji.line1, testData.addresses.JP.kanji_line1)
     })
-    it('optionally-required posted individual_address_kanji_city', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kanji_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kanji_city
       assert.strictEqual(stripeAccountNow.individual.address_kanji.city, testData.addresses.JP.kanji_city)
     })
-    it('optionally-required posted individual_address_kanji_town', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kanji_town', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kanji_town
       assert.strictEqual(stripeAccountNow.individual.address_kanji.town, testData.addresses.JP.kanji_town)
     })
-    it('optionally-required posted individual_address_kanji_state', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kanji_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kanji_state
       assert.strictEqual(stripeAccountNow.individual.address_kanji.state, testData.addresses.JP.kanji_state)
     })
-    it('optionally-required posted individual_address_kanji_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted individual_address_kanji_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_address_kanji_postal_code
       assert.notStrictEqual(stripeAccountNow.individual.address_kanji.postal_code, undefined)
       assert.notStrictEqual(stripeAccountNow.individual.address_kanji.postal_code, null)
     })
-    it('optionally-required posted company_name', async () => {
-      await bundledData()
+    it('optionally-required posted company_name', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_name
       assert.strictEqual(stripeAccountNow.company.name, 'Test Company Name')
     })
-    it('optionally-required posted company_phone', async () => {
-      await bundledData()
+    it('optionally-required posted company_phone', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_phone
       assert.strictEqual(stripeAccountNow.company.phone, '4567890123')
     })
-    it('optionally-required posted company_tax_id', async () => {
-      await bundledData()
+    it('optionally-required posted company_tax_id', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_tax_id
       assert.strictEqual(stripeAccountNow.company.tax_id_provided, true)
     })
-    it('optionally-required posted company_registration_number', async () => {
-      await bundledData()
+    it('optionally-required posted company_registration_number', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_registration_number
       assert.strictEqual(stripeAccountNow.company.registration_number, '00000000000')
     })
-    it('optionally-required posted company_address_line1', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_line1
       assert.strictEqual(stripeAccountNow.company.address.line1, '123 Park Lane')
     })
-    it('optionally-required posted company_address_city', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_city
       assert.strictEqual(stripeAccountNow.company.address.city, 'Vienna')
     })
-    it('optionally-required posted company_address_state', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_state
       assert.strictEqual(stripeAccountNow.company.address.state, 'QLD')
     })
-    it('optionally-required posted company_address_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_postal_code
       assert.strictEqual(stripeAccountNow.company.address.postal_code, '1020')
     })
-    it('optionally-required posted company_address_kana_line1', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kana_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kana_line1
       assert.strictEqual(stripeAccountNow.company.address_kana.line1, testData.addresses.JP.kana_line1)
     })
-    it('optionally-required posted company_address_kana_city', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kana_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kana_city
       assert.strictEqual(stripeAccountNow.company.address_kana.city, testData.addresses.JP.kana_city)
     })
-    it('optionally-required posted company_address_kana_town', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kana_town', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kana_town
       assert.strictEqual(stripeAccountNow.company.address_kana.town, testData.addresses.JP.kana_town)
     })
-    it('optionally-required posted company_address_kana_state', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kana_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kana_state
       assert.strictEqual(stripeAccountNow.company.address_kana.state, testData.addresses.JP.kana_state)
     })
-    it('optionally-required posted company_address_kana_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kana_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kana_postal_code
       assert.notStrictEqual(stripeAccountNow.company.address_kana.postal_code, undefined)
       assert.notStrictEqual(stripeAccountNow.company.address_kana.postal_code, null)
     })
-    it('optionally-required posted company_address_kanji_line1', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kanji_line1', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kanji_line1
       assert.strictEqual(stripeAccountNow.company.address_kanji.line1, testData.addresses.JP.kanji_line1)
     })
-    it('optionally-required posted company_address_kanji_city', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kanji_city', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kanji_city
       assert.strictEqual(stripeAccountNow.company.address_kanji.city, testData.addresses.JP.kanji_city)
     })
-    it('optionally-required posted company_address_kanji_town', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kanji_town', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kanji_town
       assert.strictEqual(stripeAccountNow.company.address_kanji.town, testData.addresses.JP.kanji_town)
     })
-    it('optionally-required posted company_address_kanji_state', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kanji_state', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kanji_state
       assert.strictEqual(stripeAccountNow.company.address_kanji.state, testData.addresses.JP.kanji_state)
     })
-    it('optionally-required posted company_address_kanji_postal_code', async () => {
-      await bundledData()
+    it('optionally-required posted company_address_kanji_postal_code', async function () {
+      await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.company_address_kanji_postal_code
       assert.notStrictEqual(stripeAccountNow.company.address_kanji.postal_code, undefined)
       assert.notStrictEqual(stripeAccountNow.company.address_kanji.postal_code, null)
