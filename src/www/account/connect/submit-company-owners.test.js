@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-company-owners', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -82,7 +83,9 @@ describe('/account/connect/submit-company-owners', function () {
     req.session = user.session
     cachedResponses.noOwners = await req.get()
     cachedResponses.submitWithoutOwners = await req.post()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -111,6 +114,7 @@ describe('/account/connect/submit-company-owners', function () {
 
   describe('before', () => {
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
       assert.strictEqual(data.owners.length, 1)
@@ -119,6 +123,7 @@ describe('/account/connect/submit-company-owners', function () {
 
   describe('view', () => {
     it('should reject if an owner requires information', async () => {
+      await bundledData()
       const result = cachedResponses.requiresInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -127,6 +132,7 @@ describe('/account/connect/submit-company-owners', function () {
     })
 
     it('should present the form without owners', async () => {
+      await bundledData()
       const result = cachedResponses.noOwners
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -134,6 +140,7 @@ describe('/account/connect/submit-company-owners', function () {
     })
 
     it('should present the form with completed owners', async () => {
+      await bundledData()
       const result = cachedResponses.formWithOwners
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -143,6 +150,7 @@ describe('/account/connect/submit-company-owners', function () {
 
   describe('submit', () => {
     it('should submit owners (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.submitOwners
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -151,6 +159,7 @@ describe('/account/connect/submit-company-owners', function () {
     })
 
     it('should submit without owners', async () => {
+      await bundledData()
       const result = cachedResponses.submitWithoutOwners
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

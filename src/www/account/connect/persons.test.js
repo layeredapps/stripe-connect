@@ -4,15 +4,15 @@ const TestHelper = require('../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/persons', function () {
-  const cachedResponses = {}
-  const cachedPersons = []
-  let cachedRepresentative
-  const cachedDirectors = []
-  const cachedOwners = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedRepresentative, cachedPersons, cachedDirectors, cachedOwners
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedPersons = []
+    cachedDirectors = []
+    cachedOwners = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -58,7 +58,8 @@ describe('/account/connect/persons', function () {
     await req1.route.api.before(req1)
     cachedResponses.before = req1.data
     cachedResponses.returns = await req1.get()
-  })
+    cachedResponses.finished = true
+  }
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -95,6 +96,7 @@ describe('/account/connect/persons', function () {
 
   describe('before', () => {
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.owners.length, 2)
       assert.strictEqual(data.directors.length, 2)
@@ -104,6 +106,7 @@ describe('/account/connect/persons', function () {
 
   describe('view', () => {
     it('should have row for each owner (screenshots)', async () => {
+      await bundledData()
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedOwners[0])
@@ -111,6 +114,7 @@ describe('/account/connect/persons', function () {
     })
 
     it('should have row for each director', async () => {
+      await bundledData()
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedDirectors[0])
@@ -118,6 +122,7 @@ describe('/account/connect/persons', function () {
     })
 
     it('should have row for each representative', async () => {
+      await bundledData()
       const result = await cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(cachedRepresentative.personid)

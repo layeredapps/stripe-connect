@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-stripe-account', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     // individual account
@@ -147,7 +148,9 @@ describe('/account/connect/submit-stripe-account', function () {
       { fill: '#submit-form' }
     ]
     cachedResponses.companySubmit = await req.post()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -166,6 +169,7 @@ describe('/account/connect/submit-stripe-account', function () {
 
   describe('before', () => {
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
     })
@@ -173,6 +177,7 @@ describe('/account/connect/submit-stripe-account', function () {
 
   describe('view', () => {
     it('should reject individual that hasn\'t submitted payment details', async () => {
+      await bundledData()
       const result = cachedResponses.missingIndividualPayment
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -181,6 +186,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted payment details', async () => {
+      await bundledData()
       const result = cachedResponses.missingCompanyPayment
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -189,6 +195,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that has missing owner information', async () => {
+      await bundledData()
       const result = cachedResponses.missingOwnerInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -197,6 +204,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted owners', async () => {
+      await bundledData()
       const result = cachedResponses.missingOwners
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -205,6 +213,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that has missing director information', async () => {
+      await bundledData()
       const result = cachedResponses.missingDirectorInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -213,6 +222,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted directors', async () => {
+      await bundledData()
       const result = cachedResponses.missingDirectors
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -221,6 +231,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that has missing executive information', async () => {
+      await bundledData()
       const result = cachedResponses.missingExecutiveInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -229,6 +240,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted executives', async () => {
+      await bundledData()
       const result = cachedResponses.missingExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -237,6 +249,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject company that hasn\'t submitted information', async () => {
+      await bundledData()
       const result = cachedResponses.missingCompanyInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -245,6 +258,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should reject individual that hasn\'t submitted information', async () => {
+      await bundledData()
       const result = cachedResponses.missingIndividualInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -253,6 +267,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should present the form (individual)', async () => {
+      await bundledData()
       const result = cachedResponses.individualForm
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -260,6 +275,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should present the form (company)', async () => {
+      await bundledData()
       const result = cachedResponses.companyForm
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -269,6 +285,7 @@ describe('/account/connect/submit-stripe-account', function () {
 
   describe('submit', () => {
     it('should submit registration (company) (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.companySubmit
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -277,6 +294,7 @@ describe('/account/connect/submit-stripe-account', function () {
     })
 
     it('should submit registration (individual)', async () => {
+      await bundledData()
       const result = cachedResponses.individualSubmit
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

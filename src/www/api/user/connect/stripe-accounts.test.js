@@ -5,12 +5,13 @@ const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/stripe-accounts', function () {
-  const cachedResponses = {}
-  const cachedStripeAccounts = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedStripeAccounts
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedStripeAccounts = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -39,7 +40,8 @@ describe('/api/user/connect/stripe-accounts', function () {
     req4.account = user.account
     req4.session = user.session
     cachedResponses.all = await req4.get()
-  })
+    cachedResponses.finished = true
+  }
   describe('exceptions', () => {
     describe('invalid-accountid', () => {
       it('missing querystring accountid', async () => {
@@ -73,6 +75,7 @@ describe('/api/user/connect/stripe-accounts', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const user2 = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/stripe-accounts?accountid=${user.account.accountid}`)
@@ -91,6 +94,7 @@ describe('/api/user/connect/stripe-accounts', function () {
 
   describe('receives', function () {
     it('optional querystring offset (integer)', async () => {
+      await bundledData()
       const offset = 1
       const stripeAccountsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -99,6 +103,7 @@ describe('/api/user/connect/stripe-accounts', function () {
     })
 
     it('optional querystring limit (integer)', async () => {
+      await bundledData()
       const limit = 1
       const stripeAccountsNow = cachedResponses.limit
       assert.strictEqual(stripeAccountsNow.length, limit)
@@ -112,6 +117,7 @@ describe('/api/user/connect/stripe-accounts', function () {
 
   describe('returns', function () {
     it('array', async () => {
+      await bundledData()
       const accounts = cachedResponses.returns
       assert.strictEqual(accounts.length, global.pageSize)
     })
@@ -119,6 +125,7 @@ describe('/api/user/connect/stripe-accounts', function () {
 
   describe('configuration', function () {
     it('environment PAGE_SIZE', async () => {
+      await bundledData()
       global.pageSize = 3
       const accounts = cachedResponses.pageSize
       assert.strictEqual(accounts.length, global.pageSize)

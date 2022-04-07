@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 
 describe('/administrator/connect/payout', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const administrator = await TestHelper.createOwner()
@@ -31,7 +32,9 @@ describe('/administrator/connect/payout', function () {
       { click: `/administrator/connect/payout?payoutid=${user.payout.payoutid}` }
     ]
     cachedResponses.view = await req.get()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('before', () => {
     it('should reject invalid payoutid', async () => {
       const administrator = await TestHelper.createOwner()
@@ -48,6 +51,7 @@ describe('/administrator/connect/payout', function () {
     })
 
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.payout.object, 'payout')
     })
@@ -55,6 +59,7 @@ describe('/administrator/connect/payout', function () {
 
   describe('view', () => {
     it('should have row for payout (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('payouts-table')

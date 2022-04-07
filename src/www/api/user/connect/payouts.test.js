@@ -5,12 +5,13 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/payouts', function () {
-  const cachedResponses = {}
-  const cachedPayouts = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedPayouts
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedPayouts = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
@@ -43,11 +44,12 @@ describe('/api/user/connect/payouts', function () {
     req5.account = user.account
     req5.session = user.session
     cachedResponses.all = await req5.get()
-  })
-
+    cachedResponses.finished = true
+  }
   describe('exceptions', () => {
     describe('invalid-payoutid', () => {
       it('missing querystring payoutid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/payouts')
         req.account = user.account
@@ -62,6 +64,7 @@ describe('/api/user/connect/payouts', function () {
       })
 
       it('invalid querystring payoutid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/payouts?accountid=invalid')
         req.account = user.account
@@ -78,6 +81,7 @@ describe('/api/user/connect/payouts', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const user2 = await TestHelper.createUser()
         const req = TestHelper.createRequest(`/api/user/connect/payouts?accountid=${user.account.accountid}`)
@@ -96,6 +100,7 @@ describe('/api/user/connect/payouts', function () {
 
   describe('receives', function () {
     it('optional querystring offset (integer)', async () => {
+      await bundledData()
       const offset = 1
       const payoutsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -104,17 +109,20 @@ describe('/api/user/connect/payouts', function () {
     })
 
     it('optional querystring limit (integer)', async () => {
+      await bundledData()
       const limit = 1
       const payoutsNow = cachedResponses.limit
       assert.strictEqual(payoutsNow.length, limit)
     })
 
     it('optional querystring all (boolean)', async () => {
+      await bundledData()
       const payoutsNow = cachedResponses.all
       assert.strictEqual(payoutsNow.length, cachedPayouts.length)
     })
 
     it('optional querystring stripeid (boolean)', async () => {
+      await bundledData()
       const payoutsNow = cachedResponses.stripeid
       assert.strictEqual(payoutsNow.length, cachedPayouts.length - 3)
     })
@@ -122,6 +130,7 @@ describe('/api/user/connect/payouts', function () {
 
   describe('returns', function () {
     it('array', async () => {
+      await bundledData()
       const payouts = cachedResponses.returns
       assert.strictEqual(payouts.length, global.pageSize)
     })
@@ -129,6 +138,7 @@ describe('/api/user/connect/payouts', function () {
 
   describe('configuration', function () {
     it('environment PAGE_SIZE', async () => {
+      await bundledData()
       global.pageSize = 3
       const payouts = cachedResponses.pageSize
       assert.strictEqual(payouts.length, global.pageSize)

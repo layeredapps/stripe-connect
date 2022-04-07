@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/submit-company-executives', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -82,7 +83,9 @@ describe('/account/connect/submit-company-executives', function () {
     req.session = user.session
     cachedResponses.noExecutives = await req.get()
     cachedResponses.submitWithoutExecutives = await req.post()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -111,6 +114,7 @@ describe('/account/connect/submit-company-executives', function () {
 
   describe('before', () => {
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
       assert.strictEqual(data.executives.length, 1)
@@ -119,6 +123,7 @@ describe('/account/connect/submit-company-executives', function () {
 
   describe('view', () => {
     it('should reject if a executive requires information', async () => {
+      await bundledData()
       const result = cachedResponses.requiresInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -127,6 +132,7 @@ describe('/account/connect/submit-company-executives', function () {
     })
 
     it('should present the form without executives', async () => {
+      await bundledData()
       const result = cachedResponses.noExecutives
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -134,6 +140,7 @@ describe('/account/connect/submit-company-executives', function () {
     })
 
     it('should present the form with executives', async () => {
+      await bundledData()
       const result = cachedResponses.formWithExecutives
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -143,6 +150,7 @@ describe('/account/connect/submit-company-executives', function () {
 
   describe('submit', () => {
     it('should submit executives (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.submitExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -151,6 +159,7 @@ describe('/account/connect/submit-company-executives', function () {
     })
 
     it('should submit without executives', async () => {
+      await bundledData()
       const result = cachedResponses.submitWithoutExecutives
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

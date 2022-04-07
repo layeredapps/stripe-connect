@@ -5,12 +5,13 @@ const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/persons', function () {
-  const cachedResponses = {}
-  const cachedPersons = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedPersons
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedPersons = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -59,10 +60,22 @@ describe('/api/user/connect/persons', function () {
     req4.account = user.account
     req4.session = user.session
     cachedResponses.all = await req4.get()
+    cachedResponses.finished = true
+  }
+  beforeEach(async function () {
+    try {
+      await bundledData()
+    } catch (error) {
+      for (const key in cachedResponses) {
+        delete (cachedResponses[key])
+      }
+      cachedPersons.length = 0
+    }
   })
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
       it('missing querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -81,6 +94,7 @@ describe('/api/user/connect/persons', function () {
       })
 
       it('invalid querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/persons?stripeid=invalid')
         req.account = user.account
@@ -97,6 +111,7 @@ describe('/api/user/connect/persons', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -118,6 +133,7 @@ describe('/api/user/connect/persons', function () {
 
     describe('invalid-stripe-account', () => {
       it('ineligible stripe account for individual', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         await TestHelper.createStripeAccount(user, {
           country: 'US',
@@ -139,6 +155,7 @@ describe('/api/user/connect/persons', function () {
 
   describe('receives', function () {
     it('optional querystring offset (integer)', async () => {
+      await bundledData()
       const offset = 1
       const personsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -147,12 +164,14 @@ describe('/api/user/connect/persons', function () {
     })
 
     it('optional querystring limit (integer)', async () => {
+      await bundledData()
       const limit = 1
       const personsNow = cachedResponses.limit
       assert.strictEqual(personsNow.length, limit)
     })
 
     it('optional querystring all (boolean)', async () => {
+      await bundledData()
       const personsNow = cachedResponses.all
       assert.strictEqual(personsNow.length, cachedPersons.length)
     })
@@ -160,6 +179,7 @@ describe('/api/user/connect/persons', function () {
 
   describe('returns', function () {
     it('array', async () => {
+      await bundledData()
       const persons = cachedResponses.returns
       assert.strictEqual(persons.length, global.pageSize)
     })
@@ -167,6 +187,7 @@ describe('/api/user/connect/persons', function () {
 
   describe('configuration', function () {
     it('environment PAGE_SIZE', async () => {
+      await bundledData()
       global.pageSize = 3
       const persons = cachedResponses.pageSize
       assert.strictEqual(persons.length, global.pageSize)

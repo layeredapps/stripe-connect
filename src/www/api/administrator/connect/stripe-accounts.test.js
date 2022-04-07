@@ -5,12 +5,13 @@ const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/administrator/connect/stripe-accounts', function () {
-  const cachedResponses = {}
-  const cachedStripeAccounts = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedStripeAccounts
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedStripeAccounts = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const administrator = await TestHelper.createOwner()
@@ -55,7 +56,8 @@ describe('/api/administrator/connect/stripe-accounts', function () {
     req5.account = administrator.account
     req5.session = administrator.session
     cachedResponses.accountid = await req5.get()
-  })
+    cachedResponses.finished = true
+  }
   describe('exceptions', () => {
     describe('invalid-accountid', () => {
       it('invalid querystring accountid', async () => {
@@ -76,6 +78,7 @@ describe('/api/administrator/connect/stripe-accounts', function () {
 
   describe('receives', function () {
     it('optional querystring offset (integer)', async () => {
+      await bundledData()
       const offset = 1
       const stripeAccountsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -84,17 +87,20 @@ describe('/api/administrator/connect/stripe-accounts', function () {
     })
 
     it('optional querystring limit (integer)', async () => {
+      await bundledData()
       const limit = 1
       const stripeAccountsNow = cachedResponses.limit
       assert.strictEqual(stripeAccountsNow.length, limit)
     })
 
     it('optional querystring all (boolean)', async () => {
+      await bundledData()
       const stripeAccountsNow = cachedResponses.all
       assert.strictEqual(stripeAccountsNow.length, cachedStripeAccounts.length)
     })
 
     it('optional querystring accountid (string)', async () => {
+      await bundledData()
       const stripeAccountsNow = cachedResponses.accountid
       assert.strictEqual(stripeAccountsNow.length, 2)
     })
@@ -102,6 +108,7 @@ describe('/api/administrator/connect/stripe-accounts', function () {
 
   describe('returns', function () {
     it('array', async () => {
+      await bundledData()
       const payouts = cachedResponses.returns
       assert.strictEqual(payouts.length, global.pageSize)
     })
@@ -109,6 +116,7 @@ describe('/api/administrator/connect/stripe-accounts', function () {
 
   describe('configuration', function () {
     it('environment PAGE_SIZE', async () => {
+      await bundledData()
       global.pageSize = 3
       const payouts = cachedResponses.pageSize
       assert.strictEqual(payouts.length, global.pageSize)

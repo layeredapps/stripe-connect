@@ -35,9 +35,9 @@ describe('/account/connect/edit-payment-information', function () {
   })
 
   describe('view', async () => {
-    const cachedResponses = {}
-    beforeEach(async () => {
-      if (Object.keys(cachedResponses).length) {
+    let cachedResponses
+    async function bundledData () {
+      if (cachedResponses && cachedResponses.finished) {
         return
       }
       await DashboardTestHelper.setupBeforeEach()
@@ -106,7 +106,7 @@ describe('/account/connect/edit-payment-information', function () {
       req.account = user.account
       req.session = user.session
       cachedResponses.routing_number = await req.get()
-    })
+    }
     it('should present the form', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
@@ -122,6 +122,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
     it('should have element for field account_holder_type', async () => {
+      await bundledData()
       const result = cachedResponses.account_holder_type
       const doc = TestHelper.extractDoc(result.html)
       const individual = doc.getElementById('individual')
@@ -130,66 +131,77 @@ describe('/account/connect/edit-payment-information', function () {
       assert.notStrictEqual(company, undefined)
     })
     it('should have element for field currency', async () => {
+      await bundledData()
       const result = cachedResponses.currency
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('currency')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field iban', async () => {
+      await bundledData()
       const result = cachedResponses.iban
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('iban')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field account_number', async () => {
+      await bundledData()
       const result = cachedResponses.account_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('account_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field bsb_number', async () => {
+      await bundledData()
       const result = cachedResponses.bsb_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bsb_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field institution_number', async () => {
+      await bundledData()
       const result = cachedResponses.institution_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('institution_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field transit_number', async () => {
+      await bundledData()
       const result = cachedResponses.transit_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('transit_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field sort_code', async () => {
+      await bundledData()
       const result = cachedResponses.sort_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('sort_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field branch_code', async () => {
+      await bundledData()
       const result = cachedResponses.branch_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('branch_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field clearing_code', async () => {
+      await bundledData()
       const result = cachedResponses.clearing_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('clearing_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field bank_code', async () => {
+      await bundledData()
       const result = cachedResponses.bank_code
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('bank_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field routing_number', async () => {
+      await bundledData()
       const result = cachedResponses.routing_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('routing_number')
@@ -225,9 +237,9 @@ describe('/account/connect/edit-payment-information', function () {
   })
 
   describe('errors', async () => {
-    const cachedResponses = {}
-    beforeEach(async () => {
-      if (Object.keys(cachedResponses).length) {
+    let cachedResponses
+    async function bundledData () {
+      if (cachedResponses && cachedResponses.finished) {
         return
       }
       await DashboardTestHelper.setupBeforeEach()
@@ -330,9 +342,10 @@ describe('/account/connect/edit-payment-information', function () {
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.routing_number = 'invalid'
       cachedResponses.invalidRoutingNumber = await req.post()
-    })
+    }
 
     it('reject invalid field account_holder_type', async () => {
+      await bundledData()
       const result = cachedResponses.invalidAccountHolderType
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -340,6 +353,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-account_holder_type')
     })
     it('reject invalid field currency', async () => {
+      await bundledData()
       const result = cachedResponses.invalidCurrency
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -347,6 +361,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-currency')
     })
     it('reject invalid field iban', async () => {
+      await bundledData()
       const result = cachedResponses.invalidIBAN
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -354,6 +369,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-iban')
     })
     it('reject invalid field account_number', async () => {
+      await bundledData()
       const result = cachedResponses.invalidAccountNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -361,6 +377,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-account_number')
     })
     it('reject invalid field bsb_number', async () => {
+      await bundledData()
       const result = cachedResponses.invalidBSBNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -368,6 +385,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-bsb_number')
     })
     it('reject invalid field institution_number', async () => {
+      await bundledData()
       const result = cachedResponses.invalidInstitutionNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -375,6 +393,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-institution_number')
     })
     it('reject invalid field transit_number', async () => {
+      await bundledData()
       const result = cachedResponses.invalidTransitNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -382,6 +401,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-transit_number')
     })
     it('reject invalid field sort_code', async () => {
+      await bundledData()
       const result = cachedResponses.invalidSortCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -389,6 +409,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-sort_code')
     })
     it('reject invalid field clearing_code', async () => {
+      await bundledData()
       const result = cachedResponses.invalidClearingCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -396,6 +417,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-clearing_code')
     })
     it('reject invalid field bank_code', async () => {
+      await bundledData()
       const result = cachedResponses.invalidBankCode
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -403,6 +425,7 @@ describe('/account/connect/edit-payment-information', function () {
       assert.strictEqual(message.attr.template, 'invalid-bank_code')
     })
     it('reject invalid field routing_number', async () => {
+      await bundledData()
       const result = cachedResponses.invalidRoutingNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

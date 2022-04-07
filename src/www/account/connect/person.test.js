@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 
 describe('/account/connect/person', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestStripeAccounts.createCompanyWithOwners('AT', 1)
@@ -63,7 +64,9 @@ describe('/account/connect/person', function () {
       await TestStripeAccounts.waitForPersonFieldToLeave(user, 'director', 'verification.document')
     }
     cachedResponses.directorComplete = await req.get()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('before', () => {
     it('should reject invalid personid', async () => {
       const user = await TestHelper.createUser()
@@ -80,6 +83,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.person.object, 'person')
     })
@@ -87,6 +91,7 @@ describe('/account/connect/person', function () {
 
   describe('view', () => {
     it('should show table for person (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('persons-table')
@@ -94,6 +99,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show person is representative', async () => {
+      await bundledData()
       const result = cachedResponses.representative
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('representative')
@@ -101,6 +107,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show person is owner', async () => {
+      await bundledData()
       const result = cachedResponses.owner
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('owner')
@@ -108,6 +115,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show person is director', async () => {
+      await bundledData()
       const result = cachedResponses.director
       const doc = TestHelper.extractDoc(result.html)
       const cell = doc.getElementById('director')
@@ -115,6 +123,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show person requires additional information', async () => {
+      await bundledData()
       const result = cachedResponses.director
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById('requires-information')
@@ -122,6 +131,7 @@ describe('/account/connect/person', function () {
     })
 
     it('should show no additional information required', async () => {
+      await bundledData()
       const result = cachedResponses.directorComplete
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById('requires-information')

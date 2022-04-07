@@ -5,14 +5,15 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/administrator/connect/payouts', function () {
-  const cachedResponses = {}
-  const cachedPayouts = []
-  const accountPayouts = []
-  const stripeAccountPayouts = []
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses, cachedPayouts, accountPayouts, stripeAccountPayouts
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
+    cachedPayouts = []
+    accountPayouts = []
+    stripeAccountPayouts = []
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const administrator = await TestHelper.createOwner()
@@ -57,10 +58,11 @@ describe('/api/administrator/connect/payouts', function () {
     req6.account = administrator.account
     req6.session = administrator.session
     cachedResponses.stripeid = await req6.get()
-  })
-
+    cachedResponses.finished = true
+  }
   describe('receives', function () {
     it('optional querystring offset (integer)', async () => {
+      await bundledData()
       const offset = 1
       const payoutsNow = cachedResponses.offset
       for (let i = 0, len = global.pageSize; i < len; i++) {
@@ -69,22 +71,26 @@ describe('/api/administrator/connect/payouts', function () {
     })
 
     it('optional querystring limit (integer)', async () => {
+      await bundledData()
       const limit = 1
       const payoutsNow = cachedResponses.limit
       assert.strictEqual(payoutsNow.length, limit)
     })
 
     it('optional querystring all (boolean)', async () => {
+      await bundledData()
       const payoutsNow = cachedResponses.all
       assert.strictEqual(payoutsNow.length, cachedPayouts.length)
     })
 
     it('optional querystring accountid (string)', async () => {
+      await bundledData()
       const payoutsNow = cachedResponses.accountid
       assert.strictEqual(payoutsNow.length, accountPayouts.length)
     })
 
     it('optional querystring stripeid (string)', async () => {
+      await bundledData()
       const payoutsNow = cachedResponses.stripeid
       assert.strictEqual(payoutsNow.length, stripeAccountPayouts.length)
     })
@@ -92,6 +98,7 @@ describe('/api/administrator/connect/payouts', function () {
 
   describe('returns', function () {
     it('array', async () => {
+      await bundledData()
       const payouts = cachedResponses.returns
       assert.strictEqual(payouts.length, global.pageSize)
     })
@@ -99,6 +106,7 @@ describe('/api/administrator/connect/payouts', function () {
 
   describe('configuration', function () {
     it('environment PAGE_SIZE', async () => {
+      await bundledData()
       global.pageSize = 3
       const payouts = cachedResponses.pageSize
       assert.strictEqual(payouts.length, global.pageSize)

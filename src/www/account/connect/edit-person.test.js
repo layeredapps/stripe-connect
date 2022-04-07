@@ -5,11 +5,12 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/edit-person', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -128,7 +129,9 @@ describe('/account/connect/edit-person', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.uploads = await req.get()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid person', async () => {
       const user = await TestHelper.createUser()
@@ -147,54 +150,63 @@ describe('/account/connect/edit-person', function () {
 
   describe('view', async () => {
     it('should present the form', async () => {
+      await bundledData()
       const result = cachedResponses.dob
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
     })
     it('should have element for field dob_day', async () => {
+      await bundledData()
       const result = cachedResponses.dob
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('dob_day')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field dob_month', async () => {
+      await bundledData()
       const result = cachedResponses.dob
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('dob_month')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field dob_year', async () => {
+      await bundledData()
       const result = cachedResponses.dob
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('dob_year')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field relationship_percent_ownership', async () => {
+      await bundledData()
       const result = cachedResponses.relationship_percent_ownership
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('relationship_percent_ownership')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_line1', async () => {
+      await bundledData()
       const result = cachedResponses.address
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_line1')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_line2', async () => {
+      await bundledData()
       const result = cachedResponses.address
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_line2')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_city', async () => {
+      await bundledData()
       const result = cachedResponses.address
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_city')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_state', async () => {
+      await bundledData()
       const result = cachedResponses.address
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_state')
@@ -207,126 +219,147 @@ describe('/account/connect/edit-person', function () {
     //   assert.notStrictEqual(field, undefined)
     // })
     it('should have element for field address_postal_code', async () => {
+      await bundledData()
       const result = cachedResponses.address
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_postal_code')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field id_number', async () => {
+      await bundledData()
       const result = cachedResponses.id_number
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('id_number')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field phone', async () => {
+      await bundledData()
       const result = cachedResponses.phone
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('phone')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field ssn_last_4', async () => {
+      await bundledData()
       const result = cachedResponses.ssn_last_4
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('ssn_last_4')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field email', async () => {
+      await bundledData()
       const result = cachedResponses.email
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('email')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field first_name_kana', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('first_name_kana')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field last_name_kana', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('last_name_kana')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kana_line1', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kana_line1')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kana_town', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kana_town')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kana_city', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kana_city')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kana_state', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kana_state')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field first_name_kanji', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('first_name_kana')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field last_name_kanji', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('last_name_kana')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kanji_line1', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kanji_line1')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kanji_town', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kanji_town')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kanji_city', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kanji_city')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field address_kanji_state', async () => {
+      await bundledData()
       const result = cachedResponses.kana_kanji
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('address_kanji_state')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field verification_document_front', async () => {
+      await bundledData()
       const result = cachedResponses.uploads
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('verification_document_front')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field verification_document_back', async () => {
+      await bundledData()
       const result = cachedResponses.uploads
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('verification_document_back')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field verification_additional_document_front', async () => {
+      await bundledData()
       const result = cachedResponses.uploads
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('verification_additional_document_front')
       assert.notStrictEqual(field, undefined)
     })
     it('should have element for field verification_additional_document_back', async () => {
+      await bundledData()
       const result = cachedResponses.uploads
       const doc = TestHelper.extractDoc(result.html)
       const field = doc.getElementById('verification_additional_document_back')
@@ -391,6 +424,7 @@ describe('/account/connect/edit-person', function () {
 
   describe('errors', () => {
     it('reject invalid field dob_day', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-dob_day']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -398,6 +432,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-dob_day')
     })
     it('reject invalid field dob_month', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-dob_month']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -405,6 +440,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-dob_month')
     })
     it('reject invalid field dob_year', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-dob_year']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -412,6 +448,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-dob_year')
     })
     it('reject invalid field relationship_percent_ownership', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-relationship_percent_ownership']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -419,6 +456,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-relationship_percent_ownership')
     })
     it('reject invalid field id_number', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-id_number']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -426,6 +464,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-id_number')
     })
     it('reject invalid field phone', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-phone']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -433,6 +472,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-phone')
     })
     it('reject invalid field ssn_last_4', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-ssn_last_4']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
@@ -440,6 +480,7 @@ describe('/account/connect/edit-person', function () {
       assert.strictEqual(message.attr.template, 'invalid-ssn_last_4')
     })
     it('reject invalid field email', async () => {
+      await bundledData()
       const result = cachedResponses['invalid-email']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

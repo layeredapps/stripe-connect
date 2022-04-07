@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/account/connect/set-stripe-account-submitted', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -137,10 +138,13 @@ describe('/account/connect/set-stripe-account-submitted', function () {
     } catch (error) {
       cachedResponses.individualAlreadySubmitted = error.message
     }
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
       it('missing querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/set-stripe-account-submitted')
         req.account = user.account
@@ -155,6 +159,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
       })
 
       it('invalid querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/set-stripe-account-submitted?stripeid=invalid')
         req.account = user.account
@@ -171,10 +176,12 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-stripe-account', () => {
       it('ineligible Stripe company account is submitted', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyAlreadySubmitted
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
       it('ineligible Stripe individual account is submitted', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.individualAlreadySubmitted
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
@@ -182,6 +189,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
@@ -189,11 +197,13 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-payment-details', () => {
       it('ineligible Stripe company account missing payment details', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyMissingPaymentDetails
         assert.strictEqual(errorMessage, 'invalid-payment-details')
       })
 
       it('ineligible Stripe individual account missing payment details', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.individualMissingPaymentDetails
         assert.strictEqual(errorMessage, 'invalid-payment-details')
       })
@@ -201,11 +211,13 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-registration', () => {
       it('ineligible Stripe company account missing information', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyMissingRegistrationDetails
         assert.strictEqual(errorMessage, 'invalid-registration')
       })
 
       it('ineligible Stripe individual account missing information', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.individualMissingRegistrationDetails
         assert.strictEqual(errorMessage, 'invalid-registration')
       })
@@ -213,6 +225,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-person', () => {
       it('ineligible company person missing information', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidPerson
         assert.strictEqual(errorMessage, 'invalid-person')
       })
@@ -220,6 +233,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-company-owner', () => {
       it('ineligible company owners not submitted', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyMissingOwners
         assert.strictEqual(errorMessage, 'invalid-company-owner')
       })
@@ -227,6 +241,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-director', () => {
       it('ineligible company directors not submitted', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyMissingDirectors
         assert.strictEqual(errorMessage, 'invalid-company-director')
       })
@@ -234,6 +249,7 @@ describe('/account/connect/set-stripe-account-submitted', function () {
 
     describe('invalid-executive', () => {
       it('ineligible company executives not submitted', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.companyMissingExecutives
         assert.strictEqual(errorMessage, 'invalid-company-executive')
       })

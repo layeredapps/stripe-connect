@@ -6,9 +6,9 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/update-payment-information', function () {
   describe('exceptions', () => {
-    const cachedResponses = {}
-    beforeEach(async () => {
-      if (Object.keys(cachedResponses).length) {
+    let cachedResponses
+    async function bundledData () {
+      if (cachedResponses && cachedResponses.finished) {
         return
       }
       await DashboardTestHelper.setupBeforeEach()
@@ -261,14 +261,17 @@ describe('/api/user/connect/update-payment-information', function () {
       } catch (error) {
         cachedResponses.invalidAccount = error.message
       }
-    })
+    }
+
     describe('invalid-stripeid', () => {
       it('missing querystring stripeid', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingStripeID
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
 
       it('invalid querystring stripeid', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidStripeID
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
@@ -276,6 +279,7 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
@@ -283,10 +287,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-account_holder_type', () => {
       it('missing querystring account_holder_type', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingAccountHolderType
         assert.strictEqual(errorMessage, 'invalid-account_holder_type')
       })
       it('invalid querystring account_holder_type', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccountHolderType
         assert.strictEqual(errorMessage, 'invalid-account_holder_type')
       })
@@ -294,10 +300,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-currency', () => {
       it('missing querystring currency', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingCurrency
         assert.strictEqual(errorMessage, 'invalid-currency')
       })
       it('invalid querystring currency', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidCurrency
         assert.strictEqual(errorMessage, 'invalid-currency')
       })
@@ -305,10 +313,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-iban', () => {
       it('missing querystring iban', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingIBAN
         assert.strictEqual(errorMessage, 'invalid-external_account.iban')
       })
       it('invalid querystring iban', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidIBAN
         assert.strictEqual(errorMessage, 'invalid-external_account.iban')
       })
@@ -316,10 +326,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-account_number', () => {
       it('missing querystring account_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingAccountNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.account_number')
       })
       it('invalid querystring account_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccountNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.account_number')
       })
@@ -327,10 +339,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-bsb_number', () => {
       it('missing querystring bsb_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingBSBNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.bsb_number')
       })
       it('invalid querystring bsb_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidBSBNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.bsb_number')
       })
@@ -338,10 +352,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-institution_number', () => {
       it('missing querystring institution_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingInstitutionNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.institution_number')
       })
       it('invalid querystring institution_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidInstitutionNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.institution_number')
       })
@@ -349,10 +365,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-transit_number', () => {
       it('missing querystring transit_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingTransitNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.transit_number')
       })
       it('invalid querystring transit_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidTransitNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.transit_number')
       })
@@ -360,10 +378,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-sort_code', () => {
       it('missing querystring sort_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingSortCode
         assert.strictEqual(errorMessage, 'invalid-external_account.sort_code')
       })
       it('invalid querystring sort_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidSortCode
         assert.strictEqual(errorMessage, 'invalid-external_account.sort_code')
       })
@@ -371,10 +391,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-clearing_code', () => {
       it('missing querystring clearing_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingClearingCode
         assert.strictEqual(errorMessage, 'invalid-external_account.clearing_code')
       })
       it('invalid querystring clearing_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidClearingCode
         assert.strictEqual(errorMessage, 'invalid-external_account.clearing_code')
       })
@@ -382,10 +404,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-bank_code', () => {
       it('missing querystring bank_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingBankCode
         assert.strictEqual(errorMessage, 'invalid-external_account.bank_code')
       })
       it('invalid querystring bank_code', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidBankCode
         assert.strictEqual(errorMessage, 'invalid-external_account.bank_code')
       })
@@ -393,10 +417,12 @@ describe('/api/user/connect/update-payment-information', function () {
 
     describe('invalid-routing_number', () => {
       it('missing querystring routing_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingRoutingNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.routing_number')
       })
       it('invalid querystring routing_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidRoutingNumber
         assert.strictEqual(errorMessage, 'invalid-external_account.routing_number')
       })
@@ -404,9 +430,9 @@ describe('/api/user/connect/update-payment-information', function () {
   })
 
   describe('receives', () => {
-    const cachedResponses = {}
-    beforeEach(async () => {
-      if (Object.keys(cachedResponses).length) {
+    let cachedResponses
+    async function bundledData () {
+      if (cachedResponses && cachedResponses.finished) {
         return
       }
       await DashboardTestHelper.setupBeforeEach()
@@ -487,64 +513,76 @@ describe('/api/user/connect/update-payment-information', function () {
       req.session = user.session
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       cachedResponses.routingNumber = await req.patch()
-    })
+    }
 
-    it('required posted account_holder_type', () => {
+    it('required posted account_holder_type', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('required posted currency', () => {
+    it('required posted currency', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted iban', () => {
+    it('optionally-required posted iban', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted account_number', () => {
+    it('optionally-required posted account_number', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted bsb_number', () => {
+    it('optionally-required posted bsb_number', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted institution_number', () => {
+    it('optionally-required posted institution_number', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted transit_number', () => {
+    it('optionally-required posted transit_number', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted sort_code', () => {
+    it('optionally-required posted sort_code', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted branch_code', () => {
+    it('optionally-required posted branch_code', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted clearing_code', () => {
+    it('optionally-required posted clearing_code', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted bank_code', () => {
+    it('optionally-required posted bank_code', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })
 
-    it('optionally-required posted routing_number', () => {
+    it('optionally-required posted routing_number', async () => {
+      await bundledData()
       const stripeAccountNow = cachedResponses.routingNumber
       assert.strictEqual(stripeAccountNow.stripeObject.external_accounts.total_count, 1)
     })

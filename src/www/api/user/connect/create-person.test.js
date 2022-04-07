@@ -4,11 +4,12 @@ const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/create-person', () => {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -171,10 +172,13 @@ describe('/api/user/connect/create-person', () => {
       relationship_percent_ownership: '0.1'
     }
     cachedResponses.owner = await req.post()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
       it('missing querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/create-person')
         req.account = user.account
@@ -189,6 +193,7 @@ describe('/api/user/connect/create-person', () => {
       })
 
       it('invalid querystring stripeid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/create-person?stripeid=invalid')
         req.account = user.account
@@ -205,21 +210,25 @@ describe('/api/user/connect/create-person', () => {
 
     describe('invalid-stripe-account', () => {
       it('ineligible stripe account for individuals', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.individualAccount
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
 
       it('ineligible stripe account does not require directors', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.directorsNotRequired
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
 
       it('ineligible stripe account does not require owners', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.ownersNotRequired
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
 
       it('ineligible stripe account does not require executives', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.executivesNotRequired
         assert.strictEqual(errorMessage, 'invalid-stripe-account')
       })
@@ -227,6 +236,7 @@ describe('/api/user/connect/create-person', () => {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
@@ -234,11 +244,13 @@ describe('/api/user/connect/create-person', () => {
 
     describe('invalid-relationship_percent_ownership', () => {
       it('missing posted relationship.percent_ownership', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingPercentOwned
         assert.strictEqual(errorMessage, 'invalid-relationship_percent_ownership')
       })
 
       it('invalid posted relationship.percent_ownership', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidPercentOwned
         assert.strictEqual(errorMessage, 'invalid-relationship_percent_ownership')
       })
@@ -246,11 +258,13 @@ describe('/api/user/connect/create-person', () => {
 
     describe('invalid-relationship_title', () => {
       it('missing posted relationship.title', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.missingRelationshipTitle
         assert.strictEqual(errorMessage, 'invalid-relationship_title')
       })
 
       it('invalid posted relationship_title', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidRelationshipTitle
         assert.strictEqual(errorMessage, 'invalid-relationship_title')
       })
@@ -259,38 +273,45 @@ describe('/api/user/connect/create-person', () => {
 
   describe('receives', () => {
     it('optional posted relationship_representative', async () => {
+      await bundledData()
       const person = cachedResponses.representative
       assert.strictEqual(person.stripeObject.relationship.representative, true)
     })
 
     it('optionally-required posted relationship_executive', async () => {
+      await bundledData()
       const person = cachedResponses.executive
       assert.strictEqual(person.stripeObject.relationship.executive, true)
     })
 
     it('optional posted relationship_director', async () => {
+      await bundledData()
       const person = cachedResponses.director
       assert.strictEqual(person.stripeObject.relationship.director, true)
     })
 
     it('optional posted relationship_owner', async () => {
+      await bundledData()
       const person = cachedResponses.owner
       assert.strictEqual(person.stripeObject.relationship.owner, true)
     })
 
     it('required posted relationship_percent_ownership', async () => {
+      await bundledData()
       const person = cachedResponses.owner
       assert.strictEqual(person.stripeObject.relationship.percent_ownership, 0.1)
     })
 
     it('required posted relationship_title', async () => {
       const person = cachedResponses.owner
+      await bundledData()
       assert.strictEqual(person.stripeObject.relationship.title, 'Chairperson')
     })
   })
 
   describe('returns', () => {
     it('object', async () => {
+      await bundledData()
       const person = cachedResponses.owner
       assert.strictEqual(person.object, 'person')
     })

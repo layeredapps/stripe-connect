@@ -5,11 +5,12 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts')
 
 describe('/account/connect/stripe-account', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     // invalid account
@@ -64,7 +65,8 @@ describe('/account/connect/stripe-account', function () {
     // submitted
     await TestHelper.submitStripeAccount(user3)
     cachedResponses.submitted = await req.get()
-  })
+    cachedResponses.finished = true
+  }
 
   describe('before', () => {
     it('should reject invalid stripeid', async () => {
@@ -87,6 +89,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should bind data to req', async () => {
+      await bundledData()
       const data = cachedResponses.before
       assert.strictEqual(data.stripeAccount.object, 'account')
     })
@@ -94,6 +97,7 @@ describe('/account/connect/stripe-account', function () {
 
   describe('view', () => {
     it('should show registration unstarted (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.unstarted
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('account-status')
@@ -102,6 +106,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should show registration completed', async () => {
+      await bundledData()
       const result = cachedResponses.registrationComplete
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('account-status')
@@ -110,6 +115,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should show payment information required', async () => {
+      await bundledData()
       const result = cachedResponses.paymentInformationRequired
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('payment-information-status')
@@ -118,6 +124,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should show payment information created', async () => {
+      await bundledData()
       const result = cachedResponses.hasPaymentInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('payment-information-status')
@@ -126,6 +133,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should show ready to submit', async () => {
+      await bundledData()
       const result = cachedResponses.hasPaymentInformation
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('submission-status')
@@ -134,6 +142,7 @@ describe('/account/connect/stripe-account', function () {
     })
 
     it('should show registration is submitted', async () => {
+      await bundledData()
       const result = cachedResponses.submitted
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('submission-status')

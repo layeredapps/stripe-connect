@@ -5,11 +5,12 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/update-person', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -298,10 +299,13 @@ describe('/api/user/connect/update-person', function () {
         personid: user3.owner.personid
       }
     })
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     describe('invalid-personid', () => {
       it('missing querystring personid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-person')
         req.account = user.account
@@ -317,6 +321,7 @@ describe('/api/user/connect/update-person', function () {
       })
 
       it('invalid querystring personid', async () => {
+        await bundledData()
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-person?personid=invalid')
         req.account = user.account
@@ -334,6 +339,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
@@ -341,6 +347,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-person', () => {
       it('ineligible querystring person has no required information', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidPerson
         assert.strictEqual(errorMessage, 'invalid-person')
       })
@@ -348,30 +355,36 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-dob_day', () => {
       it('missing posted dob.day', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_day']
         assert.strictEqual(errorMessage, 'invalid-dob_day')
       })
       it('invalid posted dob.day', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_day']
         assert.strictEqual(errorMessage, 'invalid-dob_day')
       })
     })
     describe('invalid-dob_month', () => {
       it('missing posted dob.month', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
       it('invalid posted dob.month', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
     })
     describe('invalid-dob_year', () => {
       it('missing posted dob.month', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
       it('invalid posted dob.month', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-dob_month']
         assert.strictEqual(errorMessage, 'invalid-dob_month')
       })
@@ -379,6 +392,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-relationship_percent_ownership', () => {
       it('invalid posted relationship.percent_ownership', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-relationship_percent_ownership']
         assert.strictEqual(errorMessage, 'invalid-relationship_percent_ownership')
       })
@@ -386,6 +400,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-address_country', () => {
       it('invalid posted address.country', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-address_country']
         assert.strictEqual(errorMessage, 'invalid-address_country')
       })
@@ -393,6 +408,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-address_state', () => {
       it('invalid posted address.state', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-address_state']
         assert.strictEqual(errorMessage, 'invalid-address_state')
       })
@@ -400,6 +416,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-id_number', () => {
       it('invalid posted id_number', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-id_number']
         assert.strictEqual(errorMessage, 'invalid-id_number')
       })
@@ -407,6 +424,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-ssn_last_4', () => {
       it('invalid posted ssn_last_4', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-ssn_last_4']
         assert.strictEqual(errorMessage, 'invalid-ssn_last_4')
       })
@@ -414,6 +432,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-phone', () => {
       it('invalid posted phone', async () => {
+        await bundledData()
         const errorMessage = cachedResponses['invalid-phone']
         assert.strictEqual(errorMessage, 'invalid-phone')
       })
@@ -421,6 +440,7 @@ describe('/api/user/connect/update-person', function () {
 
     describe('invalid-account', () => {
       it('ineligible accessing account', async () => {
+        await bundledData()
         const errorMessage = cachedResponses.invalidAccount
         assert.strictEqual(errorMessage, 'invalid-account')
       })
@@ -429,66 +449,82 @@ describe('/api/user/connect/update-person', function () {
 
   describe('receives', () => {
     it('optionally-required posted dob_day', async () => {
+      await bundledData()
       const personNow = cachedResponses.dob_day
       assert.strictEqual(personNow.dob.day, 1)
     })
     it('optionally-required posted dob_month', async () => {
+      await bundledData()
       const personNow = cachedResponses.dob_month
       assert.strictEqual(personNow.dob.month, 1)
     })
     it('optionally-required posted dob_year', async () => {
+      await bundledData()
       const personNow = cachedResponses.dob_year
       assert.strictEqual(personNow.dob.year, 1970)
     })
     it('optionally-required posted address_line1', async () => {
+      await bundledData()
       const personNow = cachedResponses.address_line1
       assert.strictEqual(personNow.address.line1, '123 Park Lane')
     })
     it('optionally-required posted address_city', async () => {
+      await bundledData()
       const personNow = cachedResponses.address_city
       assert.strictEqual(personNow.address.city, 'Vienna')
     })
     it('optionally-required posted address_state', async () => {
+      await bundledData()
       const personNow = cachedResponses.address_state
       assert.strictEqual(personNow.address.state, 'SP')
     })
     it('optionally-required posted address_postal_code', async () => {
+      await bundledData()
       const personNow = cachedResponses.address_postal_code
       assert.strictEqual(personNow.address.postal_code, '1020')
     })
     it('optionally-required posted email', async () => {
+      await bundledData()
       const personNow = cachedResponses.email
       assert.strictEqual(personNow.email, 'email@address.com')
     })
     it('optionally-required posted phone', async () => {
+      await bundledData()
       const personNow = cachedResponses.phone
       assert.strictEqual(personNow.phone, '+14567890123')
     })
     it('optionally-required posted political_exposure', async () => {
+      await bundledData()
       const personNow = cachedResponses.political_exposure
       assert.strictEqual(personNow.political_exposure, 'existing')
     })
     it('optionally-required posted id_number', async () => {
+      await bundledData()
       const personNow = cachedResponses.id_number
       assert.strictEqual(personNow.id_number_provided, true)
     })
     it('optionally-required posted ssn_last_4', async () => {
+      await bundledData()
       const personNow = cachedResponses.ssn_last_4
       assert.strictEqual(personNow.ssn_last_4_provided, true)
     })
     it('optionally-required posted verification_document_front', async () => {
+      await bundledData()
       const personNow = cachedResponses.verification_document_front
       assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_document_back', async () => {
+      await bundledData()
       const personNow = cachedResponses.verification_document_back
       assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_additional_document_front', async () => {
+      await bundledData()
       const personNow = cachedResponses.verification_additional_document_front
       assert.strictEqual(personNow.verification.status, 'unverified')
     })
     it('optionally-required posted verification_additional_document_back', async () => {
+      await bundledData()
       const personNow = cachedResponses.verification_additional_document_back
       assert.strictEqual(personNow.verification.status, 'unverified')
     })
@@ -496,6 +532,7 @@ describe('/api/user/connect/update-person', function () {
 
   describe('returns', () => {
     it('object', async () => {
+      await bundledData()
       const personNow = cachedResponses.returns
       assert.strictEqual(personNow.object, 'person')
     })
@@ -503,6 +540,7 @@ describe('/api/user/connect/update-person', function () {
 
   describe('configuration', () => {
     it('environment STRIPE_JS', async () => {
+      await bundledData()
       const personNow = cachedResponses.returnsWithStripeJS
       assert.notStrictEqual(personNow.tokenUpdate, null)
       assert.notStrictEqual(personNow.tokenUpdate, undefined)

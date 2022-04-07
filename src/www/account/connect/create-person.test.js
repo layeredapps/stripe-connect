@@ -4,11 +4,12 @@ const TestHelper = require('../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/create-person', function () {
-  const cachedResponses = {}
-  beforeEach(async () => {
-    if (Object.keys(cachedResponses).length) {
+  let cachedResponses
+  async function bundledData () {
+    if (cachedResponses && cachedResponses.finished) {
       return
     }
+    cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
     const user = await TestHelper.createUser()
@@ -69,7 +70,9 @@ describe('/account/connect/create-person', function () {
       relationship_percent_ownership: '10'
     }
     cachedResponses.createOwner = await req.post()
-  })
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid stripeid', async () => {
       const user = await TestHelper.createUser()
@@ -106,6 +109,7 @@ describe('/account/connect/create-person', function () {
 
   describe('view', () => {
     it('should present the form', async () => {
+      await bundledData()
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
@@ -114,6 +118,7 @@ describe('/account/connect/create-person', function () {
 
     // TODO: needs test for removing executive
     it('should remove director option', async () => {
+      await bundledData()
       const result = cachedResponses.viewNoDirector
       const doc = TestHelper.extractDoc(result.html)
       const option = doc.getElementById('relationship_director')
@@ -139,11 +144,13 @@ describe('/account/connect/create-person', function () {
 
   describe('submit', () => {
     it('should create representative (screenshots)', async () => {
+      await bundledData()
       const result = cachedResponses.submit
       assert.strictEqual(result.redirect.startsWith('/account/connect/person?personid='), true)
     })
 
     it('should create director', async () => {
+      await bundledData()
       const result = cachedResponses.createDirector
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -152,6 +159,7 @@ describe('/account/connect/create-person', function () {
     })
 
     it('should create representative', async () => {
+      await bundledData()
       const result = cachedResponses.createRepresentative
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -160,6 +168,7 @@ describe('/account/connect/create-person', function () {
     })
 
     it('should create executive', async () => {
+      await bundledData()
       const result = cachedResponses.createExecutive
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
@@ -168,6 +177,7 @@ describe('/account/connect/create-person', function () {
     })
 
     it('should create owner', async () => {
+      await bundledData()
       const result = cachedResponses.createOwner
       const doc = TestHelper.extractDoc(result.html)
       const personsTable = doc.getElementById('persons-table')
