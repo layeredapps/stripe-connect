@@ -27,6 +27,7 @@ describe('/account/connect/edit-person', function () {
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
+    await TestHelper.rotateWebhook()
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
     let req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
     req.account = user.account
@@ -55,6 +56,7 @@ describe('/account/connect/edit-person', function () {
       country: 'HK',
       business_type: 'company'
     })
+    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_title: 'SVP Testing',
@@ -74,6 +76,7 @@ describe('/account/connect/edit-person', function () {
       country: 'JP',
       business_type: 'company'
     })
+    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_title: 'SVP Testing',
@@ -89,6 +92,7 @@ describe('/account/connect/edit-person', function () {
       country: 'US',
       business_type: 'company'
     })
+    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_executive: 'true',
@@ -111,6 +115,7 @@ describe('/account/connect/edit-person', function () {
       country: 'AT',
       business_type: 'company'
     })
+    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_executive: 'true',
@@ -122,11 +127,13 @@ describe('/account/connect/edit-person', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.email = await req.get()
+    await TestHelper.rotateWebhook()
     req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
     req.body.email = '-1'
     cachedResponses['invalid-email'] = await req.post()
     req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
     await req.post()
+    await TestHelper.rotateWebhook()
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
