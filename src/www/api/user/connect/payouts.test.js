@@ -32,6 +32,7 @@ describe('/api/user/connect/payouts', function () {
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     cachedResponses.pageSize = await req1.get()
+    global.pageSize = 2
     const req2 = TestHelper.createRequest(`/api/user/connect/payouts?accountid=${user.account.accountid}&stripeid=${user.stripeAccount.stripeid}`)
     req2.account = user.account
     req2.session = user.session
@@ -143,9 +144,8 @@ describe('/api/user/connect/payouts', function () {
   describe('configuration', function () {
     it('environment PAGE_SIZE', async function () {
       await bundledData(this.test.currentRetry())
-      global.pageSize = 3
       const payouts = cachedResponses.pageSize
-      assert.strictEqual(payouts.length, global.pageSize)
+      assert.strictEqual(payouts.length, global.pageSize + 1)
     })
   })
 })

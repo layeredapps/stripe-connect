@@ -112,9 +112,8 @@ describe('/api/administrator/connect/payouts', function () {
   describe('configuration', function () {
     it('environment PAGE_SIZE', async function () {
       await bundledData(this.test.currentRetry())
-      global.pageSize = 3
       const payouts = cachedResponses.pageSize
-      assert.strictEqual(payouts.length, global.pageSize)
+      assert.strictEqual(payouts.length, global.pageSize + 1)
     })
   })
 })

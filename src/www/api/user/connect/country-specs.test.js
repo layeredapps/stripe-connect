@@ -43,10 +43,9 @@ describe('/api/user/connect/country-specs', () => {
 
   describe('configuration', () => {
     it('environment PAGE_SIZE', async () => {
-      global.pageSize = 3
       const req = TestHelper.createRequest('/api/user/connect/country-specs')
       const countrySpecs = await req.get()
-      assert.strictEqual(countrySpecs.length, global.pageSize)
+      assert.strictEqual(countrySpecs.length, global.pageSize + 1)
     })
   })
 })

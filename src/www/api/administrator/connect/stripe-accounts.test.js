@@ -44,6 +44,7 @@ describe('/api/administrator/connect/stripe-accounts', function () {
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     cachedResponses.pageSize = await req1.get()
+    global.pageSize = 2
     const req2 = TestHelper.createRequest('/api/administrator/connect/stripe-accounts?offset=1')
     req2.account = administrator.account
     req2.session = administrator.session
@@ -121,9 +122,8 @@ describe('/api/administrator/connect/stripe-accounts', function () {
   describe('configuration', function () {
     it('environment PAGE_SIZE', async function () {
       await bundledData(this.test.currentRetry())
-      global.pageSize = 3
       const payouts = cachedResponses.pageSize
-      assert.strictEqual(payouts.length, global.pageSize)
+      assert.strictEqual(payouts.length, global.pageSize + 1)
     })
   })
 })

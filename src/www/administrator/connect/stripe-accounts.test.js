@@ -76,7 +76,7 @@ describe('/administrator/connect/stripe-accounts', function () {
       assert.strictEqual(rows.length, global.pageSize + 2)
     })
 
-    it('should change page size', async function () {
+    it('should change offset', async function () {
       await bundledData(this.test.currentRetry())
       const offset = 1
       const result = cachedResponses.offset
