@@ -243,7 +243,6 @@ async function rotateWebhook (remake) {
 
 let webhook
 
-
 async function setupWebhook () {
   webhook = null
   while (!webhook) {
@@ -268,7 +267,6 @@ async function setupWebhook () {
     }
   }
 }
-
 
 before(setupBefore)
 beforeEach(setupBeforeEach)
