@@ -71,7 +71,7 @@ describe('/administrator/connect/payouts', function () {
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('payouts-table')
       const rows = table.getElementsByTagName('tr')
-      assert.strictEqual(rows.length, global.pageSize + 1)
+      assert.strictEqual(rows.length, global.pageSize + 2)
     })
 
     it('should change page size', async function () {

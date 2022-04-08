@@ -73,7 +73,7 @@ describe('/administrator/connect/stripe-accounts', function () {
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('stripe-accounts-table')
       const rows = table.getElementsByTagName('tr')
-      assert.strictEqual(rows.length, global.pageSize + 1)
+      assert.strictEqual(rows.length, global.pageSize + 2)
     })
 
     it('should change page size', async function () {
