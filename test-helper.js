@@ -22,6 +22,155 @@ const stripe = require('stripe')({
 const stripeKey = {
   apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 }
+const enabledEvents = [
+  // 'setup_intent.canceled',
+  // 'setup_intent.created',
+  // 'setup_intent.setup_failed',
+  // 'setup_intent.succeeded',
+  // 'sigma.scheduled_query_run.created',
+  // 'review.closed',
+  // 'review.opened',
+  // 'sku.created',
+  // 'sku.deleted',
+  // 'sku.updated',
+  // 'source.canceled',
+  // 'source.chargeable',
+  // 'source.failed',
+  // 'source.mandate_notification',
+  // 'source.refund_attributes_required',
+  // 'source.transaction.created',
+  // 'source.transaction.updated',
+  // 'tax_rate.created',
+  // 'tax_rate.updated',
+  // 'topup.canceled',
+  // 'topup.created',
+  // 'topup.failed',
+  // 'topup.reversed',
+  // 'topup.succeeded',
+  // 'transfer.created',
+  // 'transfer.failed',
+  // 'transfer.paid',
+  // 'transfer.reversed',
+  // 'transfer.updated',
+  // 'reporting.report_run.failed',
+  // 'reporting.report_run.succeeded',
+  // 'reporting.report_type.updated',
+  // 'product.created',
+  // 'product.deleted',
+  // 'product.updated',
+  // 'price.created',
+  // 'price.deleted',
+  // 'price.updated',
+  // 'plan.created',
+  // 'plan.deleted',
+  // 'plan.updated',
+  // 'order_return.created',
+  // 'payment_intent.amount_capturable_updated',
+  // 'payment_intent.canceled',
+  // 'payment_intent.created',
+  // 'payment_intent.payment_failed',
+  // 'payment_intent.processing',
+  // 'payment_intent.succeeded',
+  // 'order.payment_succeeded',
+  // 'payment_method.attached',
+  // 'payment_method.card_automatically_updated',
+  // 'payment_method.detached',
+  // 'payment_method.updated',
+  'payout.canceled',
+  'payout.created',
+  'payout.failed',
+  'payout.paid',
+  'payout.updated',
+  // 'mandate.updated',
+  'person.created',
+  'person.deleted',
+  'person.updated',
+  // 'issuing_card.created',
+  // 'issuing_card.updated',
+  // 'order.created',
+  // 'order.payment_failed',
+  // 'order.updated',
+  // 'issuing_dispute.created',
+  // 'issuing_dispute.funds_reinstated',
+  // 'issuing_dispute.updated',
+  // 'issuing_transaction.created',
+  // 'issuing_transaction.updated',
+  // 'issuing_authorization.created',
+  // 'issuing_authorization.request',
+  // 'issuing_authorization.updated',
+  // 'file.created',
+  // 'credit_note.created',
+  // 'credit_note.updated',
+  // 'credit_note.voided',
+  // 'issuing_cardholder.created',
+  // 'issuing_cardholder.updated',
+  // 'invoiceitem.created',
+  // 'invoiceitem.deleted',
+  // 'invoiceitem.updated',
+  // 'invoice.created',
+  // 'invoice.deleted',
+  // 'invoice.finalized',
+  // 'invoice.marked_uncollectible',
+  // 'invoice.paid',
+  // 'invoice.payment_action_required',
+  // 'invoice.payment_failed',
+  // 'invoice.payment_succeeded',
+  // 'invoice.sent',
+  // 'invoice.upcoming',
+  // 'invoice.updated',
+  // 'invoice.voided',
+  // 'coupon.created',
+  // 'coupon.deleted',
+  // 'coupon.updated',
+  // 'checkout.session.async_payment_failed',
+  // 'checkout.session.async_payment_succeeded',
+  // 'checkout.session.completed',
+  // 'customer.created',
+  // 'customer.deleted',
+  // 'customer.updated',
+  // 'customer.discount.created',
+  // 'customer.discount.deleted',
+  // 'customer.discount.updated',
+  // 'customer.source.created',
+  // 'customer.source.deleted',
+  // 'customer.source.expiring',
+  // 'customer.source.updated',
+  // 'customer.subscription.created',
+  // 'customer.subscription.deleted',
+  // 'customer.subscription.pending_update_applied',
+  // 'customer.subscription.pending_update_expired',
+  // 'customer.subscription.trial_will_end',
+  // 'customer.subscription.updated',
+  // 'customer.tax_id.created',
+  // 'customer.tax_id.deleted',
+  // 'customer.tax_id.updated',
+  'account.external_account.deleted',
+  // 'charge.captured',
+  // 'charge.expired',
+  // 'charge.failed',
+  // 'charge.pending',
+  // 'charge.refunded',
+  // 'charge.succeeded',
+  // 'charge.updated',
+  // 'charge.dispute.closed',
+  // 'charge.dispute.created',
+  // 'charge.dispute.funds_reinstated',
+  // 'charge.dispute.funds_withdrawn',
+  // 'charge.dispute.updated',
+  // 'charge.refund.updated',
+  // 'capability.updated',
+  // 'balance.available',
+  'account.updated',
+  'account.external_account.created',
+  'account.external_account.updated'
+  // 'subscription_schedule.aborted',
+  // 'subscription_schedule.canceled',
+  // 'subscription_schedule.completed',
+  // 'subscription_schedule.created',
+  // 'subscription_schedule.expiring',
+  // 'subscription_schedule.released',
+  // 'subscription_schedule.updated'
+]
 
 const wait = util.promisify((quantity, callback) => {
   return setTimeout(callback, quantity || 100)
@@ -92,197 +241,41 @@ async function rotateWebhook (remake) {
   }
 }
 
-let webhook, tunnel, data
+let webhook
+
+
 async function setupWebhook () {
-  if (webhook) {
-    return
-  }
-  let newAddress
-  await ngrok.kill()
-  tunnel = null
-  while (!tunnel) {
+  webhook = null
+  while (!webhook) {
     try {
-      tunnel = await ngrok.connect({
+      await deleteOldWebhooks()
+      await ngrok.kill()
+      const tunnel = await ngrok.connect({
         port: global.port,
-        auth: process.env.NGROK_AUTH
+        // auth: process.env.NGROK_AUTH,
+        onLogEvent: process.env.LOG_LEVEL && process.env.LOG_LEVEL.indexOf('ngrok') > -1 ? console.log : undefined
       })
-      if (!tunnel) {
-        continue
-      }
-      newAddress = tunnel
-      break
+      webhook = await stripe.webhookEndpoints.create({
+        url: `${tunnel}/webhooks/connect/index-connect-data`,
+        enabled_events: enabledEvents,
+        connect: true
+      }, stripeKey)
+      global.connectWebhookEndPointSecret = webhook.secret
     } catch (error) {
+    }
+    if (!webhook) {
       await wait()
-      continue
     }
   }
-  if (newAddress) {
-    webhook = await stripe.webhookEndpoints.create({
-      url: `${newAddress}/webhooks/connect/index-connect-data`,
-      enabled_events: [
-        // 'setup_intent.canceled',
-        // 'setup_intent.created',
-        // 'setup_intent.setup_failed',
-        // 'setup_intent.succeeded',
-        // 'sigma.scheduled_query_run.created',
-        // 'review.closed',
-        // 'review.opened',
-        // 'sku.created',
-        // 'sku.deleted',
-        // 'sku.updated',
-        // 'source.canceled',
-        // 'source.chargeable',
-        // 'source.failed',
-        // 'source.mandate_notification',
-        // 'source.refund_attributes_required',
-        // 'source.transaction.created',
-        // 'source.transaction.updated',
-        // 'tax_rate.created',
-        // 'tax_rate.updated',
-        // 'topup.canceled',
-        // 'topup.created',
-        // 'topup.failed',
-        // 'topup.reversed',
-        // 'topup.succeeded',
-        // 'transfer.created',
-        // 'transfer.failed',
-        // 'transfer.paid',
-        // 'transfer.reversed',
-        // 'transfer.updated',
-        // 'reporting.report_run.failed',
-        // 'reporting.report_run.succeeded',
-        // 'reporting.report_type.updated',
-        // 'product.created',
-        // 'product.deleted',
-        // 'product.updated',
-        // 'price.created',
-        // 'price.deleted',
-        // 'price.updated',
-        // 'plan.created',
-        // 'plan.deleted',
-        // 'plan.updated',
-        // 'order_return.created',
-        // 'payment_intent.amount_capturable_updated',
-        // 'payment_intent.canceled',
-        // 'payment_intent.created',
-        // 'payment_intent.payment_failed',
-        // 'payment_intent.processing',
-        // 'payment_intent.succeeded',
-        // 'order.payment_succeeded',
-        // 'payment_method.attached',
-        // 'payment_method.card_automatically_updated',
-        // 'payment_method.detached',
-        // 'payment_method.updated',
-        'payout.canceled',
-        'payout.created',
-        'payout.failed',
-        'payout.paid',
-        'payout.updated',
-        // 'mandate.updated',
-        'person.created',
-        'person.deleted',
-        'person.updated',
-        // 'issuing_card.created',
-        // 'issuing_card.updated',
-        // 'order.created',
-        // 'order.payment_failed',
-        // 'order.updated',
-        // 'issuing_dispute.created',
-        // 'issuing_dispute.funds_reinstated',
-        // 'issuing_dispute.updated',
-        // 'issuing_transaction.created',
-        // 'issuing_transaction.updated',
-        // 'issuing_authorization.created',
-        // 'issuing_authorization.request',
-        // 'issuing_authorization.updated',
-        // 'file.created',
-        // 'credit_note.created',
-        // 'credit_note.updated',
-        // 'credit_note.voided',
-        // 'issuing_cardholder.created',
-        // 'issuing_cardholder.updated',
-        // 'invoiceitem.created',
-        // 'invoiceitem.deleted',
-        // 'invoiceitem.updated',
-        // 'invoice.created',
-        // 'invoice.deleted',
-        // 'invoice.finalized',
-        // 'invoice.marked_uncollectible',
-        // 'invoice.paid',
-        // 'invoice.payment_action_required',
-        // 'invoice.payment_failed',
-        // 'invoice.payment_succeeded',
-        // 'invoice.sent',
-        // 'invoice.upcoming',
-        // 'invoice.updated',
-        // 'invoice.voided',
-        // 'coupon.created',
-        // 'coupon.deleted',
-        // 'coupon.updated',
-        // 'checkout.session.async_payment_failed',
-        // 'checkout.session.async_payment_succeeded',
-        // 'checkout.session.completed',
-        // 'customer.created',
-        // 'customer.deleted',
-        // 'customer.updated',
-        // 'customer.discount.created',
-        // 'customer.discount.deleted',
-        // 'customer.discount.updated',
-        // 'customer.source.created',
-        // 'customer.source.deleted',
-        // 'customer.source.expiring',
-        // 'customer.source.updated',
-        // 'customer.subscription.created',
-        // 'customer.subscription.deleted',
-        // 'customer.subscription.pending_update_applied',
-        // 'customer.subscription.pending_update_expired',
-        // 'customer.subscription.trial_will_end',
-        // 'customer.subscription.updated',
-        // 'customer.tax_id.created',
-        // 'customer.tax_id.deleted',
-        // 'customer.tax_id.updated',
-        'account.external_account.deleted',
-        // 'charge.captured',
-        // 'charge.expired',
-        // 'charge.failed',
-        // 'charge.pending',
-        // 'charge.refunded',
-        // 'charge.succeeded',
-        // 'charge.updated',
-        // 'charge.dispute.closed',
-        // 'charge.dispute.created',
-        // 'charge.dispute.funds_reinstated',
-        // 'charge.dispute.funds_withdrawn',
-        // 'charge.dispute.updated',
-        // 'charge.refund.updated',
-        // 'capability.updated',
-        // 'balance.available',
-        'account.updated',
-        'account.external_account.created',
-        'account.external_account.updated'
-        // 'subscription_schedule.aborted',
-        // 'subscription_schedule.canceled',
-        // 'subscription_schedule.completed',
-        // 'subscription_schedule.created',
-        // 'subscription_schedule.expiring',
-        // 'subscription_schedule.released',
-        // 'subscription_schedule.updated'
-      ],
-      connect: true
-    }, stripeKey)
-    global.connectWebhookEndPointSecret = webhook.secret
-  }
 }
+
 
 before(setupBefore)
 beforeEach(setupBeforeEach)
 
 afterEach(async () => {
   await connect.Storage.flush()
-  if (data) {
-    await deleteOldStripeAccounts()
-    data = false
-  }
+  await deleteOldStripeAccounts()
 })
 
 after(async () => {
@@ -295,70 +288,33 @@ after(async () => {
 
 async function deleteOldWebhooks () {
   webhook = null
-  let webhooks
-  while (true) {
-    try {
-      webhooks = await stripe.webhookEndpoints.list(stripeKey)
-      break
-    } catch (error) {
-    }
-  }
-  while (webhooks.data && webhooks.data.length) {
-    for (const webhook of webhooks.data) {
-      if (webhook === 0) {
-        continue
-      }
-      try {
+  try {
+    const webhooks = await stripe.webhookEndpoints.list({ limit: 100 }, stripeKey)
+    if (webhooks && webhooks.data && webhooks.data.length) {
+      for (const webhook of webhooks.data) {
+        if (webhook === 0) {
+          continue
+        }
         await stripe.webhookEndpoints.del(webhook.id, stripeKey)
-      } catch (error) {
       }
     }
-    try {
-      webhooks = await stripe.webhookEndpoints.list(stripeKey)
-    } catch (error) {
-      webhooks = { data: [0] }
-    }
+  } catch (error) {
   }
 }
 
 async function deleteOldStripeAccounts () {
-  let accounts
-  while (true) {
-    try {
-      accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
-      break
-    } catch (error) {
-    }
-  }
-  while (accounts.data && accounts.data.length) {
-    for (const account of accounts.data) {
-      if (accounts.business_type === 'company') {
-        try {
-          const persons = await stripe.accounts.listPersons(account.id, { limit: 100 }, stripeKey)
-          for (const person of persons) {
-            await stripe.accounts.deletePerson(
-              account.id,
-              person.id,
-              stripeKey
-            )
-          }
-        } catch (error) {
-        }
-      }
-      try {
+  try {
+    const accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
+    if (accounts && accounts.data && accounts.data.length) {
+      for (const account of accounts.data) {
         await stripe.accounts.del(account.id, stripeKey)
-      } catch (error) {
       }
     }
-    try {
-      accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
-    } catch (error) {
-    }
+  } catch (error) {
   }
 }
 
 async function createStripeAccount (user, body) {
-  data = true
   const req = createRequest(`/api/user/connect/create-stripe-account?accountid=${user.account.accountid}`)
   req.session = user.session
   req.account = user.account

@@ -35,11 +35,10 @@ describe('/administrator/connect/payouts', function () {
       { click: '/administrator/connect' },
       { click: '/administrator/connect/payouts' }
     ]
-    await req1.route.api.before(req1)
-    cachedResponses.before = req1.data
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     cachedResponses.pageSize = await req1.get()
+    global.pageSize = 2
     const req2 = TestHelper.createRequest('/administrator/connect/payouts?offset=1')
     req2.account = administrator.account
     req2.session = administrator.session
@@ -68,7 +67,6 @@ describe('/administrator/connect/payouts', function () {
 
     it('should change page size', async function () {
       await bundledData(this.test.currentRetry())
-      global.pageSize = 3
       const result = cachedResponses.pageSize
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('payouts-table')

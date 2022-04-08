@@ -42,6 +42,7 @@ describe('/api/administrator/connect/payouts', function () {
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     cachedResponses.pageSize = await req1.get()
+    global.pageSize = 2
     const req2 = TestHelper.createRequest('/api/administrator/connect/payouts?offset=1')
     req2.account = administrator.account
     req2.session = administrator.session

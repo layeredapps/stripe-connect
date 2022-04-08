@@ -348,7 +348,6 @@ describe('/api/user/connect/update-stripe-account', function () {
 
     describe('invalid-stripeid', () => {
       it('missing querystring stripeid', async function () {
-        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account')
         req.account = user.account
@@ -364,7 +363,6 @@ describe('/api/user/connect/update-stripe-account', function () {
       })
 
       it('invalid querystring stripeid', async function () {
-        await bundledData(this.test.currentRetry())
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account?stripeid=invalid')
         req.account = user.account
