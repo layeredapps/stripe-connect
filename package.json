@@ -37,7 +37,7 @@
   "scripts": {
     "debug": "node main.js --debug-brk=5858",
     "start": "node main.js",
-    "test": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 960000 --recursive --extension .test.js .",
+    "test": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --recursive --extension .test.js .",
     "test-sqlite": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/mocha --ignore 'node_modules/**/*' --timeout 240000 --recursive --extension .test.js .",
     "test-sqlite-node-cache": "npm install sqlite3 --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing CACHE=node STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/mocha --ignore 'node_modules/**/*' --timeout 240000 --recursive --extension .test.js .",
     "test-sqlite-redis-cache": "npm install sqlite3 redis --no-save --no-audit --no-fund >/dev/null && NODE_ENV=testing CACHE=redis STORAGE=sqlite SQLITE_DATABASE=connect SQLITE_FILE=`pwd`/db.sqlite node --expose-gc --max-old-space-size=4096 ./node_modules/.bin/mocha --ignore 'node_modules/**/*' --timeout 240000 --recursive --extension .test.js .",
