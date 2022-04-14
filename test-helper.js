@@ -263,7 +263,7 @@ async function setupWebhook () {
     } catch (error) {
     }
     if (!webhook) {
-      await wait()
+      await wait(100)
     }
   }
 }
