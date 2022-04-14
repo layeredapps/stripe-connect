@@ -73,7 +73,7 @@ module.exports = async () => {
   class Person extends Model {}
   Person.init({
     personid: {
-      type: DataTypes.STRING(32),
+      type: DataTypes.STRING(64),
       primaryKey: true,
       allowNull: false
     },
@@ -83,7 +83,7 @@ module.exports = async () => {
         return 'person'
       }
     },
-    accountid: DataTypes.STRING(32),
+    accountid: DataTypes.STRING(64),
     stripeid: DataTypes.TEXT,
     tokenUpdate: dateType,
     stripeObject: {
@@ -113,7 +113,7 @@ module.exports = async () => {
   class StripeAccount extends Model {}
   StripeAccount.init({
     stripeid: {
-      type: DataTypes.STRING(32),
+      type: DataTypes.STRING(64),
       primaryKey: true,
       allowNull: false
     },
@@ -123,7 +123,7 @@ module.exports = async () => {
         return 'stripeAccount'
       }
     },
-    accountid: DataTypes.STRING(32),
+    accountid: DataTypes.STRING(64),
     tokenUpdate: dateType,
     stripeObject: {
       type: DataTypes.TEXT,
@@ -162,7 +162,7 @@ module.exports = async () => {
   class Payout extends Model {}
   Payout.init({
     payoutid: {
-      type: DataTypes.STRING(32),
+      type: DataTypes.STRING(64),
       primaryKey: true,
       allowNull: false
     },
@@ -184,7 +184,7 @@ module.exports = async () => {
         this.setDataValue('stripeObject', JSON.stringify(value))
       }
     },
-    accountid: DataTypes.STRING(32),
+    accountid: DataTypes.STRING(64),
     stripeid: DataTypes.TEXT,
     // 'createdAt' is specified for each model because mysql/mariadb truncate
     // the ms and this makes the return order unpredictable and throws off the
