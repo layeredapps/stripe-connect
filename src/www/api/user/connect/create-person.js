@@ -77,6 +77,7 @@ module.exports = {
     try {
       const person = await stripeCache.execute('accounts', 'createPerson', req.query.stripeid, personInfo, req.stripeKey)
       await connect.Storage.Person.create({
+        appid: req.appid || global.appid,
         personid: person.id,
         accountid: req.account.accountid,
         stripeid: stripeAccount.stripeid,

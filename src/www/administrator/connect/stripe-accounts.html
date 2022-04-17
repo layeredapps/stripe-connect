@@ -6,6 +6,7 @@
     <title translate="yes">Stripe accounts</title>
     <link rel="stylesheet" href="/public/content.css">
     <link rel="stylesheet" href="/public/content-additional.css">
+    <link rel="stylesheet" href="/public/connect/connect.css">
     <base target="_top" href="/">
   </head>
   <body>
@@ -15,6 +16,44 @@
       <div id="no-stripe-accounts">
         <p translate="yes">No Stripe accounts have been created yet.</p>
       </div>
+      <div class="charts" id="created-chart-container">
+        <div class="chart">
+          <h2>Created in last 365 days</h2>
+          <div class="metrics" id="created-highlights">
+          </div>
+          <div class="graph">
+            <div class="values" id="created-values"></div>
+            <div class="columns">
+              <div class="padder">
+                <ol id="created-chart" class="threesixfive"></ol>
+              </div>
+              <legend>
+                <span>Today</span>
+                <span>365 days ago</span>
+              </legend>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="charts" id="approved-chart-container">
+        <div class="chart">
+          <h2>Stripe accounts approved in last 365 days</h2>
+          <div class="metrics" id="approved-highlights">
+          </div>
+          <div class="graph">
+            <div class="values" id="approved-values"></div>
+            <div class="columns">
+              <div class="padder">
+                <ol id="approved-chart" class="threesixfive"></ol>
+              </div>
+              <legend>
+                <span>Today</span>
+                <span>365 days ago</span>
+              </legend>
+            </div>
+          </div>
+        </div>
+      </div>
       <div class="list-table-wrapper">
         <table id="stripe-accounts-table" class="list-table">
           <thead>
@@ -23,6 +62,7 @@
               <th translate="yes">Type</th>
               <th translate="yes">Name</th>
               <th translate="yes">Status</th>
+              <th translate="yes">MCC</th>
               <th translate="yes">Created</th>
               <th translate="yes">Submitted</th>
             </tr>
@@ -31,6 +71,40 @@
       </div>
       <ul id="page-links" class="pagination"></ul>
     </div>
+    <template id="chart-value">
+      <h3>${object.value}</h3>
+    </template>
+    <template id="chart-column">
+      <li><span title="${metric.value} on ${metric.dateKey}" style="height: ${metric.normalized}%; top: ${metric.top}%"></span></li>
+    </template>
+    <template id="metric-highlights">
+      <ul>
+        <li>
+          ${highlight.todayFormatted}
+          <span>today</span>
+        </li>
+        <li>
+          ${highlight.yesterdayFormatted}
+          <span>yesterday</span>
+        </li>
+        <li>
+          ${highlight.last7DaysFormatted}
+          <span>7 days</span>
+        </li>
+        <li>
+          ${highlight.last30DaysFormatted}
+          <span>30 days</span>
+        </li>
+        <li>
+          ${highlight.last90DaysFormatted}
+          <span>90 days</span>
+        </li>
+        <li>
+          ${highlight.totalFormatted}
+          <span>all time</span>
+        </li>
+      </ul>
+    </template>
     <template id="stripe-account-row">
       <tr id="${account.id}">
         <td>
@@ -43,7 +117,7 @@
         <td id="account-status-${account.id}"></td>
         <td id="mcc-description-${account.id}"></td>
         <td>${account.createdAtFormatted}</td>
-        <td>${account.submittedAtFormatted}</td>
+        <td>${account.submittedAtFormatted || '-'}</td>
       </tr>
     </template>
     <template id="page-link">
@@ -67,19 +141,22 @@
       <span translate="yes">Not submitted yet</span>
     </template>
     <template id="verified">
-      <span translate="yes">Registration has been accepted</span>
+      <span translate="yes">Accepted</span>
     </template>
     <template id="verified">
       <span translate="yes">Disabled by Stripe</span>
     </template>
     <template id="verified-requires-fields">
-      <span translate="yes">Requires additional information</span>
+      <span translate="yes">Requires information</span>
     </template>
     <template id="pending-submission">
       <span translate="yes">Pending submission</span>
     </template>
     <template id="requirements.past_due">
-      <span translate="yes">Requires additional information</span>
+      <span translate="yes">Past due information</span>
+    </template>
+    <template id="requirements.pending_verification">
+      <span translate="yes">Pending verification</span>
     </template>
     <template id="rejected.fraud">
       <span><span translate="yes">Rejected by Stripe, see</span>&nbsp;<a href="https://stripe.com/blog/why-some-businesses-arent-allowed">common reasons</a></span>

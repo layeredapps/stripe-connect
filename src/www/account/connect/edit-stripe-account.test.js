@@ -107,15 +107,15 @@ describe('/account/connect/edit-stripe-account', function () {
       req.account = user.account
       req.session = user.session
       cachedResponses.company_kana_kanji = await req.get()
-      // uploads
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'company'
-      })
-      req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      cachedResponses.company_uploads = await req.get()
+      // // uploads
+      // await TestHelper.createStripeAccount(user, {
+      //   country: 'BR',
+      //   business_type: 'company'
+      // })
+      // req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+      // req.account = user.account
+      // req.session = user.session
+      // cachedResponses.company_uploads = await req.get()
       cachedResponses.finished = true
     }
     it('should present the form', async function () {
@@ -475,20 +475,20 @@ describe('/account/connect/edit-stripe-account', function () {
       const field = doc.getElementById('company_address_kanji_state')
       assert.notStrictEqual(field, undefined)
     })
-    it('should have element for field company_verification_document_front', async function () {
-      await bundledData(this.test.currentRetry())
-      const result = cachedResponses.company_uploads
-      const doc = TestHelper.extractDoc(result.html)
-      const field = doc.getElementById('company_verification_document_front')
-      assert.notStrictEqual(field, undefined)
-    })
-    it('should have element for field company_verification_document_back', async function () {
-      await bundledData(this.test.currentRetry())
-      const result = cachedResponses.company_uploads
-      const doc = TestHelper.extractDoc(result.html)
-      const field = doc.getElementById('company_verification_document_back')
-      assert.notStrictEqual(field, undefined)
-    })
+    // it('should have element for field company_verification_document_front', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const result = cachedResponses.company_uploads
+    //   const doc = TestHelper.extractDoc(result.html)
+    //   const field = doc.getElementById('company_verification_document_front')
+    //   assert.notStrictEqual(field, undefined)
+    // })
+    // it('should have element for field company_verification_document_back', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const result = cachedResponses.company_uploads
+    //   const doc = TestHelper.extractDoc(result.html)
+    //   const field = doc.getElementById('company_verification_document_back')
+    //   assert.notStrictEqual(field, undefined)
+    // })
   })
 
   describe('submit', () => {

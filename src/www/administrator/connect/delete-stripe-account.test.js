@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
+const ScreenshotData = require('../../../../screenshot-data.js')
 
 describe('/administrator/connect/delete-stripe-account', function () {
   describe('before', () => {
@@ -57,6 +58,9 @@ describe('/administrator/connect/delete-stripe-account', function () {
         { click: `/administrator/connect/delete-stripe-account?stripeid=${user.stripeAccount.stripeid}` },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorStripeAccounts)
       await req.post()
       const req2 = TestHelper.createRequest(`/api/administrator/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req2.account = administrator.account

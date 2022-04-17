@@ -125,19 +125,19 @@ describe('/api/user/connect/update-stripe-account', function () {
         cachedResponses['invalid-individual_address_state'] = error.message
       }
       // individual id number
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'individual'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = { individual_id_number: '-1' }
-      try {
-        await req.route.api.patch(req)
-      } catch (error) {
-        cachedResponses['invalid-individual_id_number'] = error.message
-      }
+      // await TestHelper.createStripeAccount(user, {
+      //   country: 'BR',
+      //   business_type: 'individual'
+      // })
+      // req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+      // req.account = user.account
+      // req.session = user.session
+      // req.body = { individual_id_number: '-1' }
+      // try {
+      //   await req.route.api.patch(req)
+      // } catch (error) {
+      //   cachedResponses['invalid-individual_id_number'] = error.message
+      // }
       // political exposure
       req.body = { individual_political_exposure: '-1' }
       try {
@@ -614,18 +614,18 @@ describe('/api/user/connect/update-stripe-account', function () {
         cachedResponses[field] = cachedResponses[field] || result.stripeObject
       }
       // some fields only by BR
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'company'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), 'BR', user.stripeAccount.stripeObject)
-      result = await req.patch()
-      for (const field in req.body) {
-        cachedResponses[field] = cachedResponses[field] || result.stripeObject
-      }
+      // await TestHelper.createStripeAccount(user, {
+      //   country: 'BR',
+      //   business_type: 'company'
+      // })
+      // req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+      // req.account = user.account
+      // req.session = user.session
+      // req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), 'BR', user.stripeAccount.stripeObject)
+      // result = await req.patch()
+      // for (const field in req.body) {
+      //   cachedResponses[field] = cachedResponses[field] || result.stripeObject
+      // }
       // some fields only by JP
       await TestHelper.createStripeAccount(user, {
         country: 'JP',
@@ -666,18 +666,18 @@ describe('/api/user/connect/update-stripe-account', function () {
         cachedResponses[field] = cachedResponses[field] || result.stripeObject
       }
       // some individual fields only by BR
-      await TestHelper.createStripeAccount(user, {
-        country: 'BR',
-        business_type: 'individual'
-      })
-      req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), 'BR', user.stripeAccount.stripeObject)
-      result = await req.patch()
-      for (const field in req.body) {
-        cachedResponses[field] = cachedResponses[field] || result.stripeObject
-      }
+      // await TestHelper.createStripeAccount(user, {
+      //   country: 'BR',
+      //   business_type: 'individual'
+      // })
+      // req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+      // req.account = user.account
+      // req.session = user.session
+      // req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), 'BR', user.stripeAccount.stripeObject)
+      // result = await req.patch()
+      // for (const field in req.body) {
+      //   cachedResponses[field] = cachedResponses[field] || result.stripeObject
+      // }
       // await TestHelper.waitForCurrentlyDueFields(user, 'individual.verification.document')
       // req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       // req.account = user.account
@@ -754,11 +754,11 @@ describe('/api/user/connect/update-stripe-account', function () {
       const stripeAccountNow = cachedResponses.individual_political_exposure
       assert.strictEqual(stripeAccountNow.individual.political_exposure, 'existing')
     })
-    it('optionally-required posted individual_nationality', async function () {
-      await bundledData(this.test.currentRetry())
-      const stripeAccountNow = cachedResponses.individual_nationality
-      assert.strictEqual(stripeAccountNow.individual.nationality, 'BR')
-    })
+    // it('optionally-required posted individual_nationality', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const stripeAccountNow = cachedResponses.individual_nationality
+    //   assert.strictEqual(stripeAccountNow.individual.nationality, 'BR')
+    // })
     it('optionally-required posted individual_id_number', async function () {
       await bundledData(this.test.currentRetry())
       const stripeAccountNow = cachedResponses.individual_id_number

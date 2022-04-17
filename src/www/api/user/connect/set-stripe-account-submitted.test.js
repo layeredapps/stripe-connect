@@ -135,6 +135,8 @@ describe('/account/connect/set-stripe-account-submitted', function () {
     const individualAccountData = TestStripeAccounts.createAccountData(user.profile, user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
     await TestHelper.updateStripeAccount(user, individualAccountData)
     // 3) submitted individual
+    req.filename = __filename
+    req.saveResponse = true
     cachedResponses.submittedIndividual = await req.patch()
     // 4) already submitted
     try {

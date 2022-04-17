@@ -4,6 +4,8 @@
 .requirements { border: 1px solid #CCC; padding: 1rem; margin-right: 1rem }
 .numbered-list { list-style-type: decimal; margin-bottom: 2rem; padding-left: 2rem }
 .numbered-list-item { line-height: 1.5rem; list-style-type: decimal }
+.list-table th.money,
+.list-table td.money { text-align: right }
 
 form.connect-form input[type="text"] { width: auto }
 form.connect-form input[type="file"] { margin-bottom: 0.5rem }

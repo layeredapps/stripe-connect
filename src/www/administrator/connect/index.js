@@ -29,28 +29,66 @@ async function beforeRequest (req) {
       stripeAccount.statusMessage = 'not-submitted'
     }
   }
-  req.data = { stripeAccounts }
+  // registrations
+  req.query.keys = dashboard.Metrics.metricKeys('stripe-accounts-created').join(',')
+  const createdChart = await global.api.administrator.MetricKeys.get(req)
+  const createdChartMaximum = dashboard.Metrics.maximumDay(createdChart)
+  const createdChartDays = dashboard.Metrics.days(createdChart, createdChartMaximum)
+  const createdChartHighlights = dashboard.Metrics.highlights(createdChart, createdChartDays)
+  const createdChartValues = dashboard.Metrics.chartValues(createdChartMaximum)
+  // approved
+  req.query.keys = dashboard.Metrics.metricKeys('stripe-accounts-approved').join(',')
+  const approvedChart = await global.api.administrator.MetricKeys.get(req)
+  const approvedChartMaximum = dashboard.Metrics.maximumDay(approvedChart)
+  const approvedChartDays = dashboard.Metrics.days(approvedChart, approvedChartMaximum)
+  const approvedChartHighlights = dashboard.Metrics.highlights(approvedChart, approvedChartDays)
+  const approvedChartValues = dashboard.Metrics.chartValues(approvedChartMaximum)
+  // payouts
+  req.query.keys = dashboard.Metrics.metricKeys('payouts-created').join(',')
+  const payoutsChart = await global.api.administrator.MetricKeys.get(req)
+  const payoutsChartMaximum = dashboard.Metrics.maximumDay(payoutsChart)
+  const payoutsChartDays = dashboard.Metrics.days(payoutsChart, payoutsChartMaximum)
+  const payoutsChartHighlights = dashboard.Metrics.highlights(payoutsChart, payoutsChartDays)
+  const payoutsChartValues = dashboard.Metrics.chartValues(payoutsChartMaximum)
+  req.data = {
+    stripeAccounts,
+    createdChartDays,
+    createdChartHighlights,
+    createdChartValues,
+    approvedChartDays,
+    approvedChartHighlights,
+    approvedChartValues,
+    payoutsChartDays,
+    payoutsChartHighlights,
+    payoutsChartValues
+  }
 }
 
 async function renderPage (req, res) {
   const doc = dashboard.HTML.parse(req.html || req.route.html)
-  if (req.data && req.data.stripeAccounts && req.data.stripeAccounts.length) {
-    dashboard.HTML.renderTable(doc, req.data.stripeAccounts, 'stripe-account-row', 'stripe-accounts-table')
-    for (const stripeAccount of req.data.stripeAccounts) {
-      if (stripeAccount.business_type === 'individual') {
-        const businessName = doc.getElementById(`business-name-${stripeAccount.id}`)
-        businessName.parentNode.removeChild(businessName)
-      } else {
-        const individualName = doc.getElementById(`individual-name-${stripeAccount.id}`)
-        individualName.parentNode.removeChild(individualName)
-      }
-      if (stripeAccount.statusMessage) {
-        dashboard.HTML.renderTemplate(doc, null, stripeAccount.statusMessage, `account-status-${stripeAccount.id}`)
-      }
-    }
+  if (req.data.createdChartDays && req.data.createdChartDays.length) {
+    dashboard.HTML.renderList(doc, req.data.createdChartDays, 'chart-column', 'created-chart')
+    dashboard.HTML.renderList(doc, req.data.createdChartValues, 'chart-value', 'created-values')
+    dashboard.HTML.renderTemplate(doc, req.data.createdChartHighlights, 'metric-highlights', 'created-highlights')
   } else {
-    const registrationsContainer = doc.getElementById('registrations-container')
-    registrationsContainer.parentNode.removeChild(registrationsContainer)
+    const createdChart = doc.getElementById('created-chart-container')
+    createdChart.parentNode.removeChild(createdChart)
+  }
+  if (req.data.approvedChartDays && req.data.approvedChartDays.length) {
+    dashboard.HTML.renderList(doc, req.data.approvedChartDays, 'chart-column', 'approved-chart')
+    dashboard.HTML.renderList(doc, req.data.approvedChartValues, 'chart-value', 'approved-values')
+    dashboard.HTML.renderTemplate(doc, req.data.approvedChartHighlights, 'metric-highlights', 'approved-highlights')
+  } else {
+    const approvedChart = doc.getElementById('approved-chart-container')
+    approvedChart.parentNode.removeChild(approvedChart)
+  }
+  if (req.data.payoutsChartDays && req.data.payoutsChartDays.length) {
+    dashboard.HTML.renderList(doc, req.data.payoutsChartDays, 'chart-column', 'payouts-chart')
+    dashboard.HTML.renderList(doc, req.data.payoutsChartValues, 'chart-value', 'payouts-values')
+    dashboard.HTML.renderTemplate(doc, req.data.payoutsChartHighlights, 'metric-highlights', 'payouts-highlights')
+  } else {
+    const payoutsChart = doc.getElementById('payouts-chart-container')
+    payoutsChart.parentNode.removeChild(payoutsChart)
   }
   return dashboard.Response.end(req, res, doc)
 }

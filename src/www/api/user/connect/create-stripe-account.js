@@ -29,6 +29,7 @@ module.exports = {
       const requiresDirectors = allRequirements.indexOf('directors.last_name') > -1
       const requiresExecutives = allRequirements.indexOf('executives.last_name') > -1
       await connect.Storage.StripeAccount.create({
+        appid: req.appid || global.appid,
         stripeid: stripeAccount.id,
         accountid: req.query.accountid,
         stripeObject: stripeAccount,

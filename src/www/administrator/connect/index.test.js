@@ -1,6 +1,8 @@
 /* eslint-env mocha */
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
+const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
+const ScreenshotData = require('../../../../screenshot-data.js')
 
 describe('/administrator/connect', function () {
   describe('before', () => {
@@ -20,7 +22,7 @@ describe('/administrator/connect', function () {
   })
 
   describe('view', () => {
-    it('should have row for each Stripe account (screenshots)', async () => {
+    it('should have chart for Stripe registrations (screenshots)', async () => {
       const administrator = await TestHelper.createOwner()
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
@@ -35,10 +37,37 @@ describe('/administrator/connect', function () {
         { hover: '#administrator-menu-container' },
         { click: '/administrator/connect' }
       ]
+      global.pageSize = 50
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
       const result = await req.get()
       const doc = TestHelper.extractDoc(result.html)
-      const row = doc.getElementById(user.stripeAccount.stripeid)
-      assert.strictEqual(row.tag, 'tr')
+      const container = doc.getElementById('created-chart-container')
+      assert.strictEqual(container.tag, 'div')
+    })
+
+    it('should have chart for accepted Stripe registrations', async () => {
+      const administrator = await TestHelper.createOwner()
+      await TestStripeAccounts.createSubmittedIndividual('NZ')
+      const req = TestHelper.createRequest('/administrator/connect')
+      req.account = administrator.account
+      req.session = administrator.session
+      const result = await req.get()
+      const doc = TestHelper.extractDoc(result.html)
+      const container = doc.getElementById('approved-chart-container')
+      assert.strictEqual(container.tag, 'div')
+    })
+
+    it('should have chart for payouts', async () => {
+      const administrator = await TestHelper.createOwner()
+      const user = await TestStripeAccounts.createSubmittedIndividual('NZ')
+      await TestHelper.createPayout(user)
+      const req = TestHelper.createRequest('/administrator/connect')
+      req.account = administrator.account
+      req.session = administrator.session
+      const result = await req.get()
+      const doc = TestHelper.extractDoc(result.html)
+      const container = doc.getElementById('payouts-chart-container')
+      assert.strictEqual(container.tag, 'div')
     })
   })
 })

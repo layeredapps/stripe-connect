@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
+const ScreenshotData = require('../../../../screenshot-data.js')
 
 describe('/administrator/connect/reject-stripe-account', function () {
   describe('before', () => {
@@ -60,6 +61,9 @@ describe('/administrator/connect/reject-stripe-account', function () {
         { click: `/administrator/connect/reject-stripe-account?stripeid=${user.stripeAccount.stripeid}` },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorStripeAccounts)
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

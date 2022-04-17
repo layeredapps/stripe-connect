@@ -209,24 +209,24 @@ describe('/api/user/connect/update-person', function () {
       cachedResponses[field] = cachedResponses[field] || result.stripeObject
     }
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
-    // some fields only by BR
-    await TestHelper.createStripeAccount(user, {
-      country: 'BR',
-      business_type: 'company'
-    })
-    await TestHelper.createPerson(user, {
-      relationship_representative: 'true',
-      relationship_title: 'SVP Testing',
-      relationship_percent_ownership: '0'
-    })
-    req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
-    req.account = user.account
-    req.session = user.session
-    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'BR', user.representative.stripeObject)
-    result = await req.patch()
-    for (const field in req.body) {
-      cachedResponses[field] = cachedResponses[field] || result.stripeObject
-    }
+    // // some fields only by BR
+    // await TestHelper.createStripeAccount(user, {
+    //   country: 'BR',
+    //   business_type: 'company'
+    // })
+    // await TestHelper.createPerson(user, {
+    //   relationship_representative: 'true',
+    //   relationship_title: 'SVP Testing',
+    //   relationship_percent_ownership: '0'
+    // })
+    // req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
+    // req.account = user.account
+    // req.session = user.session
+    // req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'BR', user.representative.stripeObject)
+    // result = await req.patch()
+    // for (const field in req.body) {
+    //   cachedResponses[field] = cachedResponses[field] || result.stripeObject
+    // }
     // some fields only by US
     await TestHelper.createStripeAccount(user, {
       country: 'US',
@@ -261,7 +261,7 @@ describe('/api/user/connect/update-person', function () {
     req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.owner.personid}`)
     req.account = user3.account
     req.session = user3.session
-    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'GB', user3.owner.stripeObject)
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), 'AT', user3.owner.stripeObject)
     req.filename = __filename
     req.saveResponse = true
     cachedResponses.returns = await req.patch()

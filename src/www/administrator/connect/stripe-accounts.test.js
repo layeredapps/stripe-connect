@@ -2,6 +2,7 @@
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
+const ScreenshotData = require('../../../../screenshot-data.js')
 
 describe('/administrator/connect/stripe-accounts', function () {
   let cachedResponses, cachedStripeAccounts
@@ -37,8 +38,13 @@ describe('/administrator/connect/stripe-accounts', function () {
       { click: '/administrator/connect' },
       { click: '/administrator/connect/stripe-accounts' }
     ]
+    global.pageSize = 50
+    global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
+    global.packageJSON.dashboard.server.push(ScreenshotData.administratorStripeAccounts)
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
+    delete (req1.screenshots)
+    delete (req1.filename)
     cachedResponses.pageSize = await req1.get()
     global.pageSize = 2
     const req2 = TestHelper.createRequest('/administrator/connect/stripe-accounts?offset=1')
@@ -60,6 +66,7 @@ describe('/administrator/connect/stripe-accounts', function () {
   describe('view', () => {
     it('should return one page (screenshots)', async function () {
       await bundledData(this.test.currentRetry())
+      global.pageSize = 50
       const result = cachedResponses.returns
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('stripe-accounts-table')

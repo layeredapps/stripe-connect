@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
+const ScreenshotData = require('../../../../screenshot-data.js')
 
 describe('/administrator/connect/stripe-account', function () {
   describe('before', () => {
@@ -53,8 +54,12 @@ describe('/administrator/connect/stripe-account', function () {
       req.screenshots = [
         { hover: '#administrator-menu-container' },
         { click: '/administrator/connect' },
+        { click: '/administrator/connect/stripe-accounts' },
         { click: `/administrator/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` }
       ]
+      global.pageSize = 50
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
+      global.packageJSON.dashboard.server.push(ScreenshotData.administratorStripeAccounts)
       const result = await req.get()
       const doc = TestHelper.extractDoc(result.html)
       const tbody = doc.getElementById(user.stripeAccount.stripeid)
