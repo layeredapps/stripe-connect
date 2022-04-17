@@ -200,8 +200,6 @@
       ✔ should have element for field company_address_kanji_town
       ✔ should have element for field company_address_kanji_city
       ✔ should have element for field company_address_kanji_state
-      ✔ should have element for field company_verification_document_front
-      ✔ should have element for field company_verification_document_back
     submit
       ✔ should update registration no stripe.js (individual)
       ✔ should update registration stripe.js v3 (individual) (screenshots)
@@ -379,7 +377,9 @@
     before
       ✔ should bind data to req
     view
-      ✔ should have row for each Stripe account (screenshots)
+      ✔ should have chart for Stripe registrations (screenshots)
+      ✔ should have chart for accepted Stripe registrations
+      ✔ should have chart for payouts
 
   /administrator/connect/payout
     before
@@ -853,8 +853,6 @@
       ✔ optionally-required posted address_postal_code
       ✔ optionally-required posted email
       ✔ optionally-required posted phone
-      ✔ optionally-required posted political_exposure
-      ✔ optionally-required posted id_number
       ✔ optionally-required posted ssn_last_4
       ✔ optionally-required posted verification_document_front
       ✔ optionally-required posted verification_document_back
@@ -887,8 +885,6 @@
         ✔ invalid posted individual_address_country
       invalid-individual_address_state
         ✔ invalid posted individual_address_state
-      invalid-individual_id_number
-        ✔ invalid posted individual_id_number
       invalid-individual_ssn_last_4
         ✔ invalid posted individual_ssn_last_4
       invalid-individual_phone
@@ -910,8 +906,6 @@
       ✔ optionally-required posted individual_dob_year
       ✔ optionally-required posted individual_email
       ✔ optionally-required posted individual_phone
-      ✔ optionally-required posted individual_political_exposure
-      ✔ optionally-required posted individual_nationality
       ✔ optionally-required posted individual_id_number
       ✔ optionally-required posted individual_ssn_last_4
       ✔ optionally-required posted individual_address_line1
@@ -952,5 +946,5 @@
       ✔ environment STRIPE_JS
 
 
-  585 passing (44m)
+  580 passing (53m)
 
