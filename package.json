@@ -12,16 +12,22 @@
     "@layeredapps/dashboard": "latest"
   },
   "dependencies": {
-    "@layeredapps/dashboard": "latest",
-    "@layeredapps/maxmind-geoip": "latest",
-    "stripe": "^8.127.0"
+    "stripe": "^8.127.0",
+    "@layeredapps/maxmind-geoip": "latest"
   },
   "devDependencies": {
+    "@layeredapps/dashboard": "latest",
     "@faker-js/faker": "latest",
-    "mocha": "latest",
     "ngrok": "latest",
+    "ibm_db": "latest",
+    "mocha": "latest",
+    "mysql2": "latest",
+    "pg": "latest",
+    "pg-hstore": "latest",
     "puppeteer": "latest",
-    "standard": "latest"
+    "sqlite3": "latest",
+    "standard": "latest",
+    "tedious": "latest"
   },
   "engines": {
     "node": ">=16",
