@@ -162,12 +162,17 @@ function addPayoutObjects (array, quantity) {
   const now = new Date()
   const date = new Date(now.getFullYear(), now.getMonth(), now.getDate())
   const stripeAccounts = []
-  addStripeAccountObjects(stripeAccounts, quantity * 20)
+  while (stripeAccounts.length < quantity) {
+    const filler = []
+    addStripeAccountObjects(filler, quantity)
+    for (const account of filler) {
+      if (account.payouts_enabled) {
+        stripeAccounts.push(account)
+      }
+    }
+  }
   const preexisting = [].concat(array)
   for (const stripeAccount of stripeAccounts) {
-    if (!stripeAccount.payouts_enabled) {
-      continue
-    }
     let month = 0
     while (true) {
       const payoutDate = new Date(date.getFullYear(), date.getMonth() - month, date.getDate())
@@ -222,32 +227,6 @@ function addPayoutObjects (array, quantity) {
     array.unshift(item)
   }
   array.length = quantity + preexisting.length
-}
-
-function addPersonObjects (array, stripeAccount, type, quantity) {
-  const now = new Date()
-  const date = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  let identityNumber = 0
-  for (let i = 0; i < quantity; i++) {
-    const identity = DashboardScreenshots.identities[identityNumber]
-    identityNumber++
-    const person = {
-      personid: 'mmbr_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
-      object: 'person',
-      appid: global.appid,
-      payoutid: 'invt_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
-      stripeAccountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
-      accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
-      profileid: 'prof_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
-      createdAt: date,
-      createdAtFormatted: date.getFullYear() + '-' + DashboardScreenshots.twoDigits(date.getMonth() + 1) + '-' + DashboardScreenshots.twoDigits(date.getDate()),
-      updatedAt: date,
-      updatedAtFormatted: date.getFullYear() + '-' + DashboardScreenshots.twoDigits(date.getMonth() + 1) + '-' + DashboardScreenshots.twoDigits(date.getDate()),
-      displayName: identity.firstName,
-      displayEmail: identity.email
-    }
-    array.push(person)
-  }
 }
 
 // TODO: randomize the addresses
