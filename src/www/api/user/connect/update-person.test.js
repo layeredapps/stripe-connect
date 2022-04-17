@@ -480,7 +480,7 @@ describe('/api/user/connect/update-person', function () {
     it('optionally-required posted address_state', async function () {
       await bundledData(this.test.currentRetry())
       const personNow = cachedResponses.address_state
-      assert.strictEqual(personNow.address.state, 'SP')
+      assert.strictEqual(personNow.address.state, 'NY')
     })
     it('optionally-required posted address_postal_code', async function () {
       await bundledData(this.test.currentRetry())
@@ -497,16 +497,16 @@ describe('/api/user/connect/update-person', function () {
       const personNow = cachedResponses.phone
       assert.strictEqual(personNow.phone, '+14567890123')
     })
-    it('optionally-required posted political_exposure', async function () {
-      await bundledData(this.test.currentRetry())
-      const personNow = cachedResponses.political_exposure
-      assert.strictEqual(personNow.political_exposure, 'existing')
-    })
-    it('optionally-required posted id_number', async function () {
-      await bundledData(this.test.currentRetry())
-      const personNow = cachedResponses.id_number
-      assert.strictEqual(personNow.id_number_provided, true)
-    })
+    // it('optionally-required posted political_exposure', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const personNow = cachedResponses.political_exposure
+    //   assert.strictEqual(personNow.political_exposure, 'existing')
+    // })
+    // it('optionally-required posted id_number', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const personNow = cachedResponses.id_number
+    //   assert.strictEqual(personNow.id_number_provided, true)
+    // })
     it('optionally-required posted ssn_last_4', async function () {
       await bundledData(this.test.currentRetry())
       const personNow = cachedResponses.ssn_last_4

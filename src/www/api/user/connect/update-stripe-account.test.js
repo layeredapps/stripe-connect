@@ -447,13 +447,13 @@ describe('/api/user/connect/update-stripe-account', function () {
       })
     })
 
-    describe('invalid-individual_id_number', () => {
-      it('invalid posted individual_id_number', async function () {
-        await bundledData(this.test.currentRetry())
-        const errorMessage = cachedResponses['invalid-individual_id_number']
-        assert.strictEqual(errorMessage, 'invalid-individual_id_number')
-      })
-    })
+    // describe('invalid-individual_id_number', () => {
+    //   it('invalid posted individual_id_number', async function () {
+    //     await bundledData(this.test.currentRetry())
+    //     const errorMessage = cachedResponses['invalid-individual_id_number']
+    //     assert.strictEqual(errorMessage, 'invalid-individual_id_number')
+    //   })
+    // })
 
     describe('invalid-individual_ssn_last_4', () => {
       it('invalid posted individual_ssn_last_4', async function () {
@@ -749,11 +749,11 @@ describe('/api/user/connect/update-stripe-account', function () {
       const stripeAccountNow = cachedResponses.individual_phone
       assert.strictEqual(stripeAccountNow.individual.phone, '+14567890123')
     })
-    it('optionally-required posted individual_political_exposure', async function () {
-      await bundledData(this.test.currentRetry())
-      const stripeAccountNow = cachedResponses.individual_political_exposure
-      assert.strictEqual(stripeAccountNow.individual.political_exposure, 'existing')
-    })
+    // it('optionally-required posted individual_political_exposure', async function () {
+    //   await bundledData(this.test.currentRetry())
+    //   const stripeAccountNow = cachedResponses.individual_political_exposure
+    //   assert.strictEqual(stripeAccountNow.individual.political_exposure, 'existing')
+    // })
     // it('optionally-required posted individual_nationality', async function () {
     //   await bundledData(this.test.currentRetry())
     //   const stripeAccountNow = cachedResponses.individual_nationality
