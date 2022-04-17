@@ -1,4 +1,6 @@
 /* eslint-env mocha */
+global.appid = global.appid || 'tests'
+global.language = global.language || 'en'
 global.applicationPath = global.applicationPath || __dirname
 global.stripeAPIVersion = '2020-08-27'
 global.maximumStripeRetries = 0
