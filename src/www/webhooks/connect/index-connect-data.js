@@ -151,6 +151,7 @@ async function updatePayout (stripeEvent, stripeKey) {
   }
   await upsert(connect.Storage.Payout, 'payoutid', stripeObject.id, {
     payoutid: stripeObject.id,
+    appid: stripeAccount.appid,
     stripeObject
   })
   await connect.Storage.Payout.update({
