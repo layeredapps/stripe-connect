@@ -98,6 +98,10 @@ module.exports = async () => {
         this.setDataValue('stripeObject', JSON.stringify(value))
       }
     },
+    appid: {
+      type: DataTypes.STRING,
+      defaultValue: global.appid
+    },
     // 'createdAt' is specified for each model because mysql/mariadb truncate
     // the ms and this makes the return order unpredictable and throws off the
     // test suites expecting the write order to match the return order
@@ -147,6 +151,10 @@ module.exports = async () => {
         return value || undefined
       }
     },
+    appid: {
+      type: DataTypes.STRING,
+      defaultValue: global.appid
+    },
     // 'createdAt' is specified for each model because mysql/mariadb truncate
     // the ms and this makes the return order unpredictable and throws off the
     // test suites expecting the write order to match the return order
@@ -186,6 +194,10 @@ module.exports = async () => {
     },
     accountid: DataTypes.STRING(64),
     stripeid: DataTypes.TEXT,
+    appid: {
+      type: DataTypes.STRING,
+      defaultValue: global.appid
+    },
     // 'createdAt' is specified for each model because mysql/mariadb truncate
     // the ms and this makes the return order unpredictable and throws off the
     // test suites expecting the write order to match the return order
@@ -199,22 +211,30 @@ module.exports = async () => {
     modelName: 'payout'
   })
   await sequelize.sync({ force: true, alter: true })
-  StripeAccount.afterCreate(async () => {
-    await metrics.aggregate('stripe-accounts-created', new Date())
+  StripeAccount.afterCreate(async (object) => {
+    if (global.disableMetrics) {
+      return
+    }
+    await metrics.aggregate(object.dataValues.appid, 'stripe-accounts-created', object.createdAt)
   })
   StripeAccount.beforeBulkUpdate(async (object) => {
+    if (global.disableMetrics) {
+      return
+    }
     const stripeObject = JSON.parse(object.attributes.stripeObject)
-    const existing = await container.StripeAccount.findOne({
-      where: object.where
-    })
-    if(stripeObject.payouts_enabled && !existing.payouts_enabled) {
-      await metrics.aggregate('stripe-accounts-approved', new Date())
+    const existing = await StripeAccount.findOne({ where: object.where })
+    const existingStripeObject = JSON.parse(existing.dataValues.stripeObject)
+    if (stripeObject.payouts_enabled && !existingStripeObject.payouts_enabled) {
+      await metrics.aggregate(existing.dataValues.appid, 'stripe-accounts-approved', new Date())
     }
   })
   Payout.afterCreate(async (object) => {
+    if (global.disableMetrics) {
+      return
+    }
     const stripeObject = JSON.parse(object.dataValues.stripeObject)
-    await metrics.aggregate('payouts-created', new Date())
-    await metrics.aggregate('payouts-amount', new Date(), stripeObject.amount)
+    await metrics.aggregate(object.dataValues.appid, 'payouts-created', object.createdAt)
+    await metrics.aggregate(object.dataValues.appid, 'payouts-amount', object.createdAt, stripeObject.amount)
   })
   return {
     sequelize,
