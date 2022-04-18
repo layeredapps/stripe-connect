@@ -691,7 +691,7 @@
     returns
       ✔ object
 
-  /account/connect/set-stripe-account-submitted
+  /api/user/connect/set-stripe-account-submitted
     exceptions
       invalid-stripeid
         ✔ missing querystring stripeid
@@ -946,5 +946,5 @@
       ✔ environment STRIPE_JS
 
 
-  580 passing (53m)
+  580 passing (54m)
 
