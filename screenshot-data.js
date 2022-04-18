@@ -180,7 +180,7 @@ function addPayoutObjects (array, quantity) {
         break
       }
       month++
-      const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+      const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
       const payout = {
         payoutid: `po_${id}`,
         object: 'payout',
@@ -246,12 +246,12 @@ const currencies = {
 const countries = Object.keys(currencies)
 
 function createIndividualMissingInfo (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const country = countries[Math.floor(Math.random() * countries.length)]
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -440,13 +440,13 @@ function createIndividualMissingInfo (date) {
 }
 
 function createIndividualMissingSubmission (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const mcc = merchantCategoryCodes.en[Math.floor(Math.random() * merchantCategoryCodes.en.length)].code
   const country = countries[Math.floor(Math.random() * countries.length)]
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -691,13 +691,13 @@ function createIndividualMissingSubmission (date) {
 }
 
 function createIndividualSubmitted (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const mcc = merchantCategoryCodes.en[Math.floor(Math.random() * merchantCategoryCodes.en.length)].code
   const country = countries[Math.floor(Math.random() * countries.length)]
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -920,12 +920,12 @@ function createIndividualSubmitted (date) {
 }
 
 function createCompanyMissingInfo (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const country = countries[Math.floor(Math.random() * countries.length)]
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -1179,14 +1179,14 @@ function createCompanyMissingInfo (date) {
 }
 
 function createCompanyMissingBanking (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const mcc = merchantCategoryCodes.en[Math.floor(Math.random() * merchantCategoryCodes.en.length)].code
   const country = countries[Math.floor(Math.random() * countries.length)]
   const companyName = faker.company.companyName()
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -1336,14 +1336,14 @@ function createCompanyMissingBanking (date) {
 }
 
 function createCompanyMissingSubmission (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const mcc = merchantCategoryCodes.en[Math.floor(Math.random() * merchantCategoryCodes.en.length)].code
   const country = countries[Math.floor(Math.random() * countries.length)]
   const companyName = faker.company.companyName()
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
@@ -1511,14 +1511,14 @@ function createCompanyMissingSubmission (date) {
 }
 
 function createCompanySubmitted (date) {
-  const id = faker.datatype.uuid().split('-').join('').substring(0, 16)
+  const id = faker.datatype.uuid().split('-').join('').substring(0, 24)
   const mcc = merchantCategoryCodes.en[Math.floor(Math.random() * merchantCategoryCodes.en.length)].code
   const country = countries[Math.floor(Math.random() * countries.length)]
   const companyName = faker.company.companyName()
   return {
     stripeid: `acct_${id}`,
     object: 'stripeAccount',
-    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 16),
+    accountid: 'acct_' + faker.datatype.uuid().split('-').join('').substring(0, 24),
     tokenUpdate: null,
     stripeObject: {
       id: `acct_${id}`,
