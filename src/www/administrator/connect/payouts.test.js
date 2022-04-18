@@ -42,7 +42,6 @@ describe('/administrator/connect/payouts', function () {
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     delete (req1.screenshots)
-    delete (req1.filename)
     cachedResponses.pageSize = await req1.get()
     global.pageSize = 2
     const req2 = TestHelper.createRequest('/administrator/connect/payouts?offset=1')

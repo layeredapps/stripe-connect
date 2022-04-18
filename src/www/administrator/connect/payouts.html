@@ -40,7 +40,7 @@
           <thead>
             <tr>
               <th>ID</th>
-              <th class="money" translate="yes">Amount</th>
+              <th class="right" translate="yes">Amount</th>
               <th translate="yes">Stripe account</th>
               <th translate="yes">Status</th>
               <th translate="yes">Description</th>
@@ -95,7 +95,7 @@
         <td>
           <a href="/administrator/connect/payout?payoutid=${payout.id}">${payout.id}</a>
         </td>
-        <td class="money">${payout.amountFormatted} ${payout.currency}</td>
+        <td class="right">${payout.amountFormatted} ${payout.currency}</td>
         <td>
           <a href="/administrator/connect/stripe-account?stripeid=${payout.stripeid}">${payout.stripeid}</a>
         </td>
