@@ -35,6 +35,7 @@ describe('/account/connect/person', function () {
       { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
       { click: `/account/connect/person?personid=${user.owner.personid}` }
     ]
+    global.pageSize = 50
     cachedResponses.view = await req.get()
     // representative
     await TestHelper.createPerson(user, {

@@ -46,6 +46,7 @@ describe('/account/connect/stripe-account', function () {
       { click: '/account/connect/stripe-accounts' },
       { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` }
     ]
+    global.pageSize = 50
     cachedResponses.unstarted = await req.get()
     // registration completed
     await TestStripeAccounts.waitForAccountField(user, 'individual.first_name')

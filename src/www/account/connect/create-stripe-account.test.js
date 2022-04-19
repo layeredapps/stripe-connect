@@ -33,6 +33,7 @@ describe('/account/connect/create-stripe-account', () => {
         { click: '/account/connect/create-stripe-account' },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const accountsTable = doc.getElementById('stripe-accounts-table')

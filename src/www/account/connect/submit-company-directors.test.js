@@ -71,6 +71,7 @@ describe('/account/connect/submit-company-directors', function () {
       { click: `/account/connect/submit-company-directors?stripeid=${user.stripeAccount.stripeid}` },
       { fill: '#submit-form' }
     ]
+    global.pageSize = 50
     cachedResponses.submitDirectors = await req.post()
     // no directors
     await TestStripeAccounts.createCompanyWithDirectors('DE', 0, user)

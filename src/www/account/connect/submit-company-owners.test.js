@@ -79,6 +79,7 @@ describe('/account/connect/submit-company-owners', function () {
       { click: `/account/connect/submit-company-owners?stripeid=${user.stripeAccount.stripeid}` },
       { fill: '#submit-form' }
     ]
+    global.pageSize = 50
     cachedResponses.submitOwners = await req.post()
     // no owners
     await TestStripeAccounts.createCompanyWithOwners('DE', 0, user)

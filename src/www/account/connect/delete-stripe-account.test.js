@@ -88,6 +88,7 @@ describe('/account/connect/delete-stripe-account', () => {
         { click: `/account/connect/delete-stripe-account?stripeid=${user.stripeAccount.stripeid}` },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

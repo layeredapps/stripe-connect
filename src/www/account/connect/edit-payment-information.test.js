@@ -233,6 +233,7 @@ describe('/account/connect/edit-payment-information', function () {
         { click: `/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}` },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')

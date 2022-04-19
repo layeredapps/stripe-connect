@@ -79,6 +79,7 @@ describe('/account/connect/submit-company-executives', function () {
       { click: `/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}` },
       { fill: '#submit-form' }
     ]
+    global.pageSize = 50
     cachedResponses.submitExecutives = await req.post()
     // no executives
     await TestStripeAccounts.createCompanyWithExecutives('DE', 0, user)

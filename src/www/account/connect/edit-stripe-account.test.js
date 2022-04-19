@@ -552,6 +552,7 @@ describe('/account/connect/edit-stripe-account', function () {
           }
         }
       ]
+      global.pageSize = 50
       const result = await req.post()
       const doc = TestHelper.extractDoc(result.html)
       const accountTable = doc.getElementById(user.stripeAccount.stripeid)

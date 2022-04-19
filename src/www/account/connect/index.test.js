@@ -33,6 +33,7 @@ describe('/account/connect', () => {
         { hover: '#account-menu-container' },
         { click: '/account/connect' }
       ]
+      global.pageSize = 50
       const result = await req.get()
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById(user.stripeAccount.stripeid)

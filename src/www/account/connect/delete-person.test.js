@@ -76,6 +76,7 @@ describe('/account/connect/delete-person', function () {
         { click: `/account/connect/delete-person?personid=${user.owner.personid}` },
         { fill: '#submit-form' }
       ]
+      global.pageSize = 50
       await req.post()
       const req2 = TestHelper.createRequest(`/api/user/connect/persons?stripeid=${user.stripeAccount.stripeid}`)
       req2.account = user.account

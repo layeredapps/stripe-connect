@@ -59,6 +59,7 @@ describe('/account/connect/persons', function () {
       { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
       { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` }
     ]
+    global.pageSize = 50
     await req1.route.api.before(req1)
     cachedResponses.before = req1.data
     cachedResponses.returns = await req1.get()

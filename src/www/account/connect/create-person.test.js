@@ -50,10 +50,10 @@ describe('/account/connect/create-person', function () {
       { click: `/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}` },
       { fill: '#submit-form' }
     ]
+    global.pageSize = 50
     cachedResponses.submit = cachedResponses.createRepresentative = await req.post()
     // create director
     delete (req.screenshots)
-    delete (req.filename)
     req.body = {
       relationship_director: 'true',
       relationship_title: 'SVP Testing',

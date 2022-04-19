@@ -155,6 +155,7 @@ describe('/account/connect/submit-stripe-account', function () {
       { click: `/account/connect/submit-stripe-account?stripeid=${user.stripeAccount.stripeid}` },
       { fill: '#submit-form' }
     ]
+    global.pageSize = 50
     cachedResponses.companySubmit = await req.post()
     cachedResponses.finished = true
   }

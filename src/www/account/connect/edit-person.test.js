@@ -427,7 +427,7 @@ describe('/account/connect/edit-person', function () {
           }
         }
       ]
-      global.stripeJS = 3
+      global.pageSize = 50
       const result = await req.post()
       assert.strictEqual(result.redirect, `/account/connect/person?personid=${user.owner.personid}`)
     })
