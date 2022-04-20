@@ -5,7 +5,7 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/api/administrator/connect/payout', function () {
   describe('exceptions', () => {
-    describe('invalid-payoputid', () => {
+    describe('invalid-payoutid', () => {
       it('missing querystring payoutid', async () => {
         const administrator = await TestHelper.createOwner()
         const req = TestHelper.createRequest('/api/administrator/connect/payout')
