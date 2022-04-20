@@ -1,4 +1,4 @@
-@layeredapps/dashboard 0.0.17
+@layeredapps/dashboard 0.0.42
 http://localhost:8000
 
 |------------------------------------------------------------------------------|
@@ -251,6 +251,33 @@ http://localhost:8000
 |                                |          |  * ineligible accessing account              |
 |--------------------------------|----------|----------------------------------------------|
 
+|--------------------------------------------------------------------------------------------------------------------------|
+| /api/user/connect/set-stripe-account-submitted                                                                           |
+| RECEIVES-----------------------| RETURNS--------------| EXCEPTIONS-------------------------------------------------------|
+| required querystring stripeid  | object (individual)  | invalid-stripeid                                                 |
+|                                | object (company)     |  * missing querystring stripeid                                  |
+|                                |                      |  * invalid querystring stripeid                                  |
+|                                |                      | invalid-stripe-account                                           |
+|                                |                      |  * ineligible Stripe company account is submitted                |
+|                                |                      |  * ineligible Stripe individual account is submitted             |
+|                                |                      | invalid-account                                                  |
+|                                |                      |  * ineligible accessing account                                  |
+|                                |                      | invalid-payment-details                                          |
+|                                |                      |  * ineligible Stripe company account missing payment details     |
+|                                |                      |  * ineligible Stripe individual account missing payment details  |
+|                                |                      | invalid-registration                                             |
+|                                |                      |  * ineligible Stripe company account missing information         |
+|                                |                      |  * ineligible Stripe individual account missing information      |
+|                                |                      | invalid-person                                                   |
+|                                |                      |  * ineligible company person missing information                 |
+|                                |                      | invalid-company-owner                                            |
+|                                |                      |  * ineligible company owners not submitted                       |
+|                                |                      | invalid-director                                                 |
+|                                |                      |  * ineligible company directors not submitted                    |
+|                                |                      | invalid-executive                                                |
+|                                |                      |  * ineligible company executives not submitted                   |
+|--------------------------------|----------------------|------------------------------------------------------------------|
+
 |------------------------------------------------------------------------------|
 | /api/user/connect/stripe-account                                             |
 | RECEIVES-----------------------| RETURNS--| EXCEPTIONS-----------------------|
@@ -340,13 +367,13 @@ http://localhost:8000
 | optionally-required posted address_postal_code                     |          |  * invalid posted dob.day                                     |                        |
 | optionally-required posted email                                   |          | invalid-dob_month                                             |                        |
 | optionally-required posted phone                                   |          |  * missing posted dob.month                                   |                        |
-| optionally-required posted political_exposure                      |          |  * invalid posted dob.month                                   |                        |
-| optionally-required posted id_number                               |          | invalid-dob_year                                              |                        |
-| optionally-required posted ssn_last_4                              |          |  * missing posted dob.month                                   |                        |
-| optionally-required posted verification_document_front             |          |  * invalid posted dob.month                                   |                        |
-| optionally-required posted verification_document_back              |          | invalid-relationship_percent_ownership                        |                        |
-| optionally-required posted verification_additional_document_front  |          |  * invalid posted relationship.percent_ownership              |                        |
-| optionally-required posted verification_additional_document_back   |          | invalid-address_country                                       |                        |
+| optionally-required posted ssn_last_4                              |          |  * invalid posted dob.month                                   |                        |
+| optionally-required posted verification_document_front             |          | invalid-dob_year                                              |                        |
+| optionally-required posted verification_document_back              |          |  * missing posted dob.month                                   |                        |
+| optionally-required posted verification_additional_document_front  |          |  * invalid posted dob.month                                   |                        |
+| optionally-required posted verification_additional_document_back   |          | invalid-relationship_percent_ownership                        |                        |
+|                                                                    |          |  * invalid posted relationship.percent_ownership              |                        |
+|                                                                    |          | invalid-address_country                                       |                        |
 |                                                                    |          |  * invalid posted address.country                             |                        |
 |                                                                    |          | invalid-address_state                                         |                        |
 |                                                                    |          |  * invalid posted address.state                               |                        |
@@ -371,18 +398,16 @@ http://localhost:8000
 | optionally-required posted individual_dob_year                   |          | invalid-individual_dob_day                    |                        |
 | optionally-required posted individual_email                      |          |  * missing posted individual_dob_day          |                        |
 | optionally-required posted individual_phone                      |          |  * invalid posted individual_dob_day          |                        |
-| optionally-required posted individual_political_exposure         |          | invalid-individual_dob_month                  |                        |
-| optionally-required posted individual_nationality                |          |  * missing posted individual_dob_month        |                        |
-| optionally-required posted individual_id_number                  |          |  * invalid posted individual_dob_month        |                        |
-| optionally-required posted individual_ssn_last_4                 |          | invalid-individual_dob_year                   |                        |
-| optionally-required posted individual_address_line1              |          |  * missing posted individual_dob_month        |                        |
-| optionally-required posted individual_address_city               |          |  * invalid posted individual_dob_month        |                        |
-| optionally-required posted individual_address_state              |          | invalid-individual_address_country            |                        |
-| optionally-required posted individual_address_postal_code        |          |  * invalid posted individual_address_country  |                        |
-| optionally-required posted individual_address_kana_line1         |          | invalid-individual_address_state              |                        |
-| optionally-required posted individual_address_kana_city          |          |  * invalid posted individual_address_state    |                        |
-| optionally-required posted individual_address_kana_town          |          | invalid-individual_id_number                  |                        |
-| optionally-required posted individual_address_kana_state         |          |  * invalid posted individual_id_number        |                        |
+| optionally-required posted individual_id_number                  |          | invalid-individual_dob_month                  |                        |
+| optionally-required posted individual_ssn_last_4                 |          |  * missing posted individual_dob_month        |                        |
+| optionally-required posted individual_address_line1              |          |  * invalid posted individual_dob_month        |                        |
+| optionally-required posted individual_address_city               |          | invalid-individual_dob_year                   |                        |
+| optionally-required posted individual_address_state              |          |  * missing posted individual_dob_month        |                        |
+| optionally-required posted individual_address_postal_code        |          |  * invalid posted individual_dob_month        |                        |
+| optionally-required posted individual_address_kana_line1         |          | invalid-individual_address_country            |                        |
+| optionally-required posted individual_address_kana_city          |          |  * invalid posted individual_address_country  |                        |
+| optionally-required posted individual_address_kana_town          |          | invalid-individual_address_state              |                        |
+| optionally-required posted individual_address_kana_state         |          |  * invalid posted individual_address_state    |                        |
 | optionally-required posted individual_address_kana_postal_code   |          | invalid-individual_ssn_last_4                 |                        |
 | optionally-required posted individual_address_kanji_line1        |          |  * invalid posted individual_ssn_last_4       |                        |
 | optionally-required posted individual_address_kanji_city         |          | invalid-individual_phone                      |                        |
