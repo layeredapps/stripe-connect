@@ -1,5 +1,13 @@
 # Documentation for Stripe Connect
 
+#### Shortcuts
+
+- [Documentation website](https://layeredapps.github.io)
+- [Module documentation](https://layeredapps.github.io/stripe-connect-module)
+- [UI screenshots](https://layeredapps.github.io/stripe-connect-ui)
+- [API documentation](https://layeredapps.github.io/stripe-connect-api)
+- [Environment configuration](https://layeredapps.github.io/stripe-connect-configuration)
+
 #### Index
 
 - [Introduction](#introduction)
