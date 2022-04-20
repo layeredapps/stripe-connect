@@ -2,9 +2,10 @@ const connect = require('../../../../../index.js')
 
 module.exports = {
   get: async (req) => {
+    req.query = req.query || {}
     let where
-    if (req.query && req.query.stripeid) {
-      const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
+    if (req.query.stripeid) {
+      const stripeAccount = await global.api.administrator.connect.StripeAccount.get(req)
       if (!stripeAccount) {
         throw new Error('invalid-stripeid')
       }
