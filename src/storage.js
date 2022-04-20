@@ -223,6 +223,9 @@ module.exports = async () => {
     }
     const stripeObject = JSON.parse(object.attributes.stripeObject)
     const existing = await StripeAccount.findOne({ where: object.where })
+    if (!existing) {
+      return
+    }
     const existingStripeObject = JSON.parse(existing.dataValues.stripeObject)
     if (stripeObject.payouts_enabled && !existingStripeObject.payouts_enabled) {
       await metrics.aggregate(existing.dataValues.appid, 'stripe-accounts-approved', new Date())
