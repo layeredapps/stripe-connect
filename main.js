@@ -1,13 +1,13 @@
 (async () => {
   if (!process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET) {
+    const stripeKey = {
+      apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+    }
     const stripe = require('stripe')({
       apiVersion: global.stripeAPIVersion
     })
     if (global.maxmimumStripeRetries) {
       stripe.setMaxNetworkRetries(global.maximumStripeRetries)
-    }
-    const stripeKey = {
-      apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
     }
     const webhooks = await stripe.webhookEndpoints.list({ limit: 100 }, stripeKey)
     if (webhooks && webhooks.data && webhooks.data.length) {
