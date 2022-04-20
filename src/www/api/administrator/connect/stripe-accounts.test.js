@@ -41,6 +41,8 @@ describe('/api/administrator/connect/stripe-accounts', function () {
     const req1 = TestHelper.createRequest('/api/administrator/connect/stripe-accounts')
     req1.account = administrator.account
     req1.session = administrator.session
+    req1.filename = __filename
+    req1.saveResponse = true
     cachedResponses.returns = await req1.get()
     global.pageSize = 3
     cachedResponses.pageSize = await req1.get()
