@@ -508,6 +508,51 @@
     ],
     "configuration": []
   },
+  "/api/user/connect/set-stripe-account-submitted": {
+    "url": "/api/user/connect/set-stripe-account-submitted",
+    "verb": "patch",
+    "auth": false,
+    "receives": [],
+    "exceptions": {
+      "invalid-stripeid": [
+        "missing querystring stripeid",
+        "invalid querystring stripeid"
+      ],
+      "invalid-stripe-account": [
+        "ineligible Stripe company account is submitted",
+        "ineligible Stripe individual account is submitted"
+      ],
+      "invalid-account": [
+        "ineligible accessing account"
+      ],
+      "invalid-payment-details": [
+        "ineligible Stripe company account missing payment details",
+        "ineligible Stripe individual account missing payment details"
+      ],
+      "invalid-registration": [
+        "ineligible Stripe company account missing information",
+        "ineligible Stripe individual account missing information"
+      ],
+      "invalid-person": [
+        "ineligible company person missing information"
+      ],
+      "invalid-company-owner": [
+        "ineligible company owners not submitted"
+      ],
+      "invalid-director": [
+        "ineligible company directors not submitted"
+      ],
+      "invalid-executive": [
+        "ineligible company executives not submitted"
+      ]
+    },
+    "redacts": [],
+    "returns": [
+      "object (individual)",
+      "object (company)"
+    ],
+    "configuration": []
+  },
   "/api/user/connect/stripe-account": {
     "url": "/api/user/connect/stripe-account",
     "verb": "get",
@@ -665,8 +710,6 @@
       "optionally-required posted address_postal_code",
       "optionally-required posted email",
       "optionally-required posted phone",
-      "optionally-required posted political_exposure",
-      "optionally-required posted id_number",
       "optionally-required posted ssn_last_4",
       "optionally-required posted verification_document_front",
       "optionally-required posted verification_document_back",
@@ -734,8 +777,6 @@
       "optionally-required posted individual_dob_year",
       "optionally-required posted individual_email",
       "optionally-required posted individual_phone",
-      "optionally-required posted individual_political_exposure",
-      "optionally-required posted individual_nationality",
       "optionally-required posted individual_id_number",
       "optionally-required posted individual_ssn_last_4",
       "optionally-required posted individual_address_line1",
@@ -799,9 +840,6 @@
       ],
       "invalid-individual_address_state": [
         "invalid posted individual_address_state"
-      ],
-      "invalid-individual_id_number": [
-        "invalid posted individual_id_number"
       ],
       "invalid-individual_ssn_last_4": [
         "invalid posted individual_ssn_last_4"
