@@ -39,9 +39,9 @@ describe('/account/connect/stripe-accounts', function () {
       { click: '/account/connect' },
       { click: '/account/connect/stripe-accounts' }
     ]
-    global.pageSize = 50
     await req1.route.api.before(req1)
     cachedResponses.before = req1.data
+    global.pageSize = 50
     cachedResponses.returns = await req1.get()
     cachedResponses.finished = true
   }
@@ -49,9 +49,11 @@ describe('/account/connect/stripe-accounts', function () {
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
-      assert.strictEqual(data.stripeAccounts.length, cachedStripeAccounts.length)
+      assert.strictEqual(data.stripeAccounts.length, 5)
       assert.strictEqual(data.stripeAccounts[0].id, cachedStripeAccounts[0])
       assert.strictEqual(data.stripeAccounts[1].id, cachedStripeAccounts[1])
+      // 1x individual
+      // 4x company created in loop
     })
   })
 
@@ -62,10 +64,14 @@ describe('/account/connect/stripe-accounts', function () {
       const doc = TestHelper.extractDoc(result.html)
       const companyTable = doc.getElementById('company-accounts-table')
       const companyRows = companyTable.getElementsByTagName('tr')
-      assert.strictEqual(companyRows.length, global.pageSize + 2 + 1)
+      assert.strictEqual(companyRows.length, 5)
+      // 4x company created in loop
+      // 1x table heading
       const individualTable = doc.getElementById('individual-accounts-table')
       const individualRows = individualTable.getElementsByTagName('tr')
-      assert.strictEqual(individualRows.length, 1 + 1)
+      assert.strictEqual(individualRows.length, 2)
+      // 1x individual created
+      // 1x table heading
     })
   })
 })
