@@ -22,7 +22,7 @@
     "auth": false,
     "receives": [],
     "exceptions": {
-      "invalid-payoputid": [
+      "invalid-payoutid": [
         "missing querystring payoutid",
         "invalid querystring payoutid"
       ]
@@ -57,6 +57,64 @@
       "optional querystring stripeid (string)"
     ],
     "exceptions": {},
+    "redacts": [],
+    "returns": [
+      "array"
+    ],
+    "configuration": [
+      "environment PAGE_SIZE"
+    ]
+  },
+  "/api/administrator/connect/person": {
+    "url": "/api/administrator/connect/person",
+    "verb": "get",
+    "auth": false,
+    "receives": [],
+    "exceptions": {
+      "invalid-personid": [
+        "missing querystring personid",
+        "invalid querystring personid"
+      ]
+    },
+    "redacts": [],
+    "returns": [
+      "object"
+    ],
+    "configuration": []
+  },
+  "/api/administrator/connect/persons-count": {
+    "url": "/api/administrator/connect/persons-count",
+    "verb": "get",
+    "auth": false,
+    "receives": [
+      "optional querystring stripeid"
+    ],
+    "exceptions": {
+      "invalid-stripe-account": [
+        "invalid Stripe account is individual"
+      ]
+    },
+    "redacts": [],
+    "returns": [
+      "integer"
+    ],
+    "configuration": []
+  },
+  "/api/administrator/connect/persons": {
+    "url": "/api/administrator/connect/persons",
+    "verb": "get",
+    "auth": false,
+    "receives": [
+      "optional querystring offset (integer)",
+      "optional querystring limit (integer)",
+      "optional querystring all (boolean)",
+      "optional querystring stripeid (string)"
+    ],
+    "exceptions": {
+      "invalid-stripeid": [
+        "invalid Stripe account is individual"
+      ]
+    },
     "redacts": [],
     "returns": [
       "array"
