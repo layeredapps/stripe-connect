@@ -429,7 +429,7 @@
 
   /api/administrator/connect/payout
     exceptions
-      invalid-payoputid
+      invalid-payoutid
         ✔ missing querystring payoutid
         ✔ invalid querystring payoutid
     returns
@@ -445,6 +445,37 @@
       ✔ optional querystring limit (integer)
       ✔ optional querystring all (boolean)
       ✔ optional querystring accountid (string)
+      ✔ optional querystring stripeid (string)
+    returns
+      ✔ array
+    configuration
+      ✔ environment PAGE_SIZE
+
+  /api/administrator/connect/person
+    exceptions
+      invalid-personid
+        ✔ missing querystring personid
+        ✔ invalid querystring personid
+    returns
+      ✔ object
+
+  /api/administrator/connect/persons-count
+    exceptions
+      invalid-stripe-account
+        ✔ invalid Stripe account is individual
+    receives
+      ✔ optional querystring stripeid
+    returns
+      ✔ integer
+
+  /api/administrator/connect/persons
+    exceptions
+      invalid-stripeid
+        ✔ invalid Stripe account is individual
+    receives
+      ✔ optional querystring offset (integer)
+      ✔ optional querystring limit (integer)
+      ✔ optional querystring all (boolean)
       ✔ optional querystring stripeid (string)
     returns
       ✔ array
@@ -946,5 +977,5 @@
       ✔ environment STRIPE_JS
 
 
-  580 passing (52m)
+  593 passing (1h)
 
