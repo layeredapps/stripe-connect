@@ -12,7 +12,7 @@ http://localhost:8000
 |------------------------------------------------------------------------------|
 | /api/administrator/connect/payout                                            |
 | RECEIVES-----------------------| RETURNS--| EXCEPTIONS-----------------------|
-| required querystring payoutid  | object   | invalid-payoputid                |
+| required querystring payoutid  | object   | invalid-payoutid                 |
 |                                |          |  * missing querystring payoutid  |
 |                                |          |  * invalid querystring payoutid  |
 |--------------------------------|----------|----------------------------------|
@@ -32,6 +32,30 @@ http://localhost:8000
 | RETURNS-----------------------------------|
 | integer                                   |
 |-------------------------------------------|
+
+|------------------------------------------------------------------------------|
+| /api/administrator/connect/person                                            |
+| RECEIVES-----------------------| RETURNS--| EXCEPTIONS-----------------------|
+| required querystring personid  | object   | invalid-personid                 |
+|                                |          |  * missing querystring personid  |
+|                                |          |  * invalid querystring personid  |
+|--------------------------------|----------|----------------------------------|
+
+|------------------------------------------------------------------------------------------------------------------------|
+| /api/administrator/connect/persons                                                                                     |
+| RECEIVES--------------------------------| RETURNS--| EXCEPTIONS-------------------------------| CONFIGURATION----------|
+| optional querystring offset (integer)   | array    | invalid-stripeid                         | environment PAGE_SIZE  |
+| optional querystring limit (integer)    |          |  * invalid Stripe account is individual  |                        |
+| optional querystring all (boolean)      |          |                                          |                        |
+| optional querystring stripeid (string)  |          |                                          |                        |
+|-----------------------------------------|----------|------------------------------------------|------------------------|
+
+|--------------------------------------------------------------------------------------|
+| /api/administrator/connect/persons-count                                             |
+| RECEIVES-----------------------| RETURNS--| EXCEPTIONS-------------------------------|
+| optional querystring stripeid  | integer  | invalid-stripe-account                   |
+|                                |          |  * invalid Stripe account is individual  |
+|--------------------------------|----------|------------------------------------------|
 
 |------------------------------------------------------------------------------|
 | /api/administrator/connect/set-stripe-account-rejected                       |
@@ -435,4 +459,4 @@ http://localhost:8000
 |------------------------------------------------------------------|----------|-----------------------------------------------|------------------------|
 
 
-2022-04-22T01:28:37.150Z
+2022-04-22T06:08:58.639Z
