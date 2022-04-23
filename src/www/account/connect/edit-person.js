@@ -140,9 +140,9 @@ async function renderPage (req, res, messageTemplate) {
         continue
       }
       if (element.tag === 'input') {
-        element.setAttribute('value', (req.body[field] || '').split("'").join('&quot;'))
+        element.setAttribute('value', dashboard.Format.replaceQuotes(req.body[field] || ''))
       } else if (element.tag === 'select') {
-        dashboard.HTML.setSelectedOptionByValue(doc, element, (req.body[field] || '').split("'").join('&quot;'))
+        dashboard.HTML.setSelectedOptionByValue(doc, element, req.body[field] || '')
       }
     }
   }

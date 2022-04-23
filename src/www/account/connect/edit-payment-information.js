@@ -67,7 +67,7 @@ async function renderPage (req, res, messageTemplate) {
           (element.attr.type === 'checkbox' || element.attr.type === 'radio')) {
           element.setAttribute('checked', 'checked')
         } else {
-          element.setAttribute('value', (req.body[field] || '').split("'").join('&quot;'))
+          element.setAttribute('value', dashboard.Format.replaceQuotes(req.body[field] || ''))
         }
       } else if (element.tag === 'select') {
         dashboard.HTML.setSelectedOptionByValue(doc, field, req.body[field] || '')

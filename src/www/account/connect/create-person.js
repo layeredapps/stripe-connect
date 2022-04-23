@@ -48,11 +48,11 @@ async function renderPage (req, res, messageTemplate) {
   }
   if (req.body) {
     for (const fieldName in req.body) {
-      const el = doc.getElementById(fieldName)
-      if (!el) {
+      const element = doc.getElementById(fieldName)
+      if (!element) {
         continue
       }
-      el.attr.value = req.body[fieldName]
+      element.setAttribute('value', dashboard.Format.replaceQuotes(req.body[fieldName]))
     }
   } else if (req.query.relationship_director) {
     doc.getElementById('relationship_director').setAttribute('checked', true)
