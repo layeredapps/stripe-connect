@@ -93,6 +93,7 @@ async function renderPage (req, res) {
   } else {
     removeElements.push('submitted')
   }
+  const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
   if (req.data.stripeAccount.business_type === 'individual') {
     removeElements.push('business', 'business-name')
     if (req.data.stripeAccount.individual.first_name) {
@@ -119,6 +120,61 @@ async function renderPage (req, res) {
     } else {
       removeElements.push('representatives-table')
     }
+    if (completedPaymentInformation) {
+      removeElements.push('setup-payment')
+      dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
+    } else {
+      removeElements.push('update-payment')
+      dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
+    }
+    if (req.data.owners && req.data.owners.length) {
+      dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
+      for (const person of req.data.owners) {
+        if (person.requirements.currently_due.length) {
+          removeElements.push(`requires-no-information-${person.id}`)
+        } else {
+          removeElements.push(`requires-information-${person.id}`)
+        }
+      }
+    } else {
+      if (!req.data.stripeAccount.requiresOwners) {
+        removeElements.push('owners-container')
+      } else {
+        removeElements.push('owners-table')
+      }
+    }
+    if (req.data.directors && req.data.directors.length) {
+      dashboard.HTML.renderTable(doc, req.data.directors, 'person-row', 'directors-table')
+      for (const person of req.data.directors) {
+        if (person.requirements.currently_due.length) {
+          removeElements.push(`requires-no-information-${person.id}`)
+        } else {
+          removeElements.push(`requires-information-${person.id}`)
+        }
+      }
+    } else {
+      if (!req.data.stripeAccount.requiresDirectors) {
+        removeElements.push('directors-container')
+      } else {
+        removeElements.push('directors-table')
+      }
+    }
+    if (req.data.executives && req.data.executives.length) {
+      dashboard.HTML.renderTable(doc, req.data.executives, 'person-row', 'executives-table')
+      for (const person of req.data.executives) {
+        if (person.requirements.currently_due.length) {
+          removeElements.push(`requires-no-information-${person.id}`)
+        } else {
+          removeElements.push(`requires-information-${person.id}`)
+        }
+      }
+    } else {
+      if (!req.data.stripeAccount.requiresExecutives) {
+        removeElements.push('executives-container')
+      } else {
+        removeElements.push('executives-table')
+      }
+    }
   }
   if (req.data.stripeAccount.submittedAt) {
     removeElements.push('registration-container')
@@ -128,50 +184,6 @@ async function renderPage (req, res) {
   } else {
     dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
     removeElements.push('update-registration-link')
-  }
-  const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
-  if (completedPaymentInformation) {
-    removeElements.push('setup-payment')
-    dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
-  } else {
-    removeElements.push('update-payment')
-    dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
-  }
-  if (req.data.owners && req.data.owners.length) {
-    dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
-    for (const person of req.data.owners) {
-      if (person.requirements.currently_due.length) {
-        removeElements.push(`requires-no-information-${person.id}`)
-      } else {
-        removeElements.push(`requires-information-${person.id}`)
-      }
-    }
-  } else if (!req.data.stripeAccount.requiresOwners) {
-    removeElements.push('owners-container')
-  }
-  if (req.data.directors && req.data.directors.length) {
-    dashboard.HTML.renderTable(doc, req.data.directors, 'person-row', 'directors-table')
-    for (const person of req.data.directors) {
-      if (person.requirements.currently_due.length) {
-        removeElements.push(`requires-no-information-${person.id}`)
-      } else {
-        removeElements.push(`requires-information-${person.id}`)
-      }
-    }
-  } else if (!req.data.stripeAccount.requiresDirectors) {
-    removeElements.push('directors-container')
-  }
-  if (req.data.executives && req.data.executives.length) {
-    dashboard.HTML.renderTable(doc, req.data.executives, 'person-row', 'executives-table')
-    for (const person of req.data.executives) {
-      if (person.requirements.currently_due.length) {
-        removeElements.push(`requires-no-information-${person.id}`)
-      } else {
-        removeElements.push(`requires-information-${person.id}`)
-      }
-    }
-  } else if (!req.data.stripeAccount.requiresExecutives) {
-    removeElements.push('executives-container')
   }
   if (req.data.stripeAccount.submittedAt) {
     dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'submitted-information', 'submission-status')

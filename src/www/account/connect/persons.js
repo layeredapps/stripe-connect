@@ -57,6 +57,11 @@ async function renderPage (req, res) {
       } else {
         removeElements.push(`requires-information-${person.id}`)
       }
+      if (!person.first_name && !person.last_name) {
+        removeElements.push(`has-name-${person.id}`)
+      } else {
+        removeElements.push(`no-name-${person.id}`)
+      }
     }
   }
   if (!req.data.representatives || !req.data.representatives.length) {
@@ -69,6 +74,11 @@ async function renderPage (req, res) {
       } else {
         removeElements.push(`requires-information-${person.id}`)
       }
+      if (!person.first_name && !person.last_name) {
+        removeElements.push(`has-name-${person.id}`)
+      } else {
+        removeElements.push(`no-name-${person.id}`)
+      }
     }
   }
   if (!req.data.directors || !req.data.directors.length) {
@@ -80,6 +90,11 @@ async function renderPage (req, res) {
         removeElements.push(`requires-no-information-${person.id}`)
       } else {
         removeElements.push(`requires-information-${person.id}`)
+      }
+      if (!person.first_name && !person.last_name) {
+        removeElements.push(`has-name-${person.id}`)
+      } else {
+        removeElements.push(`no-name-${person.id}`)
       }
     }
   }

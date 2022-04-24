@@ -18,12 +18,16 @@
         <div class="country input-fields">
           <label class="field-label" for="country" translate="yes">Country of bank</label>
           <div class="field">
-            <select class="country" name="country" id="country">
-              <option value="" translate="yes">
-                Select
-              </option>
-            </select>
-            <button name="refresh" value="true" class="button">Refresh bank fields</button>
+            <div class="normal-field adjacent">
+              <div>
+                <select class="country" name="country" id="country">
+                  <option value="" translate="yes">
+                    Select
+                  </option>
+                </select>
+              </div>
+            </div>
+            <button name="refresh" value="true" class="small-button">Refresh</button>
           </div>
         </div>
         <div class="input-fields">
@@ -34,13 +38,11 @@
                 <input id="individual" type="radio" name="account_holder_type" value="individual">
                 <span translate="yes">Individual</span>
               </label>
+              <label class="field-label">
+                <input id="company" type="radio" name="account_holder_type" value="company">
+                <span translate="yes">Company</span>
+              </label>
             </div>
-          </div>
-          <div class="checkbox-fields">
-            <label class="field-label">
-              <input id="company" type="radio" name="account_holder_type" value="company">
-              <span translate="yes">Company</span>
-            </label>
           </div>
         </div>
         <div class="input-fields">

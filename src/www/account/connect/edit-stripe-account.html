@@ -15,7 +15,7 @@
     <div class="container">
       <h1 translate="yes">Edit Stripe account</h1>
       <div id="message-container"></div>
-      <form id="submit-form" enctype="multipart/form-data" method="POST" class="input-form" action="/account/connect/edit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
+      <form id="submit-form" enctype="multipart/form-data" method="POST" class="input-form connect-form" action="/account/connect/edit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
         <input type="hidden" id="stripe-publishable-key" />
         <input type="hidden" name="token" id="token">
         <div id="business-profile-container">
@@ -255,9 +255,11 @@
           <div id="individual_dob-container" class="input-fields">
             <label class="field-label" for="dob_day" translate="yes">Date of birth</label>
             <div class="field">
-              <input class="adjacent" required="required" id="individual_dob_day" name="individual_dob_day" type="text" size="2" maxlength="2" placeholder="DD">
-              <input class="adjacent" required="required" id="individual_dob_month" name="individual_dob_month" type="text" size="2" maxlength="2" placeholder="MM">
-              <input class="adjacent" required="required" id="individual_dob_year" name="individual_dob_year" type="text" size="4" maxlength="4" placeholder="YYYY">
+              <div class="tiny-field">
+                <div class="adjacent"><input required="required" id="individual_dob_day" name="individual_dob_day" type="text" size="2" maxlength="2" placeholder="DD"></div>
+                <div class="adjacent"><input required="required" id="individual_dob_month" name="individual_dob_month" type="text" size="2" maxlength="2" placeholder="MM"></div>
+                <div class="adjacent"><input required="required" id="individual_dob_year" name="individual_dob_year" type="text" size="4" maxlength="4" placeholder="YYYY"></div>
+              </div>
             </div>
           </div>
           <div id="individual_ssn_last_4-container" class="input-fields">

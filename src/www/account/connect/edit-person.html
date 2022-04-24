@@ -20,7 +20,7 @@
         <div id="message-container"></div>
         <div id="form-container">
           <h2 translate="yes">Relationship to company</h2>
-          <div class="input-fields">
+          <div class="checkbox-fields checkbox-group">
             <label class="field-label"><input type="checkbox" id="relationship_representative" name="relationship_representative" value="true"> Representative</label>
             <label class="field-label"><input type="checkbox" id="relationship_executive" name="relationship_executive" value="true"> Executive</label>
             <label class="field-label"><input type="checkbox" id="relationship_director" name="relationship_director" value="true"> Director</label>
@@ -101,9 +101,11 @@
           <div id="dob-container" class="input-fields">
             <label class="field-label" for="dob_day" translate="yes">Date of birth</label>
             <div class="field">
-              <input class="adjacent" required="required" id="dob_day" name="dob_day" type="text" size="2" maxlength="2" placeholder="DD">
-              <input class="adjacent" required="required" id="dob_month" name="dob_month" type="text" size="2" maxlength="2" placeholder="MM">
-              <input class="adjacent" required="required" id="dob_year" name="dob_year" type="text" size="4" maxlength="4" placeholder="YYYY">
+              <div class="tiny-field">
+                <div class="adjacent"><input required="required" id="dob_day" name="dob_day" type="text" size="2" maxlength="2" placeholder="DD"></div>
+                <div class="adjacent"><input required="required" id="dob_month" name="dob_month" type="text" size="2" maxlength="2" placeholder="MM"></div>
+                <div class="adjacent"><input required="required" id="dob_year" name="dob_year" type="text" size="4" maxlength="4" placeholder="YYYY"></div>
+              </div>
             </div>
           </div>
           <div id="gender-container" class="input-fields">
@@ -175,14 +177,18 @@
                 <input required="required" id="address_city" name="address_city" type="text" maxlength="100">
               </div>
             </div>
-            <div id="address_state-container">
+            <div id="address_state-container" class="input-fields">
               <label class="field-label" for="address_state" translate="yes">State or province</label>
               <div class="field">
-                <select id="address_state" name="address_state">
-                  <option value="" translate="yes">
-                    Select
-                  </option>
-                </select>
+                <div class="normal-field">
+                  <div>
+                    <select id="address_state" name="address_state">
+                      <option value="" translate="yes">
+                        Select
+                      </option>
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
             <div id="address_postal_code-container" class="input-fields">

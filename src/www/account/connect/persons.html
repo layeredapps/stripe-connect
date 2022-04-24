@@ -66,9 +66,10 @@
         <td>
           <a href="/account/connect/person?personid=${person.id}">${person.id}</a>
         </td>
-        <td>${person.first_name} ${person.last_name}</td>
+        <td id="has-name-${person.id}">${person.first_name} ${person.last_name}</td>
+        <td id="no-name-${person.id}">Not yet provided</td>
         <td id="requires-information-${person.id}">
-          <a class="button" href="/account/connect/edit-person?personid=${person.id}" translate="yes">Add information</a>
+          <a class="small-button" href="/account/connect/edit-person?personid=${person.id}" translate="yes">Add information</a>
         </td>
         <td id="requires-no-information-${person.id}">-</td>
       </tr>

@@ -56,24 +56,24 @@
         </div>
       </div>
       <form id="submit-form" method="post" class="input-form" action="/account/connect/submit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
-        <div class="input-fields">
+        <label>
           <input checked disabled type="checkbox"> I have provided complete and accurate information
-        </div>
-        <div id="company-representative-option" class="input-fields">
+        </label>
+        <label id="company-representative-option">
           <input checked disabled type="checkbox"> I am authorized to represent this business
-        </div>
-        <div id="company-company-owners-option" class="input-fields">
+        </label>
+        <label id="company-company-owners-option">
           <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company owner information
-        </div>
-        <div id="company-directors-option" class="input-fields">
+        </label>
+        <label id="company-directors-option">
           <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company director information
-        </div>
-        <div id="company-executives-option" class="input-fields">
+        </label>
+        <label id="company-executives-option">
           <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company executive information
-        </div>
-        <div class="input-fields">
+        </label>
+        <label>
           <input checked disabled type="checkbox"> I accept the Stripe Connect <a href="https://stripe.com/us/connect-account/legal">terms and conditions</a>
-        </div>
+        </label>
         <div class="form-buttons">
           <button id="submit-button" class="button" translate="yes">Submit registration</button>
         </div>

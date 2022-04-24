@@ -1,25 +1,28 @@
 
-.two-columns { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 2rem }
-
-.requirements { border: 1px solid var(--requirements-border-color); padding: 1rem; margin-right: 1rem }
+.requirements-wrapper { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 2rem }
+.requirements { border: 1px solid var(--requirements-border-color); padding: 1rem }
 .numbered-list { list-style-type: decimal; margin-bottom: 2rem; padding-left: 2rem }
 .numbered-list-item { line-height: 1.5rem; list-style-type: decimal }
-
-form.connect-form input[type="text"] { width: auto }
-form.connect-form input[type="file"] { margin-bottom: 0.5rem }
-form.connect-form input.full-width { width: 100%; max-width: 100% }
-form.connect-form input.adjacent { display: inline-block !important; margin-right: 0.5rem !important }
-form.connect-form input[type="file"] { margin-top: 0.5rem }
-form.connect-form select { width: 100%; margin-right: 1rem; max-width: 100% !important }
-form.connect-form h1,
-form.connect-form h2,
-form.connect-form label,
-form.connect-form .button-group,
-form.connect-form .input-fields { text-align: left }
-form.connect-form .button-group { margin-top: 1rem }
+.adjacent { display: inline-block !important; margin-right: 0.5rem !important }
+.checkbox-fields.checkbox-group { margin-bottom: 2rem }
+.connect-form input[type="file"] { margin-bottom: 0.5rem }
+.connect-form input.full-width { width: 100%; max-width: 100% }
+.connect-form input[type="file"] { margin-top: 0.5rem }
+.connect-form select { width: 100%; margin-right: 1rem; max-width: 100% !important }
+.connect-form h1,
+.connect-form h2,
+.connect-form label,
+.connect-form .button-group,
+.connect-form .input-fields { text-align: left }
+.connect-form .button-group { margin-top: 1rem }
 
 @media (max-width: 960px) {
-  .requirements-container { width: 100%; margin-bottom: 2rem; margin-right: 0 }
+  .requirements-wrapper { width: 100%; margin-bottom: 2rem; grid-gap: 1rem }
+}
+
+@media (max-width: 600px) {
+  .requirements-wrapper { display: block }
+  .requirements-wrapper .requirements:first-of-type { margin-bottom: 1rem }
 }
 
 /* color settings */
