@@ -4,9 +4,7 @@
     "modules": [
       "@layeredapps/maxmind-geoip"
     ],
-    "server": [
-      "/src/server/stripe-connect/bind-stripekey.js"
-    ]
+    "server": []
   },
   "peerDependencies": {
     "@layeredapps/dashboard": "latest"

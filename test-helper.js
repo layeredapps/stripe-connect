@@ -198,7 +198,7 @@ module.exports = {
 
 const TestHelper = require('@layeredapps/dashboard/test-helper.js')
 for (const x in TestHelper) {
-  module.exports[x] = TestHelper[x]
+  module.exports[x] = module.exports[x] || TestHelper[x]
 }
 const createRequest = module.exports.createRequest = (rawURL, method) => {
   const req = TestHelper.createRequest(rawURL, method)
@@ -215,6 +215,14 @@ async function setupBefore () {
     await deleteOldWebhooks(true)
     await setupWebhook()
   }
+  global.packageJSON.dashboard.serverFilePaths.push(
+    `${__dirname}/src/server/bind-stripekey.js`,
+    require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
+  )
+  global.packageJSON.dashboard.server.push(
+    require(`${__dirname}/src/server/bind-stripekey.js`),
+    require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
+  )
   const helperRoutes = require('./test-helper-routes.js')
   global.sitemap['/api/fake-payout'] = helperRoutes.fakePayout
   global.sitemap['/api/substitute-failed-document-front'] = helperRoutes.substituteFailedDocumentFront
@@ -224,6 +232,14 @@ async function setupBefore () {
 let webhookRotation = 0
 
 async function setupBeforeEach () {
+  global.packageJSON.dashboard.serverFilePaths.push(
+    `${__dirname}/src/server/bind-stripekey.js`,
+    require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
+  )
+  global.packageJSON.dashboard.server.push(
+    require(`${__dirname}/src/server/bind-stripekey.js`),
+    require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
+  )
   await connect.Storage.flush()
   await rotateWebhook()
   global.webhooks = []
