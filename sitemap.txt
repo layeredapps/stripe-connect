@@ -1,4 +1,4 @@
-@layeredapps/dashboard 0.0.54
+@layeredapps/dashboard 0.0.58
 http://localhost:8000
 
 Administrator menu:
@@ -15,11 +15,7 @@ Special HTML files:
 @layeredapps/dashboard/redirect.html
 
 Dashboard modules:
-@layeredapps/maxmind-geoip (1.0.16)
-
-Server handlers:
-/src/server/stripe-connect/bind-stripekey.js
-/src/server/maxmind-geoip/bind-country.js
+@layeredapps/maxmind-geoip (1.0.18)
 
 URL -------------------------------------------------- AUTH - TEMPLATE - HTTP REQUESTS - NODEJS ----------------------- HTML ---------------------
 /                                                      GUEST  FULLSCREEN                 static-page                    /src/www                  
@@ -181,4 +177,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-04-23T07:32:46.058Z
+2022-04-24T03:08:30.633Z
