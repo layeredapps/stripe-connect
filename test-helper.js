@@ -8,6 +8,7 @@ global.testConfiguration = global.testConfiguration || {}
 global.testConfiguration.stripeJS = false
 global.testConfiguration.maximumStripeRetries = 0
 
+const path = require('path')
 const util = require('util')
 const ngrok = require('ngrok')
 const packageJSON = require('./package.json')
@@ -215,14 +216,6 @@ async function setupBefore () {
     await deleteOldWebhooks(true)
     await setupWebhook()
   }
-  global.packageJSON.dashboard.serverFilePaths.push(
-    `${__dirname}/src/server/bind-stripekey.js`,
-    require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
-  )
-  global.packageJSON.dashboard.server.push(
-    require(`${__dirname}/src/server/bind-stripekey.js`),
-    require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
-  )
   const helperRoutes = require('./test-helper-routes.js')
   global.sitemap['/api/fake-payout'] = helperRoutes.fakePayout
   global.sitemap['/api/substitute-failed-document-front'] = helperRoutes.substituteFailedDocumentFront
@@ -233,11 +226,11 @@ let webhookRotation = 0
 
 async function setupBeforeEach () {
   global.packageJSON.dashboard.serverFilePaths.push(
-    `${__dirname}/src/server/bind-stripekey.js`,
+    path.join(__dirname, '/src/server/bind-stripekey.js'),
     require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   global.packageJSON.dashboard.server.push(
-    require(`${__dirname}/src/server/bind-stripekey.js`),
+    require(path.join(__dirname, '/src/server/bind-stripekey.js')),
     require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   await connect.Storage.flush()
