@@ -8,6 +8,7 @@ global.testConfiguration = global.testConfiguration || {}
 global.testConfiguration.stripeJS = false
 global.testConfiguration.maximumStripeRetries = 0
 
+const Log = require('@layeredapps/dashboard/src/log.js')('test-helper-stripe-connect')
 const path = require('path')
 const util = require('util')
 const ngrok = require('ngrok')
@@ -210,6 +211,7 @@ const createRequest = module.exports.createRequest = (rawURL, method) => {
 let connect
 
 async function setupBefore () {
+  Log.info('setupBefore')
   connect = require('./index.js')
   await connect.setup()
   if (!webhook) {
@@ -225,6 +227,7 @@ async function setupBefore () {
 let webhookRotation = 0
 
 async function setupBeforeEach () {
+  Log.info('setupBeforeEach')
   global.packageJSON.dashboard.serverFilePaths.push(
     path.join(__dirname, '/src/server/bind-stripekey.js'),
     require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
@@ -239,6 +242,7 @@ async function setupBeforeEach () {
 }
 
 async function rotateWebhook (remake) {
+  Log.info('rotateWebhook', remake)
   if (!global.webhooks) {
     global.webhooks = []
   } else if (global.webhooks.length > 0) {
@@ -255,6 +259,7 @@ async function rotateWebhook (remake) {
 let webhook
 
 async function setupWebhook () {
+  Log.info('setupWebhook')
   webhook = null
   while (!webhook) {
     try {
@@ -263,7 +268,7 @@ async function setupWebhook () {
       const tunnel = await ngrok.connect({
         port: global.port,
         // auth: process.env.NGROK_AUTH,
-        onLogEvent: process.env.LOG_LEVEL && process.env.LOG_LEVEL.indexOf('ngrok') > -1 ? console.log : undefined
+        onLogEvent: Log.info
       })
       webhook = await stripe.webhookEndpoints.create({
         url: `${tunnel}/webhooks/connect/index-connect-data`,
@@ -283,11 +288,13 @@ before(setupBefore)
 beforeEach(setupBeforeEach)
 
 afterEach(async () => {
+  Log.info('afterEach')
   await connect.Storage.flush()
   await deleteOldStripeAccounts()
 })
 
 after(async () => {
+  Log.info('after')
   if (webhook) {
     await deleteOldWebhooks()
     webhook = null
@@ -296,6 +303,7 @@ after(async () => {
 })
 
 async function deleteOldWebhooks () {
+  Log.info('deleteOldWebhooks')
   webhook = null
   try {
     const webhooks = await stripe.webhookEndpoints.list({ limit: 100 }, stripeKey)
@@ -312,18 +320,25 @@ async function deleteOldWebhooks () {
 }
 
 async function deleteOldStripeAccounts () {
+  Log.info('deleteOldStripeAccounts')
   try {
     const accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
     if (accounts && accounts.data && accounts.data.length) {
       for (const account of accounts.data) {
-        await stripe.accounts.del(account.id, stripeKey)
+        try {
+          await stripe.accounts.del(account.id, stripeKey)
+        } catch (error) {
+          Log.error('error deleting account', account.id, error)
+        }
       }
     }
   } catch (error) {
+    Log.error('error listing accounts for delete', error)
   }
 }
 
 async function createStripeAccount (user, body) {
+  Log.info('createStripeAccount', user, body)
   const req = createRequest(`/api/user/connect/create-stripe-account?accountid=${user.account.accountid}`)
   req.session = user.session
   req.account = user.account
@@ -333,6 +348,7 @@ async function createStripeAccount (user, body) {
 }
 
 async function updateStripeAccount (user, body, uploads) {
+  Log.info('updateStripeAccount', user, body, uploads)
   const req = createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -342,6 +358,7 @@ async function updateStripeAccount (user, body, uploads) {
 }
 
 async function createExternalAccount (user, body) {
+  Log.info('createExternalAccount', user, body)
   const req = createRequest(`/api/user/connect/update-payment-information?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -364,6 +381,7 @@ async function createExternalAccount (user, body) {
 }
 
 async function createPerson (user, body) {
+  Log.info('createPerson', user, body)
   const req = createRequest(`/api/user/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -382,6 +400,7 @@ async function createPerson (user, body) {
 }
 
 async function updatePerson (user, person, body, uploads) {
+  Log.info('updatePerson', user, person, body, uploads)
   const req = createRequest(`/api/user/connect/update-person?personid=${person.personid}`)
   req.session = user.session
   req.account = user.account
@@ -398,6 +417,7 @@ async function updatePerson (user, person, body, uploads) {
 }
 
 async function createPayout (user) {
+  Log.info('createPayout', user)
   const req = createRequest(`/api/fake-payout?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -418,6 +438,7 @@ async function createPayout (user) {
 }
 
 async function submitCompanyOwners (user) {
+  Log.info('submitCompanyOwners', user)
   const req = createRequest(`/api/user/connect/set-company-owners-submitted?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -439,6 +460,7 @@ async function submitCompanyOwners (user) {
 }
 
 async function submitCompanyDirectors (user) {
+  Log.info('submitCompanyDirectors', user)
   const req = createRequest(`/api/user/connect/set-company-directors-submitted?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -460,6 +482,7 @@ async function submitCompanyDirectors (user) {
 }
 
 async function submitCompanyExecutives (user) {
+  Log.info('submitCompanyExecutives', user)
   const req = createRequest(`/api/user/connect/set-company-executives-submitted?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account
@@ -481,6 +504,7 @@ async function submitCompanyExecutives (user) {
 }
 
 async function submitStripeAccount (user) {
+  Log.info('submitStripeAccount', user)
   const req = createRequest(`/api/user/connect/set-stripe-account-submitted?stripeid=${user.stripeAccount.stripeid}`)
   req.session = user.session
   req.account = user.account

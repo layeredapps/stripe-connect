@@ -98,6 +98,7 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       p1 = null
     }
   }
+  Log.info('stripe query', group, method, p1, p2, p3, p4, p5)
   if (p5) {
     return stripe[group][method](p1, p2, p3, p4, p5, (error, result) => {
       if (!error) {

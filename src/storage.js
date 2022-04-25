@@ -1,5 +1,6 @@
 const { Model, DataTypes } = require('sequelize')
 const metrics = require('@layeredapps/dashboard/src/metrics.js')
+const Log = require('@layeredapps/dashboard/src/log.js')('sequelize-stripe-connect')
 
 module.exports = async () => {
   let storage, dateType
@@ -211,6 +212,13 @@ module.exports = async () => {
     modelName: 'payout'
   })
   await sequelize.sync({ force: true, alter: true })
+  const originalQuery = sequelize.query
+  sequelize.query = function () {
+    return originalQuery.apply(this, arguments).catch((error) => {
+      Log.error(error)
+      throw error
+    })
+  }
   StripeAccount.afterCreate(async (object) => {
     if (global.disableMetrics) {
       return
