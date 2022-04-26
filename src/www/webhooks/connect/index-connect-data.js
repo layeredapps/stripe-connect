@@ -135,8 +135,8 @@ async function updatePayout (stripeEvent, stripeKey) {
   let stripeAccount
   try {
     stripeAccount = await connect.Storage.StripeAccount.findOne({
+      attributes: ['stripeid', 'appid', 'accountid'],
       where: {
-        attributes: ['stripeid', 'appid', 'accountid'],
         stripeid: stripeEvent.account
       }
     })
@@ -167,15 +167,15 @@ async function updatePayout (stripeEvent, stripeKey) {
       stripeid: stripeAccount.dataValues.stripeid,
       appid: stripeAccount.dataValues.appid,
       accountid: stripeAccount.dataValues.accountid,
-      stripeObject      
+      stripeObject
     })
   }
-  return connect.Storage.update({
-    stripeObject      
+  return connect.Storage.Payout.update({
+    stripeObject
   }, {
     where: {
       payoutid: stripeObject.id,
-      appid: stripeAccount.dataValues.appid,
+      appid: stripeAccount.dataValues.appid
     }
   })
 }
