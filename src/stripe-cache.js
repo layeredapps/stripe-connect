@@ -1,4 +1,4 @@
-const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect')
+const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect-stripe-cache')
 const packageJSON = require('../package.json')
 const stripe = require('stripe')({
   apiVersion: global.stripeAPIVersion,
@@ -95,12 +95,13 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       p1 = null
     }
   }
-  Log.info('stripe query', group, method, p1, p2, p3, p4, p5)
+  Log.info('execute', group, method, p1, p2, p3, p4, p5)
   if (p5) {
     return stripe[group][method](p1, p2, p3, p4, p5, (error, result) => {
       if (!error) {
         return callback(null, result)
       }
+      Log.error('error', group, method, error)
       const retry = retriableError(error)
       if (retry) {
         return execute(group, method, p1, p2, p3, p4, p5, callback)
@@ -112,6 +113,7 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       if (!error) {
         return callback(null, result)
       }
+      Log.error('error', group, method, error)
       const retry = retriableError(error)
       if (retry) {
         return execute(group, method, p1, p2, p3, p4, p5, callback)
@@ -123,6 +125,7 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       if (!error) {
         return callback(null, result)
       }
+      Log.error('error', group, method, error)
       const retry = retriableError(error)
       if (retry) {
         return execute(group, method, p1, p2, p3, p4, p5, callback)
@@ -134,6 +137,7 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       if (!error) {
         return callback(null, result)
       }
+      Log.error('error', group, method, error)
       const retry = retriableError(error)
       if (retry) {
         return execute(group, method, p1, p2, p3, p4, p5, callback)
@@ -145,6 +149,7 @@ function execute (group, method, p1, p2, p3, p4, p5, callback) {
       if (!error) {
         return callback(null, result)
       }
+      Log.error('error', group, method, error)
       const retry = retriableError(error)
       if (retry) {
         return execute(group, method, p1, p2, p3, p4, p5, callback)
