@@ -977,5 +977,5 @@
       ✔ environment STRIPE_JS
 
 
-  593 passing (1h)
+  593 passing (57m)
 
