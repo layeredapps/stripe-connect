@@ -46,9 +46,6 @@ function retriableError (error) {
     }
     return true
   }
-  if (process.env.NODE_ENV === 'testing' && error.raw.code === 'account_invalid') {
-    return true
-  }
   return false
 }
 
