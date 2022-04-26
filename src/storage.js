@@ -211,7 +211,9 @@ module.exports = async () => {
     sequelize,
     modelName: 'payout'
   })
-  await sequelize.sync({ force: true, alter: true })
+  // table creation
+  await sequelize.sync()
+  // exception logging
   const originalQuery = sequelize.query
   sequelize.query = function () {
     return originalQuery.apply(this, arguments).catch((error) => {
@@ -219,6 +221,7 @@ module.exports = async () => {
       throw error
     })
   }
+  // metrics
   StripeAccount.afterCreate(async (object) => {
     if (global.disableMetrics) {
       return
@@ -251,9 +254,9 @@ module.exports = async () => {
     sequelize,
     flush: async () => {
       if (process.env.NODE_ENV === 'testing') {
-        await Payout.destroy({ where: {} })
-        await Person.destroy({ where: {} })
-        await StripeAccount.destroy({ where: {} })
+        await Payout.sync({ force: true })
+        await Person.sync({ force: true })
+        await StripeAccount.sync({ force: true })
       }
     },
     CountrySpec,
