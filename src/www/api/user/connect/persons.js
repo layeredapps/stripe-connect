@@ -13,7 +13,8 @@ module.exports = {
       throw new Error('invalid-stripe-account')
     }
     const where = {
-      stripeid: req.query.stripeid
+      stripeid: req.query.stripeid,
+      appid: req.appid || global.appid
     }
     let personids
     if (req.query.all) {

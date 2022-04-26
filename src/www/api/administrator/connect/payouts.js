@@ -2,24 +2,22 @@ const connect = require('../../../../../index.js')
 
 module.exports = {
   get: async (req) => {
-    let where
     req.query = req.query || {}
+    const where = {
+      appid: req.appid || global.appid
+    }
     if (req.query.stripeid) {
       const StripeAccount = await global.api.administrator.connect.StripeAccount.get(req)
       if (!StripeAccount) {
         throw new Error('invalid-stripeid')
       }
-      where = {
-        stripeid: req.query.stripeid
-      }
+      where.stripeid = req.query.stripeid
     } else if (req.query.accountid) {
       const account = await global.api.administrator.Account.get(req)
       if (!account) {
         throw new Error('invalid-account')
       }
-      where = {
-        accountid: req.query.accountid
-      }
+      where.accountid = req.query.accountid
     }
     let payoutids
     if (req.query.all) {

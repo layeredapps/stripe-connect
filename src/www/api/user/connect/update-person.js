@@ -41,7 +41,8 @@ module.exports = {
           tokenUpdate: new Date()
         }, {
           where: {
-            personid: req.query.personid
+            personid: req.query.personid,
+            appid: req.appid || global.appid
           }
         })
       } catch (error) {
@@ -239,7 +240,8 @@ module.exports = {
         stripeObject: personNow
       }, {
         where: {
-          personid: req.query.personid
+          personid: req.query.personid,
+          appid: req.appid || global.appid
         }
       })
     } catch (error) {

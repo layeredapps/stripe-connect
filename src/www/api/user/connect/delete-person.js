@@ -16,7 +16,8 @@ module.exports = {
     await stripeCache.execute('accounts', 'deletePerson', person.stripeid, req.query.personid, req.stripeKey)
     await connect.Storage.Person.destroy({
       where: {
-        personid: req.query.personid
+        personid: req.query.personid,
+        appid: req.appid || global.appid
       }
     })
     return true

@@ -65,26 +65,6 @@ module.exports = {
   }
 }
 
-async function upsert (dataStore, idName, id, newValues) {
-  const existing = await dataStore.findOne({
-    where: {
-      [idName]: id
-    }
-  })
-  if (!existing) {
-    return dataStore.create(newValues)
-  }
-  const object = {}
-  for (const field in newValues) {
-    object[field] = newValues[field] || existing.dataValues[field]
-  }
-  return dataStore.update(object, {
-    where: {
-      [idName]: id
-    }
-  })
-}
-
 async function load (id, group, key) {
   try {
     return stripeCache.retrieve(id, group, key)
@@ -103,7 +83,7 @@ async function loadPerson (stripeid, id, key) {
 
 async function updatePerson (stripeEvent, stripeKey) {
   const exists = await connect.Storage.Person.findOne({
-    attributes: ['personid'],
+    attributes: ['personid', 'appid'],
     where: {
       personid: stripeEvent.data.object.id
     }
@@ -120,14 +100,15 @@ async function updatePerson (stripeEvent, stripeKey) {
     stripeObject
   }, {
     where: {
-      personid: stripeObject.id
+      personid: exists.dataValues.personid,
+      appid: exists.dataValues.appid
     }
   })
 }
 
 async function updateStripeAccount (stripeEvent, stripeKey) {
   const exists = await connect.Storage.StripeAccount.findOne({
-    attributes: ['stripeid'],
+    attributes: ['stripeid', 'appid'],
     where: {
       stripeid: stripeEvent.data.object.id
     }
@@ -144,27 +125,20 @@ async function updateStripeAccount (stripeEvent, stripeKey) {
     stripeObject
   }, {
     where: {
-      stripeid: stripeObject.id
+      stripeid: exists.dataValues.stripeid,
+      appid: exists.dataValues.appid
     }
   })
 }
 
 async function updatePayout (stripeEvent, stripeKey) {
-  Log.info('update payout', stripeEvent.data.object)
-  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
-    apiKey: stripeKey.apiKey,
-    stripeAccount: stripeEvent.account
-  })
-  if (!stripeObject) {
-    return
-  }
   let stripeAccount
   try {
-    stripeAccount = await global.api.administrator.connect.StripeAccount.get({
-      query: {
+    stripeAccount = await connect.Storage.StripeAccount.findOne({
+      where: {
+        attributes: ['stripeid', 'appid'],
         stripeid: stripeEvent.account
-      },
-      stripeKey
+      }
     })
   } catch (error) {
     Log.error('could not load stripe account', error)
@@ -173,17 +147,35 @@ async function updatePayout (stripeEvent, stripeKey) {
   if (!stripeAccount) {
     return
   }
-  await upsert(connect.Storage.Payout, 'payoutid', stripeObject.id, {
-    payoutid: stripeObject.id,
-    appid: stripeAccount.appid,
-    stripeObject
+  Log.info('update payout', stripeEvent.data.object)
+  const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
+    apiKey: stripeKey.apiKey,
+    stripeAccount: stripeEvent.account
   })
-  await connect.Storage.Payout.update({
-    stripeid: stripeAccount.stripeid,
-    accountid: stripeAccount.accountid
+  if (!stripeObject) {
+    return
+  }
+
+  const existing = await connect.Storage.Payout.findOne({
+    where: {
+      payoutid: stripeObject.id,
+      appid: stripeAccount.dataValues.appid
+    }
+  })
+  if (!existing) {
+    return connect.Storage.Payout.create({
+      payoutid: stripeObject.id,
+      stripeid: stripeAccount.dataValues.stripeid,
+      appid: stripeAccount.dataValues.appid,
+      stripeObject      
+    })
+  }
+  return connect.Storage.update({
+    stripeObject      
   }, {
     where: {
-      payoutid: stripeObject.id
+      payoutid: stripeObject.id,
+      appid: stripeAccount.dataValues.appid,
     }
   })
 }

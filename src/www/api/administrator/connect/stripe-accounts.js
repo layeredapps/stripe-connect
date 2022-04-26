@@ -3,15 +3,15 @@ const connect = require('../../../../../index.js')
 module.exports = {
   get: async (req) => {
     req.query = req.query || {}
-    let where
+    const where = {
+      appid: req.appid || global.appid
+    }
     if (req.query.accountid) {
       const account = await global.api.administrator.Account.get(req)
       if (!account) {
         throw new Error('invalid-accountid')
       }
-      where = {
-        accountid: req.query.accountid
-      }
+      where.accountid = req.query.accountid
     }
     let stripeids
     if (req.query.all) {

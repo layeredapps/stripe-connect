@@ -10,7 +10,8 @@ module.exports = {
     if (!stripeAccount) {
       const stripeAccountInfo = await connect.Storage.StripeAccount.findOne({
         where: {
-          stripeid: req.query.stripeid
+          stripeid: req.query.stripeid,
+          appid: req.appid || global.appid
         }
       })
       if (!stripeAccountInfo) {

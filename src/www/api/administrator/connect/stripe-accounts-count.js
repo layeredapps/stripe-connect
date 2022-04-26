@@ -2,14 +2,14 @@ const connect = require('../../../../../index.js')
 
 module.exports = {
   get: async (req) => {
-    let where
-    if (req.query && req.query.accountid) {
-      where = {
-        where: {
-          accountid: req.query.accountid
-        }
-      }
+    const where = {
+      appid: req.appid || global.appid
     }
-    return connect.Storage.StripeAccount.count(where)
+    if (req.query && req.query.accountid) {
+      where.accountid = req.query.accountid
+    }
+    return connect.Storage.StripeAccount.count({
+      where
+    })
   }
 }

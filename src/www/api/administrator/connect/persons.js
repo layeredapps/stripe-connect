@@ -3,7 +3,9 @@ const connect = require('../../../../../index.js')
 module.exports = {
   get: async (req) => {
     req.query = req.query || {}
-    let where
+    const where = {
+      appid: req.appid || global.appid
+    }
     if (req.query.stripeid) {
       const stripeAccount = await global.api.administrator.connect.StripeAccount.get(req)
       if (!stripeAccount) {
@@ -12,9 +14,7 @@ module.exports = {
       if (stripeAccount.stripeObject.business_type !== 'company') {
         throw new Error('invalid-stripe-account')
       }
-      where = {
-        stripeid: req.query.stripeid
-      }
+      where.stripeid = req.query.stripeid
     }
     let personids
     if (req.query.all) {

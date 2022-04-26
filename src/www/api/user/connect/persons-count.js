@@ -14,7 +14,8 @@ module.exports = {
     }
     return connect.Storage.Person.count({
       where: {
-        stripeid: req.query.stripeid
+        stripeid: req.query.stripeid,
+        appid: req.appid || global.appid
       }
     })
   }

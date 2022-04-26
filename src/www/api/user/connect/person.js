@@ -10,7 +10,8 @@ module.exports = {
     if (!person) {
       const personInfo = await connect.Storage.Person.findOne({
         where: {
-          personid: req.query.personid
+          personid: req.query.personid,
+          appid: req.appid || global.appid
         }
       })
       if (!personInfo) {

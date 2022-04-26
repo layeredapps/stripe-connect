@@ -41,7 +41,8 @@ module.exports = {
           tokenUpdate: new Date()
         }, {
           where: {
-            stripeid: req.query.stripeid
+            stripeid: req.query.stripeid,
+            appid: req.appid || global.appid
           }
         })
         await dashboard.StorageCache.remove(req.query.stripeid)
@@ -296,7 +297,8 @@ module.exports = {
         stripeObject: stripeAccountNow
       }, {
         where: {
-          stripeid: req.query.stripeid
+          stripeid: req.query.stripeid,
+          appid: req.appid || global.appid
         }
       })
       await dashboard.StorageCache.remove(req.query.stripeid)
