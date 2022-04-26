@@ -1,4 +1,4 @@
-@layeredapps/dashboard 0.0.61
+@layeredapps/dashboard 0.0.63
 http://localhost:8000
 
 Administrator menu:
@@ -177,4 +177,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-04-26T01:31:48.819Z
+2022-04-26T11:58:27.580Z
