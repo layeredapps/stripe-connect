@@ -2,8 +2,52 @@
 const assert = require('assert')
 const TestHelper = require('../../../../test-helper.js')
 const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
+const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/delete-person', function () {
+  let cachedResponses
+  async function bundledData (retryNumber) {
+    if (retryNumber > 0) {
+      cachedResponses = {}
+      await TestHelper.rotateWebhook(true)
+    }
+    if (cachedResponses && cachedResponses.finished) {
+      return
+    }
+    cachedResponses = {}
+    await DashboardTestHelper.setupBeforeEach()
+    await TestHelper.setupBeforeEach()
+    const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
+    const user2 = await TestHelper.createUser()
+    let req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
+    req.account = user2.account
+    req.session = user2.session
+    try {
+      await req.route.api.before(req)
+    } catch (error) {
+      cachedResponses.invalidAccount = error.message
+    }
+    req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
+    req.account = user.account
+    req.session = user.session
+    await req.route.api.before(req)
+    cachedResponses.before = req.data
+    cachedResponses.view = await req.get()
+    req.filename = __filename
+    req.screenshots = [
+      { hover: '#account-menu-container' },
+      { click: '/account/connect' },
+      { click: '/account/connect/stripe-accounts' },
+      { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
+      { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
+      { click: `/account/connect/person?personid=${user.owner.personid}` },
+      { click: `/account/connect/delete-person?personid=${user.owner.personid}` },
+      { fill: '#submit-form' }
+    ]
+    cachedResponses.submit = await req.post()
+    cachedResponses.finished = true
+  }
+
   describe('exceptions', () => {
     it('should reject invalid personid', async () => {
       const user = await TestHelper.createUser()
@@ -19,40 +63,25 @@ describe('/account/connect/delete-person', function () {
       assert.strictEqual(errorMessage, 'invalid-personid')
     })
 
-    it('should require own Stripe account', async () => {
-      const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
-      const user2 = await TestHelper.createUser()
-      const req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
-      req.account = user2.account
-      req.session = user2.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
+    it('should require own Stripe account', async function () {
+      await bundledData(this.test.currentRetry())
+      const errorMessage = cachedResponses.invalidAccount
       assert.strictEqual(errorMessage, 'invalid-account')
     })
   })
 
   describe('before', () => {
-    it('should bind data to req', async () => {
-      const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
-      const req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
-      req.account = user.account
-      req.session = user.session
-      await req.route.api.before(req)
-      assert.strictEqual(req.data.person.id, user.owner.personid)
+    it('should bind data to req', async function () {
+      await bundledData(this.test.currentRetry())
+      const data = cachedResponses.before
+      assert.strictEqual(data.person.object, 'person')
     })
   })
 
   describe('view', () => {
-    it('should present the form', async () => {
-      const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
-      const req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
-      req.account = user.account
-      req.session = user.session
-      const result = await req.get()
+    it('should present the form', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
       assert.strictEqual(doc.getElementById('submit-form').tag, 'form')
       assert.strictEqual(doc.getElementById('submit-button').tag, 'button')
@@ -60,29 +89,13 @@ describe('/account/connect/delete-person', function () {
   })
 
   describe('submit', () => {
-    it('should delete person (screenshots)', async () => {
-      const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
-      const req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
-      req.account = user.account
-      req.session = user.session
-      req.filename = __filename
-      req.screenshots = [
-        { hover: '#account-menu-container' },
-        { click: '/account/connect' },
-        { click: '/account/connect/stripe-accounts' },
-        { click: `/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/persons?stripeid=${user.stripeAccount.stripeid}` },
-        { click: `/account/connect/person?personid=${user.owner.personid}` },
-        { click: `/account/connect/delete-person?personid=${user.owner.personid}` },
-        { fill: '#submit-form' }
-      ]
-      global.pageSize = 50
-      await req.post()
-      const req2 = TestHelper.createRequest(`/api/user/connect/persons?stripeid=${user.stripeAccount.stripeid}`)
-      req2.account = user.account
-      req2.session = user.session
-      const owners = await req2.get()
-      assert.strictEqual(owners, undefined)
+    it('should delete person (screenshots)', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.submit
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'success')
     })
   })
 })
