@@ -1,4 +1,4 @@
-const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect')
+const Log = require('@layeredapps/dashboard/src/log.js')('stripe-connect-webhook')
 const packageJSON = require('../../../../package.json')
 const stripe = require('stripe')({
   apiVersion: global.stripeAPIVersion,
@@ -89,6 +89,7 @@ async function load (id, group, key) {
   try {
     return stripeCache.retrieve(id, group, key)
   } catch (error) {
+    Log.error('could not load object', id, group, error)
   }
 }
 
@@ -96,10 +97,21 @@ async function loadPerson (stripeid, id, key) {
   try {
     return stripeCache.retrievePerson(stripeid, id, key)
   } catch (error) {
+    Log.error('could not load person', id, error)
   }
 }
 
 async function updatePerson (stripeEvent, stripeKey) {
+  const exists = await connect.Storage.Person.findOne({
+    attributes: ['personid'],
+    where: {
+      personid: stripeEvent.data.object.id
+    }
+  })
+  if (!exists || !exists.dataValues || !exists.dataValues.personid) {
+    return
+  }
+  Log.info('update person', stripeEvent.data.object)
   const stripeObject = await loadPerson(stripeEvent.data.object.account, stripeEvent.data.object.id, stripeKey)
   if (!stripeObject) {
     return
@@ -114,6 +126,16 @@ async function updatePerson (stripeEvent, stripeKey) {
 }
 
 async function updateStripeAccount (stripeEvent, stripeKey) {
+  const exists = await connect.Storage.StripeAccount.findOne({
+    attributes: ['stripeid'],
+    where: {
+      stripeid: stripeEvent.data.object.id
+    }
+  })
+  if (!exists || !exists.dataValues || !exists.dataValues.stripeid) {
+    return
+  }
+  Log.info('update stripe account', stripeEvent.data.object)
   const stripeObject = await load(stripeEvent.data.object.id, 'accounts', stripeKey)
   if (!stripeObject) {
     return
@@ -128,6 +150,7 @@ async function updateStripeAccount (stripeEvent, stripeKey) {
 }
 
 async function updatePayout (stripeEvent, stripeKey) {
+  Log.info('update payout', stripeEvent.data.object)
   const stripeObject = await load(stripeEvent.data.object.id, 'payouts', {
     apiKey: stripeKey.apiKey,
     stripeAccount: stripeEvent.account
@@ -144,6 +167,7 @@ async function updatePayout (stripeEvent, stripeKey) {
       stripeKey
     })
   } catch (error) {
+    Log.error('could not load stripe account', error)
     return
   }
   if (!stripeAccount) {
