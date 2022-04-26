@@ -5,6 +5,8 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/api/user/connect/set-stripe-account-submitted', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   let cachedResponses
   async function bundledData (retryNumber) {
     if (retryNumber > 0) {

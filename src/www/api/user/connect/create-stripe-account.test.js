@@ -2,7 +2,9 @@
 const assert = require('assert')
 const TestHelper = require('../../../../../test-helper.js')
 
-describe('/api/user/connect/create-stripe-account', () => {
+describe('/api/user/connect/create-stripe-account', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('exceptions', () => {
     describe('invalid-accountid', () => {
       it('missing querystring accountid', async () => {

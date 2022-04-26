@@ -4,6 +4,8 @@ const TestHelper = require('../../../../../test-helper.js')
 const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
 describe('/api/administrator/connect/person', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('exceptions', () => {
     describe('invalid-personid', () => {
       it('missing querystring personid', async () => {

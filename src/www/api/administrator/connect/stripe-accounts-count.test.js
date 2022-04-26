@@ -2,7 +2,9 @@
 const assert = require('assert')
 const TestHelper = require('../../../../../test-helper.js')
 
-describe('/api/administrator/connect/stripe-accounts-count', () => {
+describe('/api/administrator/connect/stripe-accounts-count', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('returns', () => {
     it('integer', async () => {
       const administrator = await TestHelper.createOwner()

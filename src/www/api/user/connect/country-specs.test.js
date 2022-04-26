@@ -2,7 +2,9 @@
 const assert = require('assert')
 const TestHelper = require('../../../../../test-helper.js')
 
-describe('/api/user/connect/country-specs', () => {
+describe('/api/user/connect/country-specs', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('receives', () => {
     it('optional querystring offset (integer)', async () => {
       const offset = 1

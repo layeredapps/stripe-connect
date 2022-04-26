@@ -3,7 +3,9 @@ const assert = require('assert')
 const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
-describe('/api/user/connect/create-person', () => {
+describe('/api/user/connect/create-person', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   let cachedResponses
   async function bundledData (retryNumber) {
     if (retryNumber > 0) {

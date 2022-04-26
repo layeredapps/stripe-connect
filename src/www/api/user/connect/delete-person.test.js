@@ -4,7 +4,9 @@ const TestHelper = require('../../../../../test-helper.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 
-describe('/api/user/connect/delete-person', () => {
+describe('/api/user/connect/delete-person', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   let cachedResponses
   async function bundledData (retryNumber) {
     if (retryNumber > 0) {

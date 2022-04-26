@@ -5,6 +5,8 @@ const TestStripeAccounts = require('../../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/api/user/connect/update-payment-information', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('exceptions', () => {
     let cachedResponses
     async function bundledData (retryNumber) {

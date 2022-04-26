@@ -2,7 +2,9 @@
 const assert = require('assert')
 const TestHelper = require('../../../../../test-helper.js')
 
-describe('/api/user/connect/country-spec', () => {
+describe('/api/user/connect/country-spec', function () {
+  before(TestHelper.disableMetrics)
+  after(TestHelper.enableMetrics)
   describe('exceptions', () => {
     it('missing querystring countryid', async () => {
       const user = await TestHelper.createUser()
