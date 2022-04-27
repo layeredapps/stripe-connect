@@ -237,8 +237,10 @@ async function setupBeforeEach () {
     require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   await connect.Storage.flush()
-  await rotateWebhook()
-  global.webhooks = []
+  if (!global.webhooks || global.webhooks.length) {
+    await rotateWebhook()
+    global.webhooks = []
+  }
 }
 
 async function rotateWebhook (remake) {
