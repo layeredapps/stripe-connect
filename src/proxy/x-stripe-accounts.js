@@ -1,4 +1,6 @@
-module.exports = async (req, proxyRequestOptions) => {
+module.exports = addXStripeAccountsHeader
+
+async function addXStripeAccountsHeader (req, proxyRequestOptions) {
   if (!req.account) {
     return
   }
