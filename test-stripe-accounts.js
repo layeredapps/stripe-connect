@@ -238,7 +238,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'individual'
     })
     await waitForAccountField(user, 'individual.dob.day')
@@ -263,7 +263,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
@@ -321,7 +321,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     if (numOwners && user.stripeAccount.requiresOwners) {
@@ -339,7 +339,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     if (numDirectors && user.stripeAccount.requiresDirectors) {
@@ -357,7 +357,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     if (numExecutives && user.stripeAccount.requiresExecutives) {
@@ -375,7 +375,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     user.representative = await TestHelper.createPerson(user, {
@@ -402,7 +402,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     if (user.stripeAccount.requiresOwners) {
@@ -437,7 +437,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
@@ -489,7 +489,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
@@ -541,7 +541,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     await TestHelper.createPerson(user, {
@@ -594,7 +594,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'company'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
@@ -646,7 +646,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'individual'
     })
     const accountData = createAccountData(user.profile, country, user.stripeAccount.stripeObject)
@@ -657,7 +657,7 @@ const TestStripeAccounts = module.exports = {
     country = country || 'US'
     const user = existingUser || await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
-      country: country,
+      country,
       business_type: 'individual'
     })
     const bankingData = createBankingData(user.stripeAccount.stripeObject.business_type, user.profile, user.stripeAccount.stripeObject.country)
