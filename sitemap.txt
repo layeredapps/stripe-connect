@@ -15,7 +15,7 @@ Special HTML files:
 @layeredapps/dashboard/redirect.html
 
 Dashboard modules:
-@layeredapps/maxmind-geoip (1.0.19)
+@layeredapps/maxmind-geoip (1.0.20)
 
 URL -------------------------------------------------- AUTH - TEMPLATE - HTTP REQUESTS - NODEJS ----------------------- HTML ---------------------
 /                                                      GUEST  FULLSCREEN                 static-page                    /src/www                  
@@ -177,4 +177,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-04-27T05:10:28.487Z
+2022-04-27T05:12:30.907Z
