@@ -247,6 +247,7 @@ async function rotateWebhook (remake) {
   Log.info('rotateWebhook', remake)
   if (!global.webhooks) {
     global.webhooks = []
+    await setupWebhook()
   } else if (global.webhooks.length > 0) {
     webhookRotation += global.webhooks.length
     if (remake || webhookRotation >= 20) {
