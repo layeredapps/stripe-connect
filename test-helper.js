@@ -7,6 +7,9 @@ global.maximumStripeRetries = 0
 global.testConfiguration = global.testConfiguration || {}
 global.testConfiguration.stripeJS = false
 global.testConfiguration.maximumStripeRetries = 0
+global.testConfiguration.stripeKey = process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+global.testConfiguration.stripePublishableKey = process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
+global.testConfiguration.subscriptionWebhookEndPointSecret = process.env.CONNECT_WEBHOOK_SECRET || false
 
 const Log = require('@layeredapps/dashboard/src/log.js')('test-helper-stripe-connect')
 const path = require('path')

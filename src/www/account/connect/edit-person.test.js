@@ -9,7 +9,6 @@ describe('/account/connect/edit-person', function () {
   async function bundledData (retryNumber) {
     if (retryNumber > 0) {
       cachedResponses = {}
-      await TestHelper.rotateWebhook(true)
     }
     if (cachedResponses && cachedResponses.finished) {
       return
@@ -17,6 +16,8 @@ describe('/account/connect/edit-person', function () {
     cachedResponses = {}
     await DashboardTestHelper.setupBeforeEach()
     await TestHelper.setupBeforeEach()
+    global.webhooks = [true]
+    await TestHelper.rotateWebhook(true)
     const user = await TestHelper.createUser()
     await TestHelper.createStripeAccount(user, {
       country: 'AU',
@@ -27,8 +28,8 @@ describe('/account/connect/edit-person', function () {
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
-    await TestHelper.rotateWebhook()
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'first_name')
+    await TestHelper.rotateWebhook(true)
     let req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
     req.account = user.account
     req.session = user.session
@@ -56,13 +57,13 @@ describe('/account/connect/edit-person', function () {
       country: 'HK',
       business_type: 'company'
     })
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    await TestHelper.rotateWebhook(true)
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
     req.account = user.account
     req.session = user.session
@@ -76,13 +77,13 @@ describe('/account/connect/edit-person', function () {
       country: 'JP',
       business_type: 'company'
     })
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'address_kana.city')
+    await TestHelper.rotateWebhook(true)
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
     req.account = user.account
     req.session = user.session
@@ -92,7 +93,6 @@ describe('/account/connect/edit-person', function () {
       country: 'US',
       business_type: 'company'
     })
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_executive: 'true',
@@ -100,6 +100,7 @@ describe('/account/connect/edit-person', function () {
       relationship_percent_ownership: '0'
     })
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    await TestHelper.rotateWebhook(true)
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
     req.account = user.account
     req.session = user.session
@@ -115,7 +116,6 @@ describe('/account/connect/edit-person', function () {
       country: 'AT',
       business_type: 'company'
     })
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_representative: 'true',
       relationship_executive: 'true',
@@ -127,13 +127,11 @@ describe('/account/connect/edit-person', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.email = await req.get()
-    await TestHelper.rotateWebhook()
     req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
     req.body.email = '-1'
     cachedResponses['invalid-email'] = await req.post()
     req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
     await req.post()
-    await TestHelper.rotateWebhook()
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.document')
     await TestStripeAccounts.waitForPersonField(user, 'representative', 'verification.additional_document')
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
@@ -380,6 +378,8 @@ describe('/account/connect/edit-person', function () {
 
   describe('submit', async () => {
     it('should update person no stripe.js', async () => {
+      global.webhooks = [true]
+      await TestHelper.rotateWebhook(true)
       const user = await TestStripeAccounts.createCompanyWithOwners('DE', 1)
       const req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.owner.personid}`)
       req.account = user.account
@@ -394,6 +394,8 @@ describe('/account/connect/edit-person', function () {
     })
 
     it('should update person stripe.js v3 (screenshots)', async () => {
+      global.webhooks = [true]
+      await TestHelper.rotateWebhook(true)
       const user = await TestStripeAccounts.createCompanyWithOwners('US', 1)
       const req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.owner.personid}`)
       req.account = user.account
