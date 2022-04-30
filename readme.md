@@ -1,4 +1,4 @@
-# Documentation for Stripe Connect
+# Documentation for Stripe Connect module
 
 #### Shortcuts
 
