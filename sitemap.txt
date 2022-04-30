@@ -1,5 +1,5 @@
 @layeredapps/dashboard 0.0.72
-http://localhost:8000
+http://localhost:50009
 
 Administrator menu:
 @layeredapps/stripe-connect/src/www/administrator/connect "Stripe Connect <span translate="yes">module</span>"
@@ -177,4 +177,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-04-29T22:27:38.648Z
+2022-04-30T03:15:51.510Z
