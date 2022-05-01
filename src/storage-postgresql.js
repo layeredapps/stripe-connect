@@ -6,6 +6,5 @@ module.exports = async () => {
   const sequelize = new Sequelize(prefixedDatabaseURL, {
     logging: Log.info
   })
-  await sequelize.query('CREATE EXTENSION IF NOT EXISTS "uuid-ossp";')
   return sequelize
 }
