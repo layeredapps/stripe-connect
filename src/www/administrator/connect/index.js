@@ -66,29 +66,39 @@ async function beforeRequest (req) {
 
 async function renderPage (req, res) {
   const doc = dashboard.HTML.parse(req.html || req.route.html)
-  if (req.data.createdChartDays && req.data.createdChartDays.length) {
-    dashboard.HTML.renderList(doc, req.data.createdChartDays, 'chart-column', 'created-chart')
-    dashboard.HTML.renderList(doc, req.data.createdChartValues, 'chart-value', 'created-values')
-    dashboard.HTML.renderTemplate(doc, req.data.createdChartHighlights, 'metric-highlights', 'created-highlights')
+  const removeElements = []
+  if (req.data) {
+    if (req.data.createdChartDays && req.data.createdChartDays.length) {
+      dashboard.HTML.renderList(doc, req.data.createdChartDays, 'chart-column', 'created-chart')
+      dashboard.HTML.renderList(doc, req.data.createdChartValues, 'chart-value', 'created-values')
+      dashboard.HTML.renderTemplate(doc, req.data.createdChartHighlights, 'metric-highlights', 'created-highlights')
+    } else {
+      const createdChart = doc.getElementById('created-chart-container')
+      createdChart.parentNode.removeChild(createdChart)
+    }
+    if (req.data.approvedChartDays && req.data.approvedChartDays.length) {
+      dashboard.HTML.renderList(doc, req.data.approvedChartDays, 'chart-column', 'approved-chart')
+      dashboard.HTML.renderList(doc, req.data.approvedChartValues, 'chart-value', 'approved-values')
+      dashboard.HTML.renderTemplate(doc, req.data.approvedChartHighlights, 'metric-highlights', 'approved-highlights')
+    } else {
+      const approvedChart = doc.getElementById('approved-chart-container')
+      approvedChart.parentNode.removeChild(approvedChart)
+    }
+    if (req.data.payoutsChartDays && req.data.payoutsChartDays.length) {
+      dashboard.HTML.renderList(doc, req.data.payoutsChartDays, 'chart-column', 'payouts-chart')
+      dashboard.HTML.renderList(doc, req.data.payoutsChartValues, 'chart-value', 'payouts-values')
+      dashboard.HTML.renderTemplate(doc, req.data.payoutsChartHighlights, 'metric-highlights', 'payouts-highlights')
+    } else {
+      const payoutsChart = doc.getElementById('payouts-chart-container')
+      payoutsChart.parentNode.removeChild(payoutsChart)
+    }
+    removeElements.push('no-stripe-accounts')
   } else {
-    const createdChart = doc.getElementById('created-chart-container')
-    createdChart.parentNode.removeChild(createdChart)
+    removeElements.push('created-chart-container', 'approved-chart-container', 'payouts-chart-container')
   }
-  if (req.data.approvedChartDays && req.data.approvedChartDays.length) {
-    dashboard.HTML.renderList(doc, req.data.approvedChartDays, 'chart-column', 'approved-chart')
-    dashboard.HTML.renderList(doc, req.data.approvedChartValues, 'chart-value', 'approved-values')
-    dashboard.HTML.renderTemplate(doc, req.data.approvedChartHighlights, 'metric-highlights', 'approved-highlights')
-  } else {
-    const approvedChart = doc.getElementById('approved-chart-container')
-    approvedChart.parentNode.removeChild(approvedChart)
-  }
-  if (req.data.payoutsChartDays && req.data.payoutsChartDays.length) {
-    dashboard.HTML.renderList(doc, req.data.payoutsChartDays, 'chart-column', 'payouts-chart')
-    dashboard.HTML.renderList(doc, req.data.payoutsChartValues, 'chart-value', 'payouts-values')
-    dashboard.HTML.renderTemplate(doc, req.data.payoutsChartHighlights, 'metric-highlights', 'payouts-highlights')
-  } else {
-    const payoutsChart = doc.getElementById('payouts-chart-container')
-    payoutsChart.parentNode.removeChild(payoutsChart)
-  }
+  for (const id of removeElements) {
+    const element = doc.getElementById(id)
+    element.parentNode.removeChild(element)
+  }  
   return dashboard.Response.end(req, res, doc)
 }
