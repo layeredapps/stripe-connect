@@ -23,9 +23,36 @@
     "pg": "latest",
     "pg-hstore": "latest",
     "puppeteer": "latest",
+    "redis": "latest",
     "sqlite3": "latest",
     "standard": "latest",
     "tedious": "latest"
+  },
+  "peerDependenciesMeta": {
+    "pg": {
+      "optional": true
+    },
+    "pg-hstore": {
+      "optional": true
+    },
+    "mysql2": {
+      "optional": true
+    },
+    "ibm_db": {
+      "optional": true
+    },
+    "mariadb": {
+      "optional": true
+    },
+    "redis": {
+      "optional": true
+    },
+    "sqlite3": {
+      "optional": true
+    },
+    "tedious": {
+      "optional": true
+    }
   },
   "engines": {
     "node": ">=16",
