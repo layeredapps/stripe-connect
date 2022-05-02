@@ -99,6 +99,6 @@ async function renderPage (req, res) {
   for (const id of removeElements) {
     const element = doc.getElementById(id)
     element.parentNode.removeChild(element)
-  }  
+  }
   return dashboard.Response.end(req, res, doc)
 }
