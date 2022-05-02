@@ -6,6 +6,9 @@ module.exports = {
     if (!req.query || !req.query.stripeid) {
       throw new Error('invalid-stripeid')
     }
+    if (!req.body) {
+      throw new Error('invalid-selection')
+    }
     const stripeAccount = await global.api.user.connect.StripeAccount.get(req)
     if (!stripeAccount) {
       throw new Error('invalid-stripeid')

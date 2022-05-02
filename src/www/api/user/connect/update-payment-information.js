@@ -1,6 +1,6 @@
 const connect = require('../../../../../index.js')
-const stripeCache = require('../../../../stripe-cache.js')
 const dashboard = require('@layeredapps/dashboard')
+const stripeCache = require('../../../../stripe-cache.js')
 
 module.exports = {
   patch: async (req) => {
