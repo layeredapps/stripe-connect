@@ -70,7 +70,7 @@ describe('/account/connect/submit-company-executives', function () {
     cachedResponses.formWithExecutives = await req.get()
     // submit executives
     req.filename = __filename
-        req.screenshots = [
+    req.screenshots = [
       { hover: '#account-menu-container' },
       { click: '/account/connect' },
       { click: '/account/connect/stripe-accounts' },

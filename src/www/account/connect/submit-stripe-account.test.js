@@ -150,7 +150,7 @@ describe('/account/connect/submit-stripe-account', function () {
     req.puppeteer = false
     req.account = user.account
     req.session = user.session
-        cachedResponses.csrf = await req.post()
+    cachedResponses.csrf = await req.post()
     delete (req.puppeteer)
     // 8) submitted
     req.filename = __filename

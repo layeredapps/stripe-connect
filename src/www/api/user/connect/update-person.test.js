@@ -171,7 +171,7 @@ describe('/api/user/connect/update-person', function () {
     req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user3.representative.personid}`)
     req.account = user3.account
     req.session = user3.session
-        try {
+    try {
       await req.patch(req)
     } catch (error) {
       cachedResponses.invalidPerson = error.message
@@ -203,7 +203,7 @@ describe('/api/user/connect/update-person', function () {
     req = TestHelper.createRequest(`/api/user/connect/update-person?personid=${user.representative.personid}`)
     req.account = user.account
     req.session = user.session
-        req.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
+    req.uploads = TestStripeAccounts.createPersonUploadData(user.representative.stripeObject)
     result = await req.patch()
     for (const field in req.uploads) {
       cachedResponses[field] = cachedResponses[field] || result.stripeObject
@@ -274,7 +274,7 @@ describe('/api/user/connect/update-person', function () {
     req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user3.owner.personid}`)
     req.account = user3.account
     req.session = user3.session
-        req.uploads = TestStripeAccounts.createPersonUploadData(user3.owner.stripeObject)
+    req.uploads = TestStripeAccounts.createPersonUploadData(user3.owner.stripeObject)
     req.waitBefore = async (page) => {
       while (true) {
         try {
@@ -313,7 +313,7 @@ describe('/api/user/connect/update-person', function () {
         const req = TestHelper.createRequest('/api/user/connect/update-person')
         req.account = user.account
         req.session = user.session
-                let errorMessage
+        let errorMessage
         try {
           await req.patch(req)
         } catch (error) {
@@ -328,7 +328,7 @@ describe('/api/user/connect/update-person', function () {
         const req = TestHelper.createRequest('/api/user/connect/update-person?personid=invalid')
         req.account = user.account
         req.session = user.session
-                let errorMessage
+        let errorMessage
         try {
           await req.patch(req)
         } catch (error) {

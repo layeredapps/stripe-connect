@@ -70,7 +70,7 @@ describe('/account/connect/submit-company-owners', function () {
     cachedResponses.formWithOwners = await req.get()
     // submit owners
     req.filename = __filename
-        req.screenshots = [
+    req.screenshots = [
       { hover: '#account-menu-container' },
       { click: '/account/connect' },
       { click: '/account/connect/stripe-accounts' },
