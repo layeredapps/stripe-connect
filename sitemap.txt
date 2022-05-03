@@ -1,4 +1,4 @@
-@layeredapps/dashboard 0.0.85
+@layeredapps/dashboard 0.0.88
 http://localhost:8000
 
 Administrator menu:
@@ -16,6 +16,14 @@ Special HTML files:
 
 Dashboard modules:
 @layeredapps/maxmind-geoip (1.0.23)
+
+Content handlers:
+@layeredapps/dashboard/src/content/insert-csrf-token.js
+@layeredapps/dashboard/src/content/set-form-return-url.js
+
+Server handlers:
+@layeredapps/dashboard/src/server/check-csrf-token.js
+@layeredapps/dashboard/src/server/check-xss-injection.js
 
 URL -------------------------------------------------- AUTH - TEMPLATE - HTTP REQUESTS - NODEJS ----------------------- HTML ---------------------
 /                                                      GUEST  FULLSCREEN                 static-page                    /src/www                  
@@ -60,7 +68,7 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /account/signin                                        GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
 /account/signout                                       GUEST  FULLSCREEN GET             @layeredapps/dashboard         @layeredapps/dashboard    
 /account/signout-complete                              GUEST  FULLSCREEN                 static-page                    @layeredapps/dashboard    
-/account/verify                                        GUEST  FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
+/account/verify                                               FULLSCREEN GET POST        @layeredapps/dashboard         @layeredapps/dashboard    
 /administrator                                                           GET             @layeredapps/dashboard         @layeredapps/dashboard    
 /administrator/account                                                   GET             @layeredapps/dashboard         @layeredapps/dashboard    
 /administrator/account-profiles                                          GET             @layeredapps/dashboard         @layeredapps/dashboard    
@@ -177,4 +185,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-05-02T23:59:23.303Z
+2022-05-03T11:54:03.861Z
