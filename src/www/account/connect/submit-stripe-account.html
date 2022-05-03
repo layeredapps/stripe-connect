@@ -56,6 +56,7 @@
         </div>
       </div>
       <form id="submit-form" method="post" class="input-form" action="/account/connect/submit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
+        <input type="hidden" name="csrf-token" />
         <label>
           <input checked disabled type="checkbox"> I have provided complete and accurate information
         </label>
@@ -123,6 +124,16 @@
     <template id="unknown-error">
       <div class="error message" translate="yes">
         Error! An error occurred submitting the registration
+      </div>
+    </template>
+    <template id="invalid-csrf-token">
+      <div class="error message" translate="yes">
+        Error! This form was not submitted correctly
+      </div>
+    </template>
+    <template id="invalid-xss-input">
+      <div class="error message" translate="yes">
+        Error! Invalid value(s) were posted to the server
       </div>
     </template>
   </body>

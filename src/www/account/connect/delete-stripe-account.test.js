@@ -45,6 +45,16 @@ describe('/account/connect/delete-stripe-account', function () {
       { fill: '#submit-form' }
     ]
     cachedResponses.submit = await req.post()
+    // invalid csrf
+    await TestHelper.createStripeAccount(user, {
+      country: 'US',
+      business_type: 'individual'
+    })
+    req = TestHelper.createRequest(`/account/connect/delete-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+    req.puppeteer = false
+    req.account = user.account
+    req.session = user.session
+    cachedResponses.csrf = await req.post()
     cachedResponses.finished = true
   }
 
@@ -96,6 +106,17 @@ describe('/account/connect/delete-stripe-account', function () {
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'success')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

@@ -41,6 +41,11 @@ describe('/administrator/connect/delete-stripe-account', function () {
     global.pageSize = 50
     global.packageJSON.dashboard.server.push(ScreenshotData.administratorIndex)
     global.packageJSON.dashboard.server.push(ScreenshotData.administratorStripeAccounts)
+    // csrf
+    req.puppeteer = false
+    cachedResponses.csrf = await req.post()
+    delete (req.puppeteer)
+    // submit
     cachedResponses.submit = await req.post()
     cachedResponses.finished = true
   }
@@ -70,6 +75,17 @@ describe('/administrator/connect/delete-stripe-account', function () {
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'success')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

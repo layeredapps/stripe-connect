@@ -146,6 +146,12 @@ describe('/account/connect/submit-stripe-account', function () {
     await req.route.api.before(req)
     cachedResponses.before = req.data
     cachedResponses.companyForm = await req.get()
+    // csrf
+    req.puppeteer = false
+    req.account = user.account
+    req.session = user.session
+        cachedResponses.csrf = await req.post()
+    delete (req.puppeteer)
     // 8) submitted
     req.filename = __filename
     req.screenshots = [
@@ -309,6 +315,17 @@ describe('/account/connect/submit-stripe-account', function () {
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'success')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

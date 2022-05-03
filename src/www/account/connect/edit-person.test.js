@@ -138,6 +138,25 @@ describe('/account/connect/edit-person', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.uploads = await req.get()
+
+    // xss
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_executive: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    req.account = user.account
+    req.session = user.session
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body.address_city = '<script>'
+    cachedResponses.xss = await req.post()
+    // csrf
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body['csrf-token'] = 'invalid'
+    cachedResponses.csrf = await req.post()
     cachedResponses.finished = true
   }
 
@@ -436,7 +455,7 @@ describe('/account/connect/edit-person', function () {
   })
 
   describe('errors', () => {
-    it('reject invalid field dob_day', async function () {
+    it('invalid-dob_day', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-dob_day']
       const doc = TestHelper.extractDoc(result.html)
@@ -444,7 +463,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-dob_day')
     })
-    it('reject invalid field dob_month', async function () {
+    it('invalid-dob_month', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-dob_month']
       const doc = TestHelper.extractDoc(result.html)
@@ -452,7 +471,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-dob_month')
     })
-    it('reject invalid field dob_year', async function () {
+    it('invalid-dob_year', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-dob_year']
       const doc = TestHelper.extractDoc(result.html)
@@ -460,7 +479,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-dob_year')
     })
-    it('reject invalid field relationship_percent_ownership', async function () {
+    it('invalid-relationship_percent_ownership', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-relationship_percent_ownership']
       const doc = TestHelper.extractDoc(result.html)
@@ -468,7 +487,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-relationship_percent_ownership')
     })
-    it('reject invalid field id_number', async function () {
+    it('invalid-id_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-id_number']
       const doc = TestHelper.extractDoc(result.html)
@@ -476,7 +495,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-id_number')
     })
-    it('reject invalid field phone', async function () {
+    it('invalid-phone', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-phone']
       const doc = TestHelper.extractDoc(result.html)
@@ -484,7 +503,7 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-phone')
     })
-    it('reject invalid field ssn_last_4', async function () {
+    it('invalid-ssn_last_4', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-ssn_last_4']
       const doc = TestHelper.extractDoc(result.html)
@@ -492,13 +511,31 @@ describe('/account/connect/edit-person', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-ssn_last_4')
     })
-    it('reject invalid field email', async function () {
+    it('invalid-email', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-email']
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-email')
+    })
+
+    it('invalid-xss-input', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.xss
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-xss-input')
+    })
+
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

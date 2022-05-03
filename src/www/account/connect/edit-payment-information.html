@@ -15,6 +15,7 @@
       <p translate="yes">Update the bank account that will receive your revenue payouts.</p>
       <div id="message-container"></div>
       <form id="submit-form" method="post" class="input-form" action="/account/connect/edit-payment-information?stripeid=${stripeAccount.id}" name="submit-form">
+        <input type="hidden" name="csrf-token" />
         <div class="country input-fields">
           <label class="field-label" for="country" translate="yes">Country of bank</label>
           <div class="field">
@@ -443,6 +444,16 @@
     <template id="invalid-transit_number">
       <div class="error message" translate="yes">
         Error! Invalid or missing transit number
+      </div>
+    </template>
+    <template id="invalid-csrf-token">
+      <div class="error message" translate="yes">
+        Error! This form was not submitted correctly
+      </div>
+    </template>
+    <template id="invalid-xss-input">
+      <div class="error message" translate="yes">
+        Error! Invalid value(s) were posted to the server
       </div>
     </template>
   </body>

@@ -352,10 +352,25 @@ describe('/account/connect/edit-payment-information', function () {
       req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
       req.body.routing_number = 'invalid'
       cachedResponses.invalidRoutingNumber = await req.post()
+      // xss
+      req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
+      req.account = user.account
+      req.session = user.session
+      req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
+      req.body.routing_number = '<script>'
+      cachedResponses.xss = await req.post()
+      // csrf
+      req = TestHelper.createRequest(`/account/connect/edit-payment-information?stripeid=${user.stripeAccount.stripeid}`)
+      req.puppeteer = false
+      req.account = user.account
+      req.session = user.session
+      req.body = TestStripeAccounts.createBankingData('individual', TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country)
+      req.body['csrf-token'] = 'invalid'
+      cachedResponses.csrf = await req.post()
       cachedResponses.finished = true
     }
 
-    it('reject invalid field account_holder_type', async function () {
+    it('invalid-account_holder_type', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidAccountHolderType
       const doc = TestHelper.extractDoc(result.html)
@@ -363,7 +378,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_holder_type')
     })
-    it('reject invalid field currency', async function () {
+    it('invalid-currency', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidCurrency
       const doc = TestHelper.extractDoc(result.html)
@@ -371,7 +386,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-currency')
     })
-    it('reject invalid field iban', async function () {
+    it('invalid-iban', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidIBAN
       const doc = TestHelper.extractDoc(result.html)
@@ -379,7 +394,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-iban')
     })
-    it('reject invalid field account_number', async function () {
+    it('invalid-account_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidAccountNumber
       const doc = TestHelper.extractDoc(result.html)
@@ -387,7 +402,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-account_number')
     })
-    it('reject invalid field bsb_number', async function () {
+    it('invalid-bsb_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidBSBNumber
       const doc = TestHelper.extractDoc(result.html)
@@ -395,7 +410,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bsb_number')
     })
-    it('reject invalid field institution_number', async function () {
+    it('invalid-institution_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidInstitutionNumber
       const doc = TestHelper.extractDoc(result.html)
@@ -403,7 +418,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-institution_number')
     })
-    it('reject invalid field transit_number', async function () {
+    it('invalid-transit_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidTransitNumber
       const doc = TestHelper.extractDoc(result.html)
@@ -411,7 +426,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-transit_number')
     })
-    it('reject invalid field sort_code', async function () {
+    it('invalid-sort_code', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidSortCode
       const doc = TestHelper.extractDoc(result.html)
@@ -419,7 +434,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-sort_code')
     })
-    it('reject invalid field clearing_code', async function () {
+    it('invalid-clearing_code', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidClearingCode
       const doc = TestHelper.extractDoc(result.html)
@@ -427,7 +442,7 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-clearing_code')
     })
-    it('reject invalid field bank_code', async function () {
+    it('invalid-bank_code', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidBankCode
       const doc = TestHelper.extractDoc(result.html)
@@ -435,13 +450,31 @@ describe('/account/connect/edit-payment-information', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-bank_code')
     })
-    it('reject invalid field routing_number', async function () {
+    it('invalid-routing_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalidRoutingNumber
       const doc = TestHelper.extractDoc(result.html)
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-routing_number')
+    })
+
+    it('invalid-xss-input', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.xss
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-xss-input')
+    })
+
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

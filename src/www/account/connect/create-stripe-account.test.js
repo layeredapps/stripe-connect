@@ -33,6 +33,20 @@ describe('/account/connect/create-stripe-account', () => {
       { fill: '#submit-form' }
     ]
     cachedResponses.submit = await req.post()
+    // xss
+    req.body = {
+      business_type: '<script>',
+      country: process.env.GENERATE_COUNTRY || 'US'
+    }
+    cachedResponses.xss = await req.post()
+    // csrf
+    req.body = {
+      business_type: 'company',
+      country: process.env.GENERATE_COUNTRY || 'US',
+      'csrf-token': 'invalid'
+    }
+    req.pupeteer = false
+    cachedResponses.csrf = await req.post()
     cachedResponses.finished = true
   }
 
@@ -58,6 +72,26 @@ describe('/account/connect/create-stripe-account', () => {
       const accountsTable = doc.getElementById('stripe-accounts-table')
       assert.notStrictEqual(accountsTable, undefined)
       assert.notStrictEqual(accountsTable, null)
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-xss-input', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.xss
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-xss-input')
+    })
+
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

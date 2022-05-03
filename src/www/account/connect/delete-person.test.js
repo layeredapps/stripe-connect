@@ -45,6 +45,17 @@ describe('/account/connect/delete-person', function () {
       { fill: '#submit-form' }
     ]
     cachedResponses.submit = await req.post()
+    // csrf
+    await TestHelper.createPerson(user, {
+      relationship_representative: 'true',
+      relationship_title: 'SVP Testing',
+      relationship_percent_ownership: '0'
+    })
+    req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
+    req.puppeteer = false
+    req.account = user.account
+    req.session = user.session
+    cachedResponses.csrf = await req.post()
     cachedResponses.finished = true
   }
 
@@ -96,6 +107,17 @@ describe('/account/connect/delete-person', function () {
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'success')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

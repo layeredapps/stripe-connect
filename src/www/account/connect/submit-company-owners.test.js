@@ -70,8 +70,7 @@ describe('/account/connect/submit-company-owners', function () {
     cachedResponses.formWithOwners = await req.get()
     // submit owners
     req.filename = __filename
-    req.body = {}
-    req.screenshots = [
+        req.screenshots = [
       { hover: '#account-menu-container' },
       { click: '/account/connect' },
       { click: '/account/connect/stripe-accounts' },
@@ -87,6 +86,11 @@ describe('/account/connect/submit-company-owners', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.noOwners = await req.get()
+    // csrf
+    req.puppeteer = false
+    cachedResponses.csrf = await req.post()
+    delete (req.puppeteer)
+    // submit
     cachedResponses.submitWithoutOwners = await req.post()
     cachedResponses.finished = true
   }
@@ -172,6 +176,17 @@ describe('/account/connect/submit-company-owners', function () {
       const messageContainer = doc.getElementById('message-container')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'success')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
     })
   })
 })

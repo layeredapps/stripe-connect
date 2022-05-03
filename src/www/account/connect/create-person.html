@@ -11,6 +11,7 @@
   <body>
     <div class="container">
       <form id="submit-form" method="post" class="input-form connect-form" action="/account/connect/create-person?stripeid=${stripeAccount.id}" name="submit-form">
+        <input type="hidden" name="csrf-token" />
         <h1 translate="yes">Create new person</h1>
         <p translate="yes">The board of directors, owners and representative must be kept up-to-date as your information changes.</p>
         <div id="message-container"></div>
@@ -86,6 +87,16 @@
     <template id="invalid-relationship_title">
       <div class="error message" translate="yes">
         Error! Invalid or missing relationship title
+      </div>
+    </template>
+    <template id="invalid-csrf-token">
+      <div class="error message" translate="yes">
+        Error! This form was not submitted correctly
+      </div>
+    </template>
+    <template id="invalid-xss-input">
+      <div class="error message" translate="yes">
+        Error! Invalid value(s) were posted to the server
       </div>
     </template>
   </body>

@@ -327,8 +327,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      req.body = {}
-      req.uploads = {
+            req.uploads = {
         company_verification_document_front: TestStripeAccounts['success_id_scan_front.png'],
         company_verification_document_back: TestStripeAccounts['success_id_scan_back.png']
       }
@@ -354,8 +353,7 @@ describe('/api/user/connect/update-stripe-account', function () {
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account')
         req.account = user.account
         req.session = user.session
-        req.body = {}
-        let errorMessage
+                let errorMessage
         try {
           await req.patch()
         } catch (error) {
@@ -369,8 +367,7 @@ describe('/api/user/connect/update-stripe-account', function () {
         const req = TestHelper.createRequest('/api/user/connect/update-stripe-account?stripeid=invalid')
         req.account = user.account
         req.session = user.session
-        req.body = {}
-        let errorMessage
+                let errorMessage
         try {
           await req.patch()
         } catch (error) {
@@ -684,8 +681,7 @@ describe('/api/user/connect/update-stripe-account', function () {
       // req = TestHelper.createRequest(`/api/user/connect/update-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       // req.account = user.account
       // req.session = user.session
-      // req.body = {}
-      // some individual fields only by JP
+      //       // some individual fields only by JP
       await TestHelper.createStripeAccount(user, {
         country: 'JP',
         business_type: 'individual'

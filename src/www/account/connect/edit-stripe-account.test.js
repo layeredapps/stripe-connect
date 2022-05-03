@@ -865,9 +865,26 @@ describe('/account/connect/edit-stripe-account', function () {
       //   company_verification_document_front: TestStripeAccounts['success_id_scan_back.png'],
       // }
       // cachedResponses.invalid_company_verification_document_back = await req.post()
+
+      // xss
+      await TestHelper.createStripeAccount(user, {
+        country: 'US',
+        business_type: 'company'
+      })
+      req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
+      req.account = user.account
+      req.session = user.session
+      req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
+      req.body.address_line1 = '<script>'
+      cachedResponses.xss = await req.post()
+      // crsf
+      req.puppeteer = false
+      req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
+      req.body['csrf-token'] = 'invalid'
+      cachedResponses.csrf = await req.post()
       cachedResponses.finished = true
     }
-    it('reject invalid field business_profile_mcc', async function () {
+    it('invalid-business_profile_mcc', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_business_profile_mcc
       const doc = TestHelper.extractDoc(result.html)
@@ -875,7 +892,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-business_profile_mcc')
     })
-    it('reject invalid field business_profile_url', async function () {
+    it('invalid-business_profile_url', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_business_profile_url
       const doc = TestHelper.extractDoc(result.html)
@@ -883,7 +900,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-business_profile_url')
     })
-    it('reject invalid field individual_dob_day', async function () {
+    it('invalid-individual_dob_day', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_dob_day
       const doc = TestHelper.extractDoc(result.html)
@@ -891,7 +908,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_dob_day')
     })
-    it('reject invalid field individual_dob_month', async function () {
+    it('invalid-individual_dob_month', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_dob_month
       const doc = TestHelper.extractDoc(result.html)
@@ -899,7 +916,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_dob_month')
     })
-    it('reject invalid field individual_dob_year', async function () {
+    it('invalid-individual_dob_year', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_dob_year
       const doc = TestHelper.extractDoc(result.html)
@@ -907,7 +924,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_dob_year')
     })
-    it('reject invalid field individual_id_number', async function () {
+    it('invalid-individual_id_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_id_number
       const doc = TestHelper.extractDoc(result.html)
@@ -915,7 +932,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_id_number')
     })
-    it('reject invalid field individual_phone', async function () {
+    it('invalid-individual_phone', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_phone
       const doc = TestHelper.extractDoc(result.html)
@@ -923,7 +940,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_phone')
     })
-    it('reject invalid field individual_ssn_last_4', async function () {
+    it('invalid-individual_ssn_last_4', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_ssn_last_4
       const doc = TestHelper.extractDoc(result.html)
@@ -931,7 +948,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_ssn_last_4')
     })
-    it('reject invalid field individual_email', async function () {
+    it('invalid-individual_email', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_email
       const doc = TestHelper.extractDoc(result.html)
@@ -939,7 +956,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_email')
     })
-    it('reject invalid field individual_first_name', async function () {
+    it('invalid-individual_first_name', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_first_name
       const doc = TestHelper.extractDoc(result.html)
@@ -947,7 +964,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_first_name')
     })
-    it('reject invalid field individual_last_name', async function () {
+    it('invalid-individual_last_name', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_last_name
       const doc = TestHelper.extractDoc(result.html)
@@ -955,7 +972,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_last_name')
     })
-    it('reject invalid field individual_first_name_kana', async function () {
+    it('invalid-individual_first_name_kana', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_first_name_kana
       const doc = TestHelper.extractDoc(result.html)
@@ -963,7 +980,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_first_name_kana')
     })
-    it('reject invalid field individual_last_name_kana', async function () {
+    it('invalid-individual_last_name_kana', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_last_name_kana
       const doc = TestHelper.extractDoc(result.html)
@@ -971,7 +988,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_last_name_kana')
     })
-    it('reject invalid field individual_first_name_kanji', async function () {
+    it('invalid-individual_first_name_kanji', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_first_name_kanji
       const doc = TestHelper.extractDoc(result.html)
@@ -979,7 +996,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_first_name_kanji')
     })
-    it('reject invalid field individual_last_name_kanji', async function () {
+    it('invalid-individual_last_name_kanji', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_last_name_kanji
       const doc = TestHelper.extractDoc(result.html)
@@ -987,7 +1004,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_last_name_kanji')
     })
-    it('reject invalid field individual_address_line1', async function () {
+    it('invalid-individual_address_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -995,7 +1012,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_line1')
     })
-    it('reject invalid field individual_address_city', async function () {
+    it('invalid-individual_address_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1003,7 +1020,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_city')
     })
-    it('reject invalid field individual_address_state', async function () {
+    it('invalid-individual_address_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1011,7 +1028,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_state')
     })
-    it('reject invalid field individual_address_postal_code', async function () {
+    it('invalid-individual_address_postal_code', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_postal_code
       const doc = TestHelper.extractDoc(result.html)
@@ -1019,7 +1036,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_postal_code')
     })
-    it('reject invalid field individual_address_kana_line1', async function () {
+    it('invalid-individual_address_kana_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kana_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -1027,7 +1044,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kana_line1')
     })
-    it('reject invalid field individual_address_kana_town', async function () {
+    it('invalid-individual_address_kana_town', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kana_town
       const doc = TestHelper.extractDoc(result.html)
@@ -1035,7 +1052,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kana_town')
     })
-    it('reject invalid field individual_address_kana_city', async function () {
+    it('invalid-individual_address_kana_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kana_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1043,7 +1060,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kana_city')
     })
-    it('reject invalid field individual_address_kana_state', async function () {
+    it('invalid-individual_address_kana_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kana_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1051,7 +1068,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kana_state')
     })
-    it('reject invalid field individual_address_kanji_line1', async function () {
+    it('invalid-individual_address_kanji_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kanji_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -1059,7 +1076,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kanji_line1')
     })
-    it('reject invalid field individual_address_kanji_town', async function () {
+    it('invalid-individual_address_kanji_town', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kanji_town
       const doc = TestHelper.extractDoc(result.html)
@@ -1067,7 +1084,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kanji_town')
     })
-    it('reject invalid field individual_address_kanji_city', async function () {
+    it('invalid-individual_address_kanji_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kanji_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1075,7 +1092,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kanji_city')
     })
-    it('reject invalid field individual_address_kanji_state', async function () {
+    it('invalid-individual_address_kanji_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_individual_address_kanji_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1083,21 +1100,21 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-individual_address_kanji_state')
     })
-    // it('reject invalid field individual_verification_document_front', async () => {
+    // it('invalid-individual_verification_document_front', async () => {
     //   const result = cachedResponses.invalid_individual_verification_document_front
     //   const doc = TestHelper.extractDoc(result.html)
     //   const messageContainer = doc.getElementById('message-container')
     //   const message = messageContainer.child[0]
     //   assert.strictEqual(message.attr.template, 'invalid-individual_verification_document_front')
     // })
-    // it('reject invalid field individual_verification_document_back', async () => {
+    // it('invalid-individual_verification_document_back', async () => {
     //   const result = cachedResponses.invalid_individual_verification_document_back
     //   const doc = TestHelper.extractDoc(result.html)
     //   const messageContainer = doc.getElementById('message-container')
     //   const message = messageContainer.child[0]
     //   assert.strictEqual(message.attr.template, 'invalid-individual_verification_document_back')
     // })
-    it('reject invalid field company_name', async function () {
+    it('invalid-company_name', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_name
       const doc = TestHelper.extractDoc(result.html)
@@ -1105,7 +1122,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_name')
     })
-    it('reject invalid field company_tax_id', async function () {
+    it('invalid-company_tax_id', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_tax_id
       const doc = TestHelper.extractDoc(result.html)
@@ -1113,7 +1130,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_tax_id')
     })
-    it('reject invalid field company_registration_number', async function () {
+    it('invalid-company_registration_number', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_registration_number
       const doc = TestHelper.extractDoc(result.html)
@@ -1121,7 +1138,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_registration_number')
     })
-    it('reject invalid field company_phone', async function () {
+    it('invalid-company_phone', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_phone
       const doc = TestHelper.extractDoc(result.html)
@@ -1129,7 +1146,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_phone')
     })
-    it('reject invalid field company_address_line1', async function () {
+    it('invalid-company_address_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -1137,7 +1154,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_line1')
     })
-    it('reject invalid field company_address_city', async function () {
+    it('invalid-company_address_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1145,7 +1162,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_city')
     })
-    it('reject invalid field company_address_state', async function () {
+    it('invalid-company_address_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1153,7 +1170,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_state')
     })
-    it('reject invalid field company_address_postal_code', async function () {
+    it('invalid-company_address_postal_code', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_postal_code
       const doc = TestHelper.extractDoc(result.html)
@@ -1161,7 +1178,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_postal_code')
     })
-    it('reject invalid field company_address_kana_line1', async function () {
+    it('invalid-company_address_kana_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kana_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -1169,7 +1186,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kana_line1')
     })
-    it('reject invalid field company_address_kana_town', async function () {
+    it('invalid-company_address_kana_town', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kana_town
       const doc = TestHelper.extractDoc(result.html)
@@ -1177,7 +1194,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kana_town')
     })
-    it('reject invalid field company_address_kana_city', async function () {
+    it('invalid-company_address_kana_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kana_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1185,7 +1202,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kana_city')
     })
-    it('reject invalid field company_address_kana_state', async function () {
+    it('invalid-company_address_kana_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kana_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1193,7 +1210,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kana_state')
     })
-    it('reject invalid field company_address_kanji_line1', async function () {
+    it('invalid-company_address_kanji_line1', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kanji_line1
       const doc = TestHelper.extractDoc(result.html)
@@ -1201,7 +1218,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kanji_line1')
     })
-    it('reject invalid field company_address_kanji_town', async function () {
+    it('invalid-company_address_kanji_town', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kanji_town
       const doc = TestHelper.extractDoc(result.html)
@@ -1209,7 +1226,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kanji_town')
     })
-    it('reject invalid field company_address_kanji_city', async function () {
+    it('invalid-company_address_kanji_city', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kanji_city
       const doc = TestHelper.extractDoc(result.html)
@@ -1217,7 +1234,7 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kanji_city')
     })
-    it('reject invalid field company_address_kanji_state', async function () {
+    it('invalid-company_address_kanji_state', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_company_address_kanji_state
       const doc = TestHelper.extractDoc(result.html)
@@ -1225,19 +1242,37 @@ describe('/account/connect/edit-stripe-account', function () {
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'invalid-company_address_kanji_state')
     })
-    // it('reject invalid field company_verification_document_front', async () => {
+    // it('invalid-company_verification_document_front', async () => {
     //   const result = cachedResponses.invalid_company_verification_document_front
     //   const doc = TestHelper.extractDoc(result.html)
     //   const messageContainer = doc.getElementById('message-container')
     //   const message = messageContainer.child[0]
     //   assert.strictEqual(message.attr.template, 'invalid-company_verification_document_front')
     // })
-    // it('reject invalid field company_verification_document_back', async () => {
+    // it('invalid-company_verification_document_back', async () => {
     //   const result = cachedResponses.invalid_company_verification_document_back
     //   const doc = TestHelper.extractDoc(result.html)
     //   const messageContainer = doc.getElementById('message-container')
     //   const message = messageContainer.child[0]
     //   assert.strictEqual(message.attr.template, 'invalid-company_verification_document_back')
     // })
+
+    it('invalid-xss-input', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.xss
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-xss-input')
+    })
+
+    it('invalid-csrf-token', async function () {
+      await bundledData(this.test.currentRetry())
+      const result = cachedResponses.csrf
+      const doc = TestHelper.extractDoc(result.html)
+      const messageContainer = doc.getElementById('message-container')
+      const message = messageContainer.child[0]
+      assert.strictEqual(message.attr.template, 'invalid-csrf-token')
+    })
   })
 })
