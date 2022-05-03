@@ -76,8 +76,8 @@ describe('/account/connect/create-person', function () {
     cachedResponses.createOwner = await req.post()
     // xss
     req.body = {
-      relationship_owner: '<script>',
-      relationship_title: 'SVP Testing',
+      relationship_owner: 'true',
+      relationship_title: '<script>',
       relationship_percent_ownership: '10'
     }
     cachedResponses.xss = await req.post()

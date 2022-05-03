@@ -138,23 +138,23 @@ describe('/account/connect/edit-person', function () {
     req.account = user.account
     req.session = user.session
     cachedResponses.uploads = await req.get()
-
     // xss
     await TestHelper.createPerson(user, {
-      relationship_representative: 'true',
+      relationship_director: 'true',
       relationship_executive: 'true',
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
-    await TestStripeAccounts.waitForPersonField(user, 'representative', 'address.city')
-    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.representative.personid}`)
+    await TestStripeAccounts.waitForPersonField(user, 'director', 'address.city')
+    req = TestHelper.createRequest(`/account/connect/edit-person?personid=${user.director.personid}`)
     req.account = user.account
     req.session = user.session
-    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.director.stripeObject)
     req.body.address_city = '<script>'
     cachedResponses.xss = await req.post()
     // csrf
-    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.representative.stripeObject)
+    req.puppeteer = false
+    req.body = TestStripeAccounts.createPersonData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.director.stripeObject)
     req.body['csrf-token'] = 'invalid'
     cachedResponses.csrf = await req.post()
     cachedResponses.finished = true

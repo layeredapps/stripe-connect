@@ -869,15 +869,15 @@ describe('/account/connect/edit-stripe-account', function () {
       // xss
       await TestHelper.createStripeAccount(user, {
         country: 'US',
-        business_type: 'company'
+        business_type: 'individual'
       })
       req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
-      req.body.address_line1 = '<script>'
+      req.body.individual_address_line1 = '<script>'
       cachedResponses.xss = await req.post()
-      // crsf
+      // csrf
       req.puppeteer = false
       req.body = TestStripeAccounts.createAccountData(TestHelper.nextIdentity(), user.stripeAccount.stripeObject.country, user.stripeAccount.stripeObject)
       req.body['csrf-token'] = 'invalid'

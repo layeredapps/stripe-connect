@@ -47,11 +47,11 @@ describe('/account/connect/delete-person', function () {
     cachedResponses.submit = await req.post()
     // csrf
     await TestHelper.createPerson(user, {
-      relationship_representative: 'true',
+      relationship_director: 'true',
       relationship_title: 'SVP Testing',
       relationship_percent_ownership: '0'
     })
-    req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
+    req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.director.personid}`)
     req.puppeteer = false
     req.account = user.account
     req.session = user.session

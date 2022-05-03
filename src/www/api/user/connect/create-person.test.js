@@ -183,8 +183,7 @@ describe('/api/user/connect/create-person', function () {
 
   describe('exceptions', () => {
     describe('invalid-stripeid', () => {
-      it('missing querystring stripeid', async function () {
-        await bundledData(this.test.currentRetry())
+      it('missing querystring stripeid', async () => {
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/create-person')
         req.account = user.account
@@ -198,8 +197,7 @@ describe('/api/user/connect/create-person', function () {
         assert.strictEqual(errorMessage, 'invalid-stripeid')
       })
 
-      it('invalid querystring stripeid', async function () {
-        await bundledData(this.test.currentRetry())
+      it('invalid querystring stripeid', async () => {
         const user = await TestHelper.createUser()
         const req = TestHelper.createRequest('/api/user/connect/create-person?stripeid=invalid')
         req.account = user.account
