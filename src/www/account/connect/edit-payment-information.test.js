@@ -6,20 +6,6 @@ const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/edit-payment-information', function () {
   describe('before', () => {
-    it('should reject invalid stripeid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/edit-payment-information?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-
     it('should bind Stripe account to req', async () => {
       const user = await TestHelper.createUser()
       await TestHelper.createStripeAccount(user, {
@@ -369,6 +355,15 @@ describe('/account/connect/edit-payment-information', function () {
       cachedResponses.csrf = await req.post()
       cachedResponses.finished = true
     }
+
+    it('invalid-stripeid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/edit-payment-information?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
 
     it('invalid-account_holder_type', async function () {
       await bundledData(this.test.currentRetry())

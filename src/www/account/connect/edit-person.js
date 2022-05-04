@@ -10,31 +10,52 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.personid) {
-    throw new Error('invalid-personid')
+    req.error = 'invalid-personid'
+    req.removeContent = true
+    req.data = {
+      person: {
+        personid: ''
+      }
+    }
+    return
   }
-  const personRaw = await global.api.user.connect.Person.get(req)
-  if (!personRaw) {
-    throw new Error('invalid-personid')
+  let personRaw
+  try {
+    personRaw = await global.api.user.connect.Person.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      person: {
+        personid: ''
+      }
+    }
+    if (error.message === 'invalid-personid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
   }
   const person = formatStripeObject(personRaw)
   if (!person.requirements.currently_due.length &&
       !person.requirements.eventually_due.length) {
-    throw new Error('invalid-person')
+    req.error = 'no-required-information'
+    req.removeContent = true
+    return
   }
   req.query.stripeid = person.account
   const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
   const stripeAccount = formatStripeObject(stripeAccountRaw)
   if (!stripeAccount) {
-    throw new Error('invalid-stripeid')
-  }
-  if (stripeAccount.business_type === 'individual') {
-    throw new Error('invalid-stripe-account')
+    req.error = 'invalid-stripeid'
+    req.removeContent = true
+    return
   }
   req.data = { stripeAccount, person }
 }
 
 async function renderPage (req, res, messageTemplate) {
-  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.person, 'person')
   const removeElements = []
   if (global.stripeJS !== 3) {
@@ -51,7 +72,7 @@ async function renderPage (req, res, messageTemplate) {
   }
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
-    if (messageTemplate === 'success' || req.error) {
+    if (req.removeContent) {
       removeElements.push('form-container')
       for (const id of removeElements) {
         const element = doc.getElementById(id)

@@ -10,13 +10,21 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.stripeid) {
-    throw new Error('invalid-stripeid')
+    req.error = 'invalid-stripeid'
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    return
   }
   if (req.query.message === 'success') {
+    req.removeContents = true
     req.data = {
       stripeAccount: {
         country: 'US',
-        id: '',
+        stripeid: '',
         metadata: {},
         requirements: {
           currently_due: []
@@ -25,24 +33,37 @@ async function beforeRequest (req) {
     }
     return
   }
-  const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
-  if (!stripeAccountRaw) {
-    throw new Error('invalid-stripe-account')
+  let stripeAccountRaw
+  try {
+    stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    if (error.message === 'invalid-stripeid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
   }
   const stripeAccount = formatStripeObject(stripeAccountRaw)
   req.data = { stripeAccount }
 }
 
 async function renderPage (req, res, messageTemplate) {
-  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.stripeAccount, 'stripeAccount')
   navbar.setup(doc, req.data.stripeAccount)
-  if (!req.data.stripeAccount || messageTemplate === 'success') {
-    dashboard.HTML.renderTemplate(doc, null, 'success', 'message-container')
-    const submitForm = doc.getElementById('submit-form')
-    submitForm.parentNode.removeChild(submitForm)
-  } else if (messageTemplate) {
+  if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
+    if (req.removeContents) {
+      const submitForm = doc.getElementById('submit-form')
+      submitForm.parentNode.removeChild(submitForm)
+    }
   }
   return dashboard.Response.end(req, res, doc)
 }

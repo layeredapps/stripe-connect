@@ -7,7 +7,7 @@ module.exports = {
 }
 
 async function renderPage (req, res, messageTemplate) {
-  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html)
   if (!messageTemplate && req.method === 'GET' && req.query && req.query['return-url']) {
     const submitForm = doc.getElementById('submit-form')
@@ -16,7 +16,7 @@ async function renderPage (req, res, messageTemplate) {
   }
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
-    if (messageTemplate === 'success') {
+    if (req.removeContents) {
       const submitForm = doc.getElementById('submit-form')
       submitForm.parentNode.removeChild(submitForm)
       return dashboard.Response.end(req, res, doc)

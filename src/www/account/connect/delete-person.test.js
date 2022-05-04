@@ -22,11 +22,8 @@ describe('/account/connect/delete-person', function () {
     let req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
     req.account = user2.account
     req.session = user2.session
-    try {
-      await req.route.api.before(req)
-    } catch (error) {
-      cachedResponses.invalidAccount = error.message
-    }
+    await req.route.api.before(req)
+    cachedResponses.invalidAccount = req.error
     req = TestHelper.createRequest(`/account/connect/delete-person?personid=${user.owner.personid}`)
     req.account = user.account
     req.session = user.session
@@ -59,28 +56,6 @@ describe('/account/connect/delete-person', function () {
     cachedResponses.finished = true
   }
 
-  describe('exceptions', () => {
-    it('should reject invalid personid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/delete-person?personid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-personid')
-    })
-
-    it('should require own Stripe account', async function () {
-      await bundledData(this.test.currentRetry())
-      const errorMessage = cachedResponses.invalidAccount
-      assert.strictEqual(errorMessage, 'invalid-account')
-    })
-  })
-
   describe('before', () => {
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
@@ -111,6 +86,21 @@ describe('/account/connect/delete-person', function () {
   })
 
   describe('errors', () => {
+    it('invalid-personid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/delete-person?personid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-personid')
+    })
+
+    it('invalid-account', async function () {
+      await bundledData(this.test.currentRetry())
+      const errorMessage = cachedResponses.invalidAccount
+      assert.strictEqual(errorMessage, 'invalid-account')
+    })
+
     it('invalid-csrf-token', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.csrf

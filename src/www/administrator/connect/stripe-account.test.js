@@ -43,25 +43,6 @@ describe('/administrator/connect/stripe-account', function () {
   }
 
   describe('before', () => {
-    it('should reject invalid stripeid', async () => {
-      const administrator = await TestHelper.createOwner()
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const req = TestHelper.createRequest('/administrator/connect/stripe-account?stripeid=invalid')
-      req.account = administrator.account
-      req.session = administrator.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
@@ -76,6 +57,17 @@ describe('/administrator/connect/stripe-account', function () {
       const doc = TestHelper.extractDoc(result.html)
       const table = doc.getElementById('stripe-accounts-table')
       assert.strictEqual(table.tag, 'table')
+    })
+  })
+
+  describe('error', () => {
+    it('invalid-stripeid', async () => {
+      const administrator = await TestHelper.createOwner()
+      const req = TestHelper.createRequest('/administrator/connect/stripe-account?stripeid=invalid')
+      req.account = administrator.account
+      req.session = administrator.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
     })
   })
 })

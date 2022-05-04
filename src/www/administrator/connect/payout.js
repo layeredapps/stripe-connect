@@ -8,9 +8,32 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.payoutid) {
-    throw new Error('invalid-payoutid')
+    req.error = 'invalid-payoutid'
+    req.removeContents = true
+    req.data = {
+      payout: {
+        payoutid: ''
+      }
+    }
+    return
   }
-  const payoutRaw = await global.api.administrator.connect.Payout.get(req)
+  let payoutRaw
+  try {
+    payoutRaw = await global.api.administrator.connect.Payout.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      payout: {
+        payoutid: ''
+      }
+    }
+    if (error.message === 'invalid-payoutid') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
+  }
   const payout = formatStripeObject(payoutRaw)
   payout.createdAtFormatted = dashboard.Format.date(payout.created)
   payout.amountFormatted = dashboard.Format.money(payout.amount, payout.currency)
@@ -18,9 +41,18 @@ async function beforeRequest (req) {
 }
 
 async function renderPage (req, res, messageTemplate) {
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.payout, 'payout')
-  if (req.data.payout.failure_code) {
-    dashboard.HTML.renderTemplate(doc, null, req.data.payout.failure_code, `status-${req.data.payout.id}`)
+  if (messageTemplate) {
+    dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
+    if (req.removeContents) {
+      const submitForm = doc.getElementById('submit-form')
+      submitForm.parentNode.removeChild(submitForm)
+    }
+  } else {
+    if (req.data.payout.failure_code) {
+      dashboard.HTML.renderTemplate(doc, null, req.data.payout.failure_code, `status-${req.data.payout.id}`)
+    }
   }
   return dashboard.Response.end(req, res, doc)
 }

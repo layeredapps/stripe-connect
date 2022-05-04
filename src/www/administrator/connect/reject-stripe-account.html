@@ -49,11 +49,6 @@
         Error! The account must have a $0 balance before rejecting
       </div>
     </template>
-    <template id="unknown-error">
-      <div class="error message" translate="yes">
-        Error! An error occurred rejecting the Stripe account
-      </div>
-    </template>
     <template id="not-submitted">
       <span translate="yes">Not submitted yet</span>
     </template>
@@ -95,6 +90,16 @@
     </template>
     <template id="disabled">
       <span><span translate="yes">Disabled by Stripe, see</span>&nbsp;<a href="https://stripe.com/blog/why-some-businesses-arent-allowed" translate="yes">common reasons</a></span>
+    </template>    
+    <template id="unknown-error">
+      <div class="error message" translate="yes">
+        Error! An unknown error occurred
+      </div>
+    </template>
+    <template id="invalid-stripeid">
+      <div class="error message" translate="yes">
+        Error! An invalid Stripe account was specified
+      </div>
     </template>
     <template id="invalid-csrf-token">
       <div class="error message" translate="yes">

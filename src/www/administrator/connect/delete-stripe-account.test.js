@@ -79,6 +79,15 @@ describe('/administrator/connect/delete-stripe-account', function () {
   })
 
   describe('errors', () => {
+    it('invalid-stripeid', async () => {
+      const administrator = await TestHelper.createOwner()
+      const req = TestHelper.createRequest('/administrator/connect/delete-stripe-account?stripeid=invalid')
+      req.account = administrator.account
+      req.session = administrator.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
     it('invalid-csrf-token', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.csrf

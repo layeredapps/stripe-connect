@@ -166,22 +166,6 @@ describe('/account/connect/submit-stripe-account', function () {
     cachedResponses.finished = true
   }
 
-  describe('exceptions', () => {
-    it('should reject invalid stripeid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/submit-stripe-account?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-  })
-
   describe('before', () => {
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
@@ -319,6 +303,15 @@ describe('/account/connect/submit-stripe-account', function () {
   })
 
   describe('errors', () => {
+    it('invalid-stripeid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/submit-stripe-account?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
     it('invalid-csrf-token', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.csrf

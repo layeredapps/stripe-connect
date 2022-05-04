@@ -10,39 +10,61 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.personid) {
-    throw new Error('invalid-personid')
-  }
-  if (req.query.message === 'success') {
+    req.error = 'invalid-personid'
+    req.removeContents = true
     req.data = {
       person: {
-        id: '',
-        object: 'person',
-        relationship: {},
-        requirements: {
-          currently_due: []
-        }
+        personid: '',
+        requirements: { currently_due: [] },
+        relationship: {}
       }
     }
     return
   }
-  const personRaw = await global.api.user.connect.Person.get(req)
+  if (req.query.message === 'success') {
+    req.removeContents = true
+    req.data = {
+      person: {
+        personid: req.query.personid,
+        requirements: { currently_due: [] },
+        relationship: {}
+      }
+    }
+    return
+  }
+  let personRaw
+  try {
+    personRaw = await global.api.user.connect.Person.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      person: {
+        personid: '',
+        requirements: { currently_due: [] },
+        relationship: {}
+      }
+    }
+    if (error.message === 'invalid-personid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
+  }
   const person = formatStripeObject(personRaw)
   req.query.stripeid = person.account
   const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
   const stripeAccount = formatStripeObject(stripeAccountRaw)
-  if (stripeAccount.company && stripeAccount.company.persons_provided) {
-    throw new Error('invalid-stripe-account')
-  }
   req.data = { person, stripeAccount }
 }
 
 async function renderPage (req, res, messageTemplate) {
-  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.person, 'person')
   await navbar.setup(doc, req.data.person)
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
-    if (messageTemplate === 'success') {
+    if (req.removeContents) {
       const submitForm = doc.getElementById('submit-form')
       submitForm.parentNode.removeChild(submitForm)
     }

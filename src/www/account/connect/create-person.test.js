@@ -93,40 +93,6 @@ describe('/account/connect/create-person', function () {
     cachedResponses.finished = true
   }
 
-  describe('exceptions', () => {
-    it('should reject invalid stripeid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/create-person?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-
-    it('should reject individual registration', async () => {
-      const user = await TestHelper.createUser()
-      await TestHelper.createStripeAccount(user, {
-        country: 'US',
-        business_type: 'individual'
-      })
-      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripe-account')
-    })
-  })
-
   describe('view', () => {
     it('should present the form', async function () {
       await bundledData(this.test.currentRetry())
@@ -207,6 +173,28 @@ describe('/account/connect/create-person', function () {
   })
 
   describe('errors', () => {
+    it('invalid-stripeid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/create-person?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
+    it('invalid-stripe-account', async () => {
+      const user = await TestHelper.createUser()
+      await TestHelper.createStripeAccount(user, {
+        country: 'US',
+        business_type: 'individual'
+      })
+      const req = TestHelper.createRequest(`/account/connect/create-person?stripeid=${user.stripeAccount.stripeid}`)
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripe-account')
+    })
+
     it('invalid-xss-input', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.xss

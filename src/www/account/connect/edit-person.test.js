@@ -160,22 +160,6 @@ describe('/account/connect/edit-person', function () {
     cachedResponses.finished = true
   }
 
-  describe('exceptions', () => {
-    it('should reject invalid person', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/edit-person?personid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-personid')
-    })
-  })
-
   describe('view', async () => {
     it('should present the form', async function () {
       await bundledData(this.test.currentRetry())
@@ -455,6 +439,15 @@ describe('/account/connect/edit-person', function () {
   })
 
   describe('errors', () => {
+    it('invalid-personid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/edit-person?personid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-personid')
+    })
+
     it('invalid-dob_day', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses['invalid-dob_day']

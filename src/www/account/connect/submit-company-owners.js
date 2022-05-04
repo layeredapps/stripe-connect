@@ -10,20 +10,49 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.stripeid) {
-    throw new Error('invalid-stripeid')
+    req.error = 'invalid-stripeid'
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    return
   }
-  const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
-  if (!stripeAccountRaw) {
-    throw new Error('invalid-stripe-account')
+  let stripeAccountRaw
+  try {
+    stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    if (error.message === 'invalid-stripeid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
   }
   const stripeAccount = formatStripeObject(stripeAccountRaw)
   if (stripeAccount.business_type === 'individual') {
-    throw new Error('invalid-stripe-account')
+    req.error = 'invalid-stripe-account'
+    req.removeContents = true
+    return
   }
   if (!stripeAccount.requiresOwners) {
-    throw new Error('invalid-stripe-account')
+    req.error = 'not-required'
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: req.query.stripeid
+      }
+    }
+    return
   }
-  if (req.query && req.query.message === 'success') {
+  if (req.query.message === 'success') {
+    req.removeContents = true
     req.data = { stripeAccount }
     return
   }

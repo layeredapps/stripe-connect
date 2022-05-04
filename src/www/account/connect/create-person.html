@@ -54,11 +54,6 @@
         Success! The registration has been updated
       </div>
     </template>
-    <template id="unknown-error">
-      <div class="error message" translate="yes">
-        Error! An error occurred creating the registration
-      </div>
-    </template>
     <template id="invalid-company-owner">
       <div class="error message" translate="yes">
         Your Stripe account does not require company owner information
@@ -87,6 +82,26 @@
     <template id="invalid-relationship_title">
       <div class="error message" translate="yes">
         Error! Invalid or missing relationship title
+      </div>
+    </template>
+    <template id="unknown-error">
+      <div class="error message" translate="yes">
+        Error! An unknown error occurred
+      </div>
+    </template>
+    <template id="invalid-stripeid">
+      <div class="error message" translate="yes">
+        Error! An invalid Stripe account was specified
+      </div>
+    </template>
+    <template id="invalid-stripe-account">
+      <div class="error message" translate="yes">
+        Error! Stripe accounts for individuals cannot add people
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot create people for someone else's Stripe account
       </div>
     </template>
     <template id="invalid-csrf-token">

@@ -26,7 +26,18 @@
     </template>
     <template id="unknown-error">
       <div class="error message" translate="yes">
-        Error! An error occurred deleting the Stripe account
+        Error! An unknown error occurred
+      </div>
+    </template>
+    </template>
+    <template id="invalid-stripeid">
+      <div class="error message" translate="yes">
+        Error! An invalid Stripe account was specified
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot delete someone else's Stripe account
       </div>
     </template>
     <template id="invalid-csrf-token">

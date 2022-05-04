@@ -11,19 +11,40 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.stripeid) {
-    throw new Error('invalid-stripeid')
+    req.removeContents = true
+    req.error = 'invalid-stripeid'
+    return
   }
-  const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
-  if (!stripeAccountRaw) {
-    throw new Error('invalid-stripeid')
+  let stripeAccountRaw
+  try {
+    stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    if (error.message === 'invalid-stripeid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
   }
   const stripeAccount = formatStripeObject(stripeAccountRaw)
   stripeAccount.stripePublishableKey = global.stripePublishableKey
+  if (!stripeAccount.requirements.currently_due.length &&
+      !stripeAccount.requirements.eventually_due.length) {
+    req.error = 'no-required-information'
+    req.removeContent = true
+    return
+  }
   req.data = { stripeAccount }
 }
 
 async function renderPage (req, res, messageTemplate) {
-  messageTemplate = messageTemplate || (req.query ? req.query.message : null)
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.stripeAccount, 'stripeAccount')
   navbar.setup(doc, req.data.stripeAccount)
   const removeElements = []
@@ -41,7 +62,7 @@ async function renderPage (req, res, messageTemplate) {
   }
   if (messageTemplate) {
     dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
-    if (messageTemplate === 'success') {
+    if (req.removeContents) {
       removeElements.push('submit-form')
       for (const id of removeElements) {
         const element = doc.getElementById(id)

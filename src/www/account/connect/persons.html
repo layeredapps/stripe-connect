@@ -74,5 +74,25 @@
         <td id="requires-no-information-${person.id}">-</td>
       </tr>
     </template>
+    <template id="unknown-error">
+      <div class="error message" translate="yes">
+        Error! An unknown error occurred
+      </div>
+    </template>
+    <template id="invalid-stripeid">
+      <div class="error message" translate="yes">
+        Error! An invalid Stripe account was specified
+      </div>
+    </template>
+    <template id="invalid-stripe-account">
+      <div class="error message" translate="yes">
+        Error! Stripe accounts for individuals do not have persons attached
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot edit people for someone else's Stripe account
+      </div>
+    </template>
   </body>
 </html>

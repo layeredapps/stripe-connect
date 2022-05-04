@@ -73,20 +73,6 @@ describe('/account/connect/person', function () {
   }
 
   describe('before', () => {
-    it('should reject invalid personid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/person?personid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-personid')
-    })
-
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
@@ -141,6 +127,17 @@ describe('/account/connect/person', function () {
       const doc = TestHelper.extractDoc(result.html)
       const row = doc.getElementById('requires-information')
       assert.strictEqual(row, undefined)
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-personid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/person?personid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-personid')
     })
   })
 })

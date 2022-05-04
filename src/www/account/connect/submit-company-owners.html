@@ -45,7 +45,7 @@
     </template>
     <template id="invalid-company-owners">
       <div class="error message" translate="yes">
-        Error! There are owners still requiring information.
+        Error! There are owners still requiring information
       </div>
     </template>
     <template id="success">
@@ -55,7 +55,27 @@
     </template>
     <template id="unknown-error">
       <div class="error message" translate="yes">
-        Error! An error occurred submitting the owners
+        Error! An unknown error occurred
+      </div>
+    </template>
+    <template id="invalid-stripeid">
+      <div class="error message" translate="yes">
+        Error! An invalid Stripe account was specified
+      </div>
+    </template>
+    <template id="invalid-stripe-account">
+      <div class="error message" translate="yes">
+        Error! Stripe accounts for individuals do not have owners
+      </div>
+    </template>
+    <template id="not-required">
+      <div class="error message" translate="yes">
+        Error! This Stripe account does not require submitting owners
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot edit people for someone else's Stripe account
       </div>
     </template>
     <template id="invalid-csrf-token">

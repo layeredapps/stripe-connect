@@ -21,12 +21,23 @@
     </div>
     <template id="success">
       <div class="success message" translate="yes">
-        Success! The company owner has been deleted
+        Success! The person has been deleted
       </div>
     </template>
     <template id="unknown-error">
       <div class="error message" translate="yes">
-        Error! An error occurred deleting the company owner
+        Error! An unknown error occurred
+      </div>
+    </template>
+    </template>
+    <template id="invalid-personid">
+      <div class="error message" translate="yes">
+        Error! An invalid person was specified
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot delete people from someone else's Stripe account
       </div>
     </template>
     <template id="invalid-csrf-token">

@@ -5,22 +5,6 @@ const TestStripeAccounts = require('../../../../test-stripe-accounts.js')
 const DashboardTestHelper = require('@layeredapps/dashboard/test-helper.js')
 
 describe('/account/connect/edit-stripe-account', function () {
-  describe('exceptions', () => {
-    it('should reject invalid Stripe account', async function () {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/edit-stripe-account?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-  })
-
   describe('view', async () => {
     let cachedResponses
     async function bundledData (retryNumber) {
@@ -884,6 +868,15 @@ describe('/account/connect/edit-stripe-account', function () {
       cachedResponses.csrf = await req.post()
       cachedResponses.finished = true
     }
+    it('invalid-stripeid', async function () {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/edit-stripe-account?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
     it('invalid-business_profile_mcc', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.invalid_business_profile_mcc

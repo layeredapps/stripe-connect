@@ -26,11 +26,8 @@ describe('/account/connect/submit-company-executives', function () {
     let req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
     req.session = user.session
-    try {
-      await req.route.api.before(req)
-    } catch (error) {
-      cachedResponses.individualAccount = error.message
-    }
+    await req.route.api.before(req)
+    cachedResponses.individualAccount = req.error
     // does not require executives
     await TestHelper.createStripeAccount(user, {
       country: 'JP',
@@ -39,11 +36,8 @@ describe('/account/connect/submit-company-executives', function () {
     req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
     req.session = user.session
-    try {
-      await req.route.api.before(req)
-    } catch (error) {
-      cachedResponses.notRequired = error.message
-    }
+    await req.route.api.before(req)
+    cachedResponses.notRequired = req.error
     // bind
     await TestStripeAccounts.createCompanyWithExecutives('DE', 1, user)
     req = TestHelper.createRequest(`/account/connect/submit-company-executives?stripeid=${user.stripeAccount.stripeid}`)
@@ -94,34 +88,6 @@ describe('/account/connect/submit-company-executives', function () {
     cachedResponses.submitWithoutExecutives = await req.post()
     cachedResponses.finished = true
   }
-
-  describe('exceptions', () => {
-    it('should reject invalid stripeid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/submit-company-executives?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-
-    it('should reject individual registration', async function () {
-      await bundledData(this.test.currentRetry())
-      const errorMessage = cachedResponses.individualAccount
-      assert.strictEqual(errorMessage, 'invalid-stripe-account')
-    })
-
-    it('should reject Stripe account that doesn\'t require executives', async function () {
-      await bundledData(this.test.currentRetry())
-      const errorMessage = cachedResponses.notRequired
-      assert.strictEqual(errorMessage, 'invalid-stripe-account')
-    })
-  })
 
   describe('before', () => {
     it('should bind data to req', async function () {
@@ -180,6 +146,27 @@ describe('/account/connect/submit-company-executives', function () {
   })
 
   describe('errors', () => {
+    it('invalid-stripeid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/submit-company-executives?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
+    it('invalid-stripe-account', async function () {
+      await bundledData(this.test.currentRetry())
+      const errorMessage = cachedResponses.individualAccount
+      assert.strictEqual(errorMessage, 'invalid-stripe-account')
+    })
+
+    it('not-required', async function () {
+      await bundledData(this.test.currentRetry())
+      const errorMessage = cachedResponses.notRequired
+      assert.strictEqual(errorMessage, 'not-required')
+    })
+
     it('invalid-csrf-token', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.csrf

@@ -271,11 +271,6 @@
         </div>
       </form>
     </div>
-    <template id="invalid-token">
-      <div class="error message" translate="yes">
-        Error! An error occurred submitting the form
-      </div>
-    </template>
     <template id="country-option">
       <option value="${country.code}">
         ${country.name}
@@ -286,14 +281,14 @@
         ${option.text}
       </option>
     </template>
-    <template id="unknown-error">
+    <template id="invalid-token">
       <div class="error message" translate="yes">
-        Error! An error occurred udpating the information
+        Error! The form was not submitted correctly
       </div>
     </template>
     <template id="upload-error">
       <div class="error message" translate="yes">
-        Error! An error occurred uploading a photo or scan
+        Error! There was a problem with your uploaded files
       </div>
     </template>
     <template id="invalid-id_number">
@@ -464,6 +459,26 @@
     <template id="invalid-address_kanji_postal_code">
       <div class="error message" translate="yes">
         Error! Invalid or missing Kanji personal address postal code
+      </div>
+    </template>
+    <template id="unknown-error">
+      <div class="error message" translate="yes">
+        Error! An unknown error occurred
+      </div>
+    </template>
+    <template id="no-required-information">
+      <div class="error message" translate="yes">
+        Error! No information is required for this person
+      </div>
+    </template>
+    <template id="invalid-personid">
+      <div class="error message" translate="yes">
+        Error! An invalid person was specified
+      </div>
+    </template>
+    <template id="invalid-account">
+      <div class="error message" translate="yes">
+        Error! You cannot edit people for someone else's Stripe account
       </div>
     </template>
     <template id="invalid-csrf-token">

@@ -27,11 +27,8 @@ describe('/account/connect/stripe-account', function () {
     let req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user2.account
     req.session = user2.session
-    try {
-      await req.route.api.before(req)
-    } catch (error) {
-      cachedResponses.invalidAccount = error.message
-    }
+    await req.route.api.before(req)
+    cachedResponses.invalidAccount = req.error
     // bind data
     req = TestHelper.createRequest(`/account/connect/stripe-account?stripeid=${user.stripeAccount.stripeid}`)
     req.account = user.account
@@ -74,26 +71,6 @@ describe('/account/connect/stripe-account', function () {
   }
 
   describe('before', () => {
-    it('should reject invalid stripeid', async () => {
-      const user = await TestHelper.createUser()
-      const req = TestHelper.createRequest('/account/connect/stripe-account?stripeid=invalid')
-      req.account = user.account
-      req.session = user.session
-      let errorMessage
-      try {
-        await req.route.api.before(req)
-      } catch (error) {
-        errorMessage = error.message
-      }
-      assert.strictEqual(errorMessage, 'invalid-stripeid')
-    })
-
-    it('should reject other account\'s stripeid', async function () {
-      await bundledData(this.test.currentRetry())
-      const errorMessage = cachedResponses.invalidAccount
-      assert.strictEqual(errorMessage, 'invalid-account')
-    })
-
     it('should bind data to req', async function () {
       await bundledData(this.test.currentRetry())
       const data = cachedResponses.before
@@ -154,6 +131,23 @@ describe('/account/connect/stripe-account', function () {
       const messageContainer = doc.getElementById('submission-status')
       const message = messageContainer.child[0]
       assert.strictEqual(message.attr.template, 'submitted-information')
+    })
+  })
+
+  describe('errors', () => {
+    it('invalid-stripeid', async () => {
+      const user = await TestHelper.createUser()
+      const req = TestHelper.createRequest('/account/connect/stripe-account?stripeid=invalid')
+      req.account = user.account
+      req.session = user.session
+      await req.route.api.before(req)
+      assert.strictEqual(req.error, 'invalid-stripeid')
+    })
+
+    it('invalid-account', async function () {
+      await bundledData(this.test.currentRetry())
+      const errorMessage = cachedResponses.invalidAccount
+      assert.strictEqual(errorMessage, 'invalid-account')
     })
   })
 })

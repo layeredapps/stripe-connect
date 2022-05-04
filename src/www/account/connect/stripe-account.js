@@ -9,11 +9,31 @@ module.exports = {
 
 async function beforeRequest (req) {
   if (!req.query || !req.query.stripeid) {
-    throw new Error('invalid-stripeid')
+    req.error = 'invalid-stripeid'
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    return
   }
-  const stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
-  if (!stripeAccountRaw) {
-    throw new Error('invalid-stripe-account')
+  let stripeAccountRaw
+  try {
+    stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
+  } catch (error) {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        stripeid: ''
+      }
+    }
+    if (error.message === 'invalid-stripeid' || error.message === 'invalid-account') {
+      req.error = error.message
+    } else {
+      req.error = 'unknown-error'
+    }
+    return
   }
   const stripeAccount = formatStripeObject(stripeAccountRaw)
   if (stripeAccount.payouts_enabled) {
@@ -81,118 +101,126 @@ async function beforeRequest (req) {
   req.data = { owners, directors, executives, representatives, stripeAccount, registrationComplete }
 }
 
-async function renderPage (req, res) {
+async function renderPage (req, res, messageTemplate) {
+  messageTemplate = req.error || messageTemplate || (req.query ? req.query.message : null)
   const doc = dashboard.HTML.parse(req.html || req.route.html, req.data.stripeAccount, 'stripeAccount')
   navbar.setup(doc, req.data.stripeAccount)
   const removeElements = []
-  if (req.data.stripeAccount.statusMessage) {
-    dashboard.HTML.renderTemplate(doc, null, req.data.stripeAccount.statusMessage, `account-status-${req.data.stripeAccount.id}`)
-  }
-  if (req.data.stripeAccount.submittedAt) {
-    removeElements.push('not-submitted2')
-  } else {
-    removeElements.push('submitted')
-  }
-  const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
-  if (req.data.stripeAccount.business_type === 'individual') {
-    removeElements.push('business', 'business-name')
-    if (req.data.stripeAccount.individual.first_name) {
-      removeElements.push('blank-name')
-    } else {
-      removeElements.push('individual-name')
+  if (messageTemplate) {
+    dashboard.HTML.renderTemplate(doc, null, messageTemplate, 'message-container')
+    if (req.removeContents) {
+      removeElements.push('submit-form')
     }
   } else {
-    removeElements.push('individual', 'individual-name')
-    if (req.data.stripeAccount.company.name) {
-      removeElements.push('blank-name')
-    } else {
-      removeElements.push('business-name')
+    if (req.data.stripeAccount.statusMessage) {
+      dashboard.HTML.renderTemplate(doc, null, req.data.stripeAccount.statusMessage, `account-status-${req.data.stripeAccount.id}`)
     }
-    if (req.data.representatives && req.data.representatives.length) {
-      dashboard.HTML.renderTable(doc, req.data.representatives, 'person-row', 'representatives-table')
-      for (const person of req.data.representatives) {
-        if (person.requirements.currently_due.length) {
-          removeElements.push(`requires-no-information-${person.id}`)
-        } else {
-          removeElements.push(`requires-information-${person.id}`)
-        }
-      }
+    if (req.data.stripeAccount.submittedAt) {
+      removeElements.push('not-submitted2')
     } else {
-      removeElements.push('representatives-table')
+      removeElements.push('submitted')
     }
-    if (completedPaymentInformation) {
-      removeElements.push('setup-payment')
-      dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
-    } else {
-      removeElements.push('update-payment')
-      dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
-    }
-    if (req.data.owners && req.data.owners.length) {
-      dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
-      for (const person of req.data.owners) {
-        if (person.requirements.currently_due.length) {
-          removeElements.push(`requires-no-information-${person.id}`)
-        } else {
-          removeElements.push(`requires-information-${person.id}`)
-        }
-      }
-    } else {
-      if (!req.data.stripeAccount.requiresOwners) {
-        removeElements.push('owners-container')
+    const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
+    if (req.data.stripeAccount.business_type === 'individual') {
+      removeElements.push('business', 'business-name')
+      if (req.data.stripeAccount.individual.first_name) {
+        removeElements.push('blank-name')
       } else {
-        removeElements.push('owners-table')
-      }
-    }
-    if (req.data.directors && req.data.directors.length) {
-      dashboard.HTML.renderTable(doc, req.data.directors, 'person-row', 'directors-table')
-      for (const person of req.data.directors) {
-        if (person.requirements.currently_due.length) {
-          removeElements.push(`requires-no-information-${person.id}`)
-        } else {
-          removeElements.push(`requires-information-${person.id}`)
-        }
+        removeElements.push('individual-name')
       }
     } else {
-      if (!req.data.stripeAccount.requiresDirectors) {
-        removeElements.push('directors-container')
+      removeElements.push('individual', 'individual-name')
+      if (req.data.stripeAccount.company.name) {
+        removeElements.push('blank-name')
       } else {
-        removeElements.push('directors-table')
+        removeElements.push('business-name')
       }
-    }
-    if (req.data.executives && req.data.executives.length) {
-      dashboard.HTML.renderTable(doc, req.data.executives, 'person-row', 'executives-table')
-      for (const person of req.data.executives) {
-        if (person.requirements.currently_due.length) {
-          removeElements.push(`requires-no-information-${person.id}`)
+      if (req.data.representatives && req.data.representatives.length) {
+        dashboard.HTML.renderTable(doc, req.data.representatives, 'person-row', 'representatives-table')
+        for (const person of req.data.representatives) {
+          if (person.requirements.currently_due.length) {
+            removeElements.push(`requires-no-information-${person.id}`)
+          } else {
+            removeElements.push(`requires-information-${person.id}`)
+          }
+        }
+      } else {
+        removeElements.push('representatives-table')
+      }
+      if (completedPaymentInformation) {
+        removeElements.push('setup-payment')
+        dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
+      } else {
+        removeElements.push('update-payment')
+        dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
+      }
+      if (req.data.owners && req.data.owners.length) {
+        dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
+        for (const person of req.data.owners) {
+          if (person.requirements.currently_due.length) {
+            removeElements.push(`requires-no-information-${person.id}`)
+          } else {
+            removeElements.push(`requires-information-${person.id}`)
+          }
+        }
+      } else {
+        if (!req.data.stripeAccount.requiresOwners) {
+          removeElements.push('owners-container')
         } else {
-          removeElements.push(`requires-information-${person.id}`)
+          removeElements.push('owners-table')
         }
       }
-    } else {
-      if (!req.data.stripeAccount.requiresExecutives) {
-        removeElements.push('executives-container')
+      if (req.data.directors && req.data.directors.length) {
+        dashboard.HTML.renderTable(doc, req.data.directors, 'person-row', 'directors-table')
+        for (const person of req.data.directors) {
+          if (person.requirements.currently_due.length) {
+            removeElements.push(`requires-no-information-${person.id}`)
+          } else {
+            removeElements.push(`requires-information-${person.id}`)
+          }
+        }
       } else {
-        removeElements.push('executives-table')
+        if (!req.data.stripeAccount.requiresDirectors) {
+          removeElements.push('directors-container')
+        } else {
+          removeElements.push('directors-table')
+        }
+      }
+      if (req.data.executives && req.data.executives.length) {
+        dashboard.HTML.renderTable(doc, req.data.executives, 'person-row', 'executives-table')
+        for (const person of req.data.executives) {
+          if (person.requirements.currently_due.length) {
+            removeElements.push(`requires-no-information-${person.id}`)
+          } else {
+            removeElements.push(`requires-information-${person.id}`)
+          }
+        }
+      } else {
+        if (!req.data.stripeAccount.requiresExecutives) {
+          removeElements.push('executives-container')
+        } else {
+          removeElements.push('executives-table')
+        }
       }
     }
-  }
-  if (req.data.stripeAccount.submittedAt) {
-    removeElements.push('registration-container')
-  } else if (req.data.registrationComplete) {
-    dashboard.HTML.renderTemplate(doc, null, 'completed-registration', 'account-status')
-    removeElements.push('start-registration-link')
-  } else {
-    dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
-    removeElements.push('update-registration-link')
-  }
-  if (req.data.stripeAccount.submittedAt) {
-    dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'submitted-information', 'submission-status')
-    removeElements.push('submit-registration-link-container')
-  } else {
-    dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'not-submitted-information', 'submission-status')
-    if (!req.data.registrationComplete || !completedPaymentInformation) {
-      const registrationLink = doc.getElementById('submit-registration-link')
-      registrationLink.setAttribute('disabled', 'disabled')
+    if (req.data.stripeAccount.submittedAt) {
+      removeElements.push('registration-container')
+    } else if (req.data.registrationComplete) {
+      dashboard.HTML.renderTemplate(doc, null, 'completed-registration', 'account-status')
+      removeElements.push('start-registration-link')
+    } else {
+      dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
+      removeElements.push('update-registration-link')
+    }
+    if (req.data.stripeAccount.submittedAt) {
+      dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'submitted-information', 'submission-status')
+      removeElements.push('submit-registration-link-container')
+    } else {
+      dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'not-submitted-information', 'submission-status')
+      if (!req.data.registrationComplete || !completedPaymentInformation) {
+        const registrationLink = doc.getElementById('submit-registration-link')
+        registrationLink.setAttribute('disabled', 'disabled')
+      }
     }
   }
   for (const id of removeElements) {
