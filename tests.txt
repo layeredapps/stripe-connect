@@ -1,6 +1,6 @@
 
-> @layeredapps/stripe-connect@0.0.30 test
-> PORT=50010 NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --retries 3 --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
+> @layeredapps/stripe-connect@0.0.38 test
+> PORT=50010 NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
 
 
 
@@ -28,9 +28,6 @@
       ✔ should bind data to req
 
   /account/connect/create-person
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should reject individual registration
     view
       ✔ should present the form
       ✔ should remove director option
@@ -40,38 +37,46 @@
       ✔ should create representative
       ✔ should create executive
       ✔ should create owner
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-stripe-account
+      ✔ invalid-xss-input
+      ✔ invalid-csrf-token
 
   /account/connect/create-stripe-account
     view
       ✔ should present the form
     submit
       ✔ should create Stripe account (screenshots)
+    errors
+      ✔ invalid-csrf-token
 
   /account/connect/delete-person
-    exceptions
-      ✔ should reject invalid personid
-      ✔ should require own Stripe account
     before
       ✔ should bind data to req
     view
       ✔ should present the form
     submit
       ✔ should delete person (screenshots)
+    errors
+      ✔ invalid-personid
+      ✔ invalid-account
+      ✔ invalid-csrf-token
 
   /account/connect/delete-stripe-account
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should require own Stripe account
     before
       ✔ should bind data to req
     view
       ✔ should present the form
     submit
       ✔ should delete Stripe account (screenshots)
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-account
+      ✔ invalid-csrf-token
 
   /account/connect/edit-payment-information
     before
-      ✔ should reject invalid stripeid
       ✔ should bind Stripe account to req
     view
       ✔ should present the form
@@ -90,21 +95,22 @@
     submit
       ✔ should update payment information (screenshots)
     errors
-      ✔ reject invalid field account_holder_type
-      ✔ reject invalid field currency
-      ✔ reject invalid field iban
-      ✔ reject invalid field account_number
-      ✔ reject invalid field bsb_number
-      ✔ reject invalid field institution_number
-      ✔ reject invalid field transit_number
-      ✔ reject invalid field sort_code
-      ✔ reject invalid field clearing_code
-      ✔ reject invalid field bank_code
-      ✔ reject invalid field routing_number
+      ✔ invalid-stripeid
+      ✔ invalid-account_holder_type
+      ✔ invalid-currency
+      ✔ invalid-iban
+      ✔ invalid-account_number
+      ✔ invalid-bsb_number
+      ✔ invalid-institution_number
+      ✔ invalid-transit_number
+      ✔ invalid-sort_code
+      ✔ invalid-clearing_code
+      ✔ invalid-bank_code
+      ✔ invalid-routing_number
+      ✔ invalid-xss-input
+      ✔ invalid-csrf-token
 
   /account/connect/edit-person
-    exceptions
-      ✔ should reject invalid person
     view
       ✔ should present the form
       ✔ should have element for field dob_day
@@ -140,18 +146,19 @@
       ✔ should update person no stripe.js
       ✔ should update person stripe.js v3 (screenshots)
     errors
-      ✔ reject invalid field dob_day
-      ✔ reject invalid field dob_month
-      ✔ reject invalid field dob_year
-      ✔ reject invalid field relationship_percent_ownership
-      ✔ reject invalid field id_number
-      ✔ reject invalid field phone
-      ✔ reject invalid field ssn_last_4
-      ✔ reject invalid field email
+      ✔ invalid-personid
+      ✔ invalid-dob_day
+      ✔ invalid-dob_month
+      ✔ invalid-dob_year
+      ✔ invalid-relationship_percent_ownership
+      ✔ invalid-id_number
+      ✔ invalid-phone
+      ✔ invalid-ssn_last_4
+      ✔ invalid-email
+      ✔ invalid-xss-input
+      ✔ invalid-csrf-token
 
   /account/connect/edit-stripe-account
-    exceptions
-      ✔ should reject invalid Stripe account
     view
       ✔ should present the form
       ✔ should have element for field business_profile_mcc
@@ -210,49 +217,52 @@
       ✔ should update registration no stripe.js (company)
       ✔ should update registration stripe.js v3 (company)
     errors
-      ✔ reject invalid field business_profile_mcc
-      ✔ reject invalid field business_profile_url
-      ✔ reject invalid field individual_dob_day
-      ✔ reject invalid field individual_dob_month
-      ✔ reject invalid field individual_dob_year
-      ✔ reject invalid field individual_id_number
-      ✔ reject invalid field individual_phone
-      ✔ reject invalid field individual_ssn_last_4
-      ✔ reject invalid field individual_email
-      ✔ reject invalid field individual_first_name
-      ✔ reject invalid field individual_last_name
-      ✔ reject invalid field individual_first_name_kana
-      ✔ reject invalid field individual_last_name_kana
-      ✔ reject invalid field individual_first_name_kanji
-      ✔ reject invalid field individual_last_name_kanji
-      ✔ reject invalid field individual_address_line1
-      ✔ reject invalid field individual_address_city
-      ✔ reject invalid field individual_address_state
-      ✔ reject invalid field individual_address_postal_code
-      ✔ reject invalid field individual_address_kana_line1
-      ✔ reject invalid field individual_address_kana_town
-      ✔ reject invalid field individual_address_kana_city
-      ✔ reject invalid field individual_address_kana_state
-      ✔ reject invalid field individual_address_kanji_line1
-      ✔ reject invalid field individual_address_kanji_town
-      ✔ reject invalid field individual_address_kanji_city
-      ✔ reject invalid field individual_address_kanji_state
-      ✔ reject invalid field company_name
-      ✔ reject invalid field company_tax_id
-      ✔ reject invalid field company_registration_number
-      ✔ reject invalid field company_phone
-      ✔ reject invalid field company_address_line1
-      ✔ reject invalid field company_address_city
-      ✔ reject invalid field company_address_state
-      ✔ reject invalid field company_address_postal_code
-      ✔ reject invalid field company_address_kana_line1
-      ✔ reject invalid field company_address_kana_town
-      ✔ reject invalid field company_address_kana_city
-      ✔ reject invalid field company_address_kana_state
-      ✔ reject invalid field company_address_kanji_line1
-      ✔ reject invalid field company_address_kanji_town
-      ✔ reject invalid field company_address_kanji_city
-      ✔ reject invalid field company_address_kanji_state
+      ✔ invalid-stripeid
+      ✔ invalid-business_profile_mcc
+      ✔ invalid-business_profile_url
+      ✔ invalid-individual_dob_day
+      ✔ invalid-individual_dob_month
+      ✔ invalid-individual_dob_year
+      ✔ invalid-individual_id_number
+      ✔ invalid-individual_phone
+      ✔ invalid-individual_ssn_last_4
+      ✔ invalid-individual_email
+      ✔ invalid-individual_first_name
+      ✔ invalid-individual_last_name
+      ✔ invalid-individual_first_name_kana
+      ✔ invalid-individual_last_name_kana
+      ✔ invalid-individual_first_name_kanji
+      ✔ invalid-individual_last_name_kanji
+      ✔ invalid-individual_address_line1
+      ✔ invalid-individual_address_city
+      ✔ invalid-individual_address_state
+      ✔ invalid-individual_address_postal_code
+      ✔ invalid-individual_address_kana_line1
+      ✔ invalid-individual_address_kana_town
+      ✔ invalid-individual_address_kana_city
+      ✔ invalid-individual_address_kana_state
+      ✔ invalid-individual_address_kanji_line1
+      ✔ invalid-individual_address_kanji_town
+      ✔ invalid-individual_address_kanji_city
+      ✔ invalid-individual_address_kanji_state
+      ✔ invalid-company_name
+      ✔ invalid-company_tax_id
+      ✔ invalid-company_registration_number
+      ✔ invalid-company_phone
+      ✔ invalid-company_address_line1
+      ✔ invalid-company_address_city
+      ✔ invalid-company_address_state
+      ✔ invalid-company_address_postal_code
+      ✔ invalid-company_address_kana_line1
+      ✔ invalid-company_address_kana_town
+      ✔ invalid-company_address_kana_city
+      ✔ invalid-company_address_kana_state
+      ✔ invalid-company_address_kanji_line1
+      ✔ invalid-company_address_kanji_town
+      ✔ invalid-company_address_kanji_city
+      ✔ invalid-company_address_kanji_state
+      ✔ invalid-xss-input
+      ✔ invalid-csrf-token
 
   /account/connect
     before
@@ -262,7 +272,6 @@
 
   /account/connect/person
     before
-      ✔ should reject invalid personid
       ✔ should bind data to req
     view
       ✔ should show table for person (screenshots)
@@ -271,22 +280,22 @@
       ✔ should show person is director
       ✔ should show person requires additional information
       ✔ should show no additional information required
+    errors
+      ✔ invalid-personid
 
   /account/connect/persons
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should reject individual registration
     before
       ✔ should bind data to req
     view
       ✔ should have row for each owner (screenshots)
       ✔ should have row for each director
       ✔ should have row for each representative
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-stripe-account
 
   /account/connect/stripe-account
     before
-      ✔ should reject invalid stripeid
-      ✔ should reject other account's stripeid
       ✔ should bind data to req
     view
       ✔ should show registration unstarted (screenshots)
@@ -295,6 +304,9 @@
       ✔ should show payment information created
       ✔ should show ready to submit
       ✔ should show registration is submitted
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-account
 
   /account/connect/stripe-accounts
     before
@@ -303,10 +315,6 @@
       ✔ should return one page (screenshots)
 
   /account/connect/submit-company-directors
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should reject individual registration
-      ✔ should reject Stripe account that doesn't require directors
     before
       ✔ should bind data to req
     view
@@ -316,12 +324,13 @@
     submit
       ✔ should submit directors (screenshots)
       ✔ should submit without directors
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-stripe-account
+      ✔ not-required
+      ✔ invalid-csrf-token
 
   /account/connect/submit-company-executives
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should reject individual registration
-      ✔ should reject Stripe account that doesn't require executives
     before
       ✔ should bind data to req
     view
@@ -331,12 +340,13 @@
     submit
       ✔ should submit executives (screenshots)
       ✔ should submit without executives
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-stripe-account
+      ✔ not-required
+      ✔ invalid-csrf-token
 
   /account/connect/submit-company-owners
-    exceptions
-      ✔ should reject invalid stripeid
-      ✔ should reject individual registration
-      ✔ should reject Stripe account that doesn't require owners
     before
       ✔ should bind data to req
     view
@@ -346,10 +356,13 @@
     submit
       ✔ should submit owners (screenshots)
       ✔ should submit without owners
+    errors
+      ✔ invalid-stripeid
+      ✔ individual-stripe-account
+      ✔ not-required
+      ✔ invalid-csrf-token
 
   /account/connect/submit-stripe-account
-    exceptions
-      ✔ should reject invalid stripeid
     before
       ✔ should bind data to req
     view
@@ -368,6 +381,9 @@
     submit
       ✔ should submit registration (company) (screenshots)
       ✔ should submit registration (individual)
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-csrf-token
 
   /administrator/connect/delete-stripe-account
     before
@@ -376,6 +392,9 @@
       ✔ should present the form
     submit
       ✔ should delete Stripe account (screenshots)
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-csrf-token
 
   /administrator/connect
     before
@@ -387,10 +406,11 @@
 
   /administrator/connect/payout
     before
-      ✔ should reject invalid payoutid
       ✔ should bind data to req
     view
       ✔ should have row for payout (screenshots)
+    errors
+      ✔ invalid-payoutid
 
   /administrator/connect/payouts
     before
@@ -407,13 +427,17 @@
       ✔ should present the form
     submit
       ✔ should update the Stripe account as rejected (screenshots)
+    errors
+      ✔ invalid-stripeid
+      ✔ invalid-csrf-token
 
   /administrator/connect/stripe-account
     before
-      ✔ should reject invalid stripeid
       ✔ should bind data to req
     view
       ✔ should have row for Stripe account (screenshots)
+    error
+      ✔ invalid-stripeid
 
   /administrator/connect/stripe-accounts
     before
@@ -981,5 +1005,5 @@
       ✔ environment STRIPE_JS
 
 
-  593 passing (55m)
+  612 passing (59m)
 
