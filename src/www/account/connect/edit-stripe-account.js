@@ -122,11 +122,6 @@ async function renderPage (req, res, messageTemplate) {
     } else {
       hasRequirements = true
     }
-    if (requirements.indexOf('company.verification.document') === -1) {
-      removeElements.push('company-document-container')
-    } else {
-      hasRequirements = true
-    }
     if (requirements.indexOf('individual.verification.document') === -1) {
       removeElements.push('individual-document-container')
     } else {
@@ -225,7 +220,13 @@ async function renderPage (req, res, messageTemplate) {
   }
   for (const id of removeElements) {
     const element = doc.getElementById(id)
+    if (!element) {
+      console.log('no element', id, removeElements)
+    }
     element.parentNode.removeChild(element)
+    if (id === 'submit-form') {
+      break
+    }
   }
   return dashboard.Response.end(req, res, doc)
 }
