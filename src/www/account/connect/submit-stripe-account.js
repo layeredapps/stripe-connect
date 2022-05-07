@@ -203,7 +203,15 @@ async function renderPage (req, res, messageTemplate) {
     }
   } else {
     if (req.data.stripeAccount.business_type !== 'company') {
-      removeElements.push('company-representative-option', 'company-company-owners-option', 'company-directors-option', 'company-executives-option')
+      removeElements.push(
+        'company-representative-option', 
+        'company-company-owners-option', 
+        'company-directors-option', 
+        'executives-option',
+        'owners-container', 
+        'directors-container', 
+        'executives-container'
+      )
     } else {
       if (req.data.owners && req.data.owners.length) {
         dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
