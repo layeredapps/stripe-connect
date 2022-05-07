@@ -82,7 +82,8 @@ async function renderPage (req, res, messageTemplate) {
       })
     }
     dashboard.HTML.renderList(doc, countries, 'country-option', 'country')
-    const currencies = connect.countryCurrencyIndex[req.data.stripeAccount.country]
+    const nominatedCountry = (req.body ? req.body.country : '') || req.data.stripeAccount.country
+    const currencies = connect.countryCurrencyIndex[nominatedCountry]
     dashboard.HTML.renderList(doc, currencies, 'currency-option', 'currency')
     if (req.body) {
       for (const field in req.body) {
