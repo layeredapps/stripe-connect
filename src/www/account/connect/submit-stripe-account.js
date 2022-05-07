@@ -204,12 +204,12 @@ async function renderPage (req, res, messageTemplate) {
   } else {
     if (req.data.stripeAccount.business_type !== 'company') {
       removeElements.push(
-        'company-representative-option', 
-        'company-company-owners-option', 
-        'company-directors-option', 
+        'company-representative-option',
+        'company-company-owners-option',
+        'company-directors-option',
         'executives-option',
-        'owners-container', 
-        'directors-container', 
+        'owners-container',
+        'directors-container',
         'executives-container'
       )
     } else {
