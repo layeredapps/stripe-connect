@@ -75,7 +75,7 @@ async function beforeRequest (req) {
     if (stripeAccount.business_type === 'company') {
       registrationStarted = stripeAccount.company.name && stripeAccount.company.name.length
     } else {
-      registrationStarted = stripeAccount.individual.first_name && stripeAccount.company.first_name.length
+      registrationStarted = stripeAccount.individual.first_name && stripeAccount.individual.first_name.length
     }
   }
   stripeAccount.company = stripeAccount.company || {}
@@ -218,10 +218,11 @@ async function renderPage (req, res, messageTemplate) {
       dashboard.HTML.renderTemplate(doc, null, 'completed-registration', 'account-status')
       removeElements.push('start-registration-link', 'update-registration-link')
     } else {
-      dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
       if (req.data.registrationStarted) {
+        dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
         removeElements.push('start-registration-link')
       } else {
+        dashboard.HTML.renderTemplate(doc, null, 'requires-registration-information', 'account-status')
         removeElements.push('update-registration-link')
       }
     }
