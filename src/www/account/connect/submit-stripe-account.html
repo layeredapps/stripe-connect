@@ -14,7 +14,7 @@
   <body>
     <div class="container">
       <h1 translate="yes">Submit Stripe account</h1>
-      <p translate="yes">Complete your <a href="https://stripe.com/connect">Stripe Connect</a> verification process by submitting your completed registration.</p>
+      <p translate="yes">Revise the Stripe Connect terms and conditions before submitting your account.</p>
       <div id="message-container"></div>
       <div id="owners-container">
         <h2 translate="yes">Owners</h2>
@@ -57,25 +57,32 @@
       </div>
       <form id="submit-form" method="post" class="input-form" action="/account/connect/submit-stripe-account?stripeid=${stripeAccount.id}" name="submit-form">
         <input type="hidden" name="csrf-token" />
-        <label>
-          <input checked disabled type="checkbox"> I have provided complete and accurate information
-        </label>
-        <label id="company-representative-option">
-          <input checked disabled type="checkbox"> I am authorized to represent this business
-        </label>
-        <label id="company-company-owners-option">
-          <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company owner information
-        </label>
-        <label id="company-directors-option">
-          <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company director information
-        </label>
-        <label id="company-executives-option">
-          <input checked disabled type="checkbox"> I have submitted, or there are no, relevant company executive information
-        </label>
-        <label>
-          <input checked disabled type="checkbox"> I accept the Stripe Connect <a href="https://stripe.com/us/connect-account/legal">terms and conditions</a>
-        </label>
-        <div class="form-buttons">
+        <div class="checkbox-fields">
+          <label class="field-label">
+            <input checked disabled type="checkbox" /> 
+            <span translate="yes">I have provided complete and accurate information</span>
+          </label>
+          <label class="field-label" id="company-representative-option">
+            <input checked disabled type="checkbox" /> 
+            <span translate="yes">I am authorized to represent this business</span>
+          </label>
+          <label class="field-label" id="company-company-owners-option">
+            <input checked disabled type="checkbox" /> 
+            <span translate="yes">I have submitted, or there are no, relevant company owner information</span>
+          </label>
+          <label class="field-label" id="company-directors-option">
+            <input checked disabled type="checkbox" /> 
+            <span translate="yes">I have submitted, or there are no, relevant company director information</span>
+          </label>
+          <label class="field-label" id="company-executives-option">
+            <input checked disabled type="checkbox" /> 
+            <span translate="yes">I have submitted, or there are no, relevant company executive information</span>
+          </label>
+          <label class="field-label">
+            <a target="_blank" href="https://stripe.com/us/connect-account/legal" translate="yes"><input checked disabled type="checkbox" /> I accept the Stripe Connect terms and conditions</a>
+          </label>
+        </div>
+        <div class="nested-button form-buttons">
           <button id="submit-button" class="button" translate="yes">Submit registration</button>
         </div>
       </form>
