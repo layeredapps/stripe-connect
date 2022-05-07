@@ -207,7 +207,7 @@ async function renderPage (req, res, messageTemplate) {
         'company-representative-option',
         'company-company-owners-option',
         'company-directors-option',
-        'executives-option',
+        'company-executives-option',
         'owners-container',
         'directors-container',
         'executives-container'
