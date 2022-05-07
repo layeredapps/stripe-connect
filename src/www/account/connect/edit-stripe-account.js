@@ -113,7 +113,7 @@ async function renderPage (req, res, messageTemplate) {
     }
     if (requirements.indexOf('individual.verification.additional_document') === -1) {
       removeElements.push('individual-additional-document-container')
-    }  
+    }
   } else {
     if (req.data.stripeAccount.country !== 'JP') {
       removeElements.push(
@@ -130,7 +130,7 @@ async function renderPage (req, res, messageTemplate) {
     }
     if (requirements.indexOf('company.registration_number') === -1) {
       removeElements.push('company-registration_number-container')
-    }  
+    }
   }
   let requireAddress = false
   for (const field of requirements) {
