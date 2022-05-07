@@ -68,6 +68,16 @@ async function beforeRequest (req) {
       registrationComplete = false
     }
   }
+  let registrationStarted = false
+  if (registrationComplete) {
+    registrationStarted = true
+  } else {
+    if (stripeAccount.business_type === 'company') {
+      registrationStarted = stripeAccount.company.name && stripeAccount.company.name.length
+    } else {
+      registrationStarted = stripeAccount.individual.first_name && stripeAccount.company.first_name.length
+    }
+  }
   stripeAccount.company = stripeAccount.company || {}
   stripeAccount.individual = stripeAccount.individual || {}
   let owners, directors, executives, representatives
@@ -97,7 +107,7 @@ async function beforeRequest (req) {
       }
     }
   }
-  req.data = { owners, directors, executives, representatives, stripeAccount, registrationComplete }
+  req.data = { owners, directors, executives, representatives, stripeAccount, registrationComplete, registrationStarted }
 }
 
 async function renderPage (req, res, messageTemplate) {
@@ -202,14 +212,18 @@ async function renderPage (req, res, messageTemplate) {
         }
       }
     }
-    if (req.data.stripeAccount.submittedAt) {
+    if (req.data.stripeAccount.submittedAt && req.data.registrationComplete) {
       removeElements.push('registration-container')
     } else if (req.data.registrationComplete) {
       dashboard.HTML.renderTemplate(doc, null, 'completed-registration', 'account-status')
       removeElements.push('start-registration-link', 'update-registration-link')
     } else {
       dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
-      removeElements.push('update-registration-link')
+      if (req.data.registrationStarted) {
+        removeElements.push('start-registration-link')
+      } else {
+        removeElements.push('update-registration-link')
+      }
     }
     if (req.data.stripeAccount.submittedAt) {
       dashboard.HTML.renderTemplate(doc, req.data.stripeAccount, 'submitted-information', 'submission-status')
