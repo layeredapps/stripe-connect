@@ -55,7 +55,7 @@ describe('/account/connect/edit-stripe-account', function () {
       req.session = user.session
       cachedResponses.individual_phone = await req.get()
       cachedResponses.individual_ssn_last_4 = await req.get()
-      //  name email and uploads
+      //  email and name
       await TestHelper.createStripeAccount(user, {
         country: 'AT',
         business_type: 'individual'
@@ -63,7 +63,13 @@ describe('/account/connect/edit-stripe-account', function () {
       req = TestHelper.createRequest(`/account/connect/edit-stripe-account?stripeid=${user.stripeAccount.stripeid}`)
       req.account = user.account
       req.session = user.session
-      cachedResponses.individual_email = cachedResponses.individual_uploads = cachedResponses.individual_name = await req.get()
+      cachedResponses.individual_email = cachedResponses.individual_name = await req.get()
+      // uploads
+      req.body = TestStripeAccounts.createAccountData(user.profile, 'AT', user.stripeAccount.stripeObject)
+      await req.post()
+      await TestStripeAccounts.waitForAccountField(user, 'individual.verification.document')
+      await TestStripeAccounts.waitForAccountField(user, 'individual.verification.additional_document')
+      cachedResponses.individual_uploads = await req.get()
       // company
       await TestHelper.createStripeAccount(user, {
         country: 'AU',

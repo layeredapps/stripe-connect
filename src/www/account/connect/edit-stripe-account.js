@@ -71,26 +71,67 @@ async function renderPage (req, res, messageTemplate) {
       return dashboard.Response.end(req, res, doc)
     }
   }
-  if (req.data.stripeAccount.country !== 'JP') {
-    removeElements.push(
-      'individual-kana-container',
-      'individual-kanji-container',
-      'individual-address-kana-kanji-container',
-      'individual-address-kana-kanji-container',
-      'company-kana-kanji-container',
-      'company-address-kana-container',
-      'company-address-kanji-container')
-  } else if (req.data.stripeAccount.business_type === 'company') {
-    removeElements.push('individual-kana-container', 'individual-kanji-container', 'individual-address-kana-kanji-container', 'individual-address-kana-kanji-container')
-  } else if (req.data.stripeAccount.business_type === 'individual') {
-    removeElements.push('company-kana-kanji-container', 'company-address-kana-container', 'company-address-kanji-container')
-  }
-  if (req.data.stripeAccount.business_type === 'individual') {
-    removeElements.push('company-address-container', 'company-container')
-  } else {
-    removeElements.push('individual-container')
-  }
   const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due)
+  if (req.data.stripeAccount.business_type === 'individual') {
+    if (req.data.stripeAccount.country !== 'JP') {
+      removeElements.push(
+        'individual-kana-container',
+        'individual-kanji-container',
+        'individual-address-kana-kanji-container',
+        'individual-address-kana-kanji-container')
+    }
+    removeElements.push('company-address-container', 'company-container')
+    if (requirements.indexOf('individual.first_name') === -1) {
+      removeElements.push('individual-first_name-container')
+    }
+    if (requirements.indexOf('individual.last_name') === -1) {
+      removeElements.push('individual-last_name-container')
+    }
+    if (requirements.indexOf('individual.phone') === -1) {
+      removeElements.push('individual-phone-container')
+    }
+    if (requirements.indexOf('individual.email') === -1) {
+      removeElements.push('individual-email-container')
+    }
+    if (requirements.indexOf('individual.dob.day') === -1) {
+      removeElements.push('individual-dob-container')
+    }
+    if (requirements.indexOf('individual.gender') === -1) {
+      removeElements.push('individual-gender-container')
+    }
+    if (requirements.indexOf('individual.id_number') === -1) {
+      removeElements.push('individual-id_number-container')
+    }
+    if (requirements.indexOf('individual.ssn_last_4') === -1) {
+      removeElements.push('individual-ssn_last_4-container')
+    }
+    if (requirements.indexOf('company.verification.document') === -1) {
+      removeElements.push('company-document-container')
+    }
+    if (requirements.indexOf('individual.verification.document') === -1) {
+      removeElements.push('individual-document-container')
+    }
+    if (requirements.indexOf('individual.verification.additional_document') === -1) {
+      removeElements.push('individual-additional-document-container')
+    }  
+  } else {
+    if (req.data.stripeAccount.country !== 'JP') {
+      removeElements.push(
+        'company-kana-kanji-container',
+        'company-address-kana-container',
+        'company-address-kanji-container')
+    }
+    removeElements.push('individual-container')
+    if (requirements.indexOf('company.phone') === -1) {
+      removeElements.push('company-phone-container')
+    }
+    if (requirements.indexOf('company.tax_id') === -1) {
+      removeElements.push('company-tax_id-container')
+    }
+    if (requirements.indexOf('company.registration_number') === -1) {
+      removeElements.push('company-registration_number-container')
+    }  
+  }
   let requireAddress = false
   for (const field of requirements) {
     requireAddress = field.indexOf(`${req.data.stripeAccount.business_type}.address`) > -1
@@ -99,22 +140,22 @@ async function renderPage (req, res, messageTemplate) {
     }
   }
   if (!requireAddress) {
-    removeElements.push(`${req.data.stripeAccount.business_type}_address-container`)
+    removeElements.push(`${req.data.stripeAccount.business_type}-address-container`)
   } else {
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.line1`) === -1) {
       removeElements.push(
-        `${req.data.stripeAccount.business_type}_address_line1-container`,
-        `${req.data.stripeAccount.business_type}_address_line2-container`
+        `${req.data.stripeAccount.business_type}-address_line1-container`,
+        `${req.data.stripeAccount.business_type}-address_line2-container`
       )
     }
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.city`) === -1) {
-      removeElements.push(`${req.data.stripeAccount.business_type}_address_city-container`)
+      removeElements.push(`${req.data.stripeAccount.business_type}-address_city-container`)
     }
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.state`) === -1) {
-      removeElements.push(`${req.data.stripeAccount.business_type}_address_state-container`)
+      removeElements.push(`${req.data.stripeAccount.business_type}-address_state-container`)
     }
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.postal_code`) === -1) {
-      removeElements.push(`${req.data.stripeAccount.business_type}_address_postal_code-container`)
+      removeElements.push(`${req.data.stripeAccount.business_type}-address_postal_code-container`)
     }
   }
   if (requirements.indexOf('business_profile.mcc') > -1) {
@@ -129,48 +170,6 @@ async function renderPage (req, res, messageTemplate) {
   if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.state`) > -1) {
     const personalStates = connect.countryDivisions[req.data.stripeAccount.country]
     dashboard.HTML.renderList(doc, personalStates, 'state-option', `${req.data.stripeAccount.business_type}_address_state`)
-  }
-  if (requirements.indexOf('individual.first_name') === -1) {
-    removeElements.push('individual_first_name-container')
-  }
-  if (requirements.indexOf('individual.last_name') === -1) {
-    removeElements.push('individual_last_name-container')
-  }
-  if (requirements.indexOf('individual.phone') === -1) {
-    removeElements.push('individual_phone-container')
-  }
-  if (requirements.indexOf('company.phone') === -1) {
-    removeElements.push('company_phone-container')
-  }
-  if (requirements.indexOf('company.tax_id') === -1) {
-    removeElements.push('company_tax_id-container')
-  }
-  if (requirements.indexOf('company.registration_number') === -1) {
-    removeElements.push('company_registration_number-container')
-  }
-  if (requirements.indexOf('individual.email') === -1) {
-    removeElements.push('individual_email-container')
-  }
-  if (requirements.indexOf('individual.dob.day') === -1) {
-    removeElements.push('individual_dob-container')
-  }
-  if (requirements.indexOf('individual.gender') === -1) {
-    removeElements.push('individual_gender-container')
-  }
-  if (requirements.indexOf('individual.id_number') === -1) {
-    removeElements.push('individual_id_number-container')
-  }
-  if (requirements.indexOf('individual.ssn_last_4') === -1) {
-    removeElements.push('individual_ssn_last_4-container')
-  }
-  if (requirements.indexOf('company.verification.document') === -1) {
-    removeElements.push('company_verification_document-container')
-  }
-  if (requirements.indexOf('individual.verification.document') === -1) {
-    removeElements.push('individual-document-container')
-  }
-  if (requirements.indexOf('individual.verification.additional_document') === -1) {
-    removeElements.push('individual-additional-document-container')
   }
   if (req.body) {
     for (const field in req.body) {
