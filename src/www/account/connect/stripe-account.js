@@ -62,7 +62,6 @@ async function beforeRequest (req) {
           field === 'relationship.director' ||
           field === 'business_type' ||
           field === 'tos_acceptance.ip' ||
-          field === 'individual.verification.document' ||
           field === 'tos_acceptance.date') {
         continue
       }
@@ -207,7 +206,7 @@ async function renderPage (req, res, messageTemplate) {
       removeElements.push('registration-container')
     } else if (req.data.registrationComplete) {
       dashboard.HTML.renderTemplate(doc, null, 'completed-registration', 'account-status')
-      removeElements.push('start-registration-link')
+      removeElements.push('start-registration-link', 'update-registration-link')
     } else {
       dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
       removeElements.push('update-registration-link')
