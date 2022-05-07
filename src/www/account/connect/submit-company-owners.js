@@ -18,6 +18,17 @@ async function beforeRequest (req) {
     }
     return
   }
+
+  if (req.query.message === 'success') {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        id: req.query.stripeid,
+        stripeid: req.query.stripeid
+      }
+    }
+    return
+  }
   let stripeAccountRaw
   try {
     stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)
@@ -49,11 +60,6 @@ async function beforeRequest (req) {
         stripeid: req.query.stripeid
       }
     }
-    return
-  }
-  if (req.query.message === 'success') {
-    req.removeContents = true
-    req.data = { stripeAccount }
     return
   }
   req.query.all = true

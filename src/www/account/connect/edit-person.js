@@ -19,6 +19,16 @@ async function beforeRequest (req) {
     }
     return
   }
+  if (req.query.message === 'success') {
+    req.removeContents = true
+    req.data = {
+      person: {
+        id: req.query.personid,
+        personid: req.query.personid
+      }
+    }
+    return
+  }
   let personRaw
   try {
     personRaw = await global.api.user.connect.Person.get(req)

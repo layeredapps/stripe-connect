@@ -15,6 +15,16 @@ async function beforeRequest (req) {
     req.error = 'invalid-stripeid'
     return
   }
+  if (req.query.message === 'success') {
+    req.removeContents = true
+    req.data = {
+      stripeAccount: {
+        id: req.query.stripeid,
+        stripeid: req.query.stripeid
+      }
+    }
+    return
+  }
   let stripeAccountRaw
   try {
     stripeAccountRaw = await global.api.user.connect.StripeAccount.get(req)

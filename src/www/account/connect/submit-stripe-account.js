@@ -23,6 +23,7 @@ async function beforeRequest (req) {
     req.removeContents = true
     req.data = {
       stripeAccount: {
+        id: req.query.stripeid,
         stripeid: req.query.stripeid
       }
     }
