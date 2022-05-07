@@ -167,10 +167,10 @@ async function renderPage (req, res, messageTemplate) {
     removeElements.push('company_verification_document-container')
   }
   if (requirements.indexOf('individual.verification.document') === -1) {
-    removeElements.push('individual_verification_document-container')
+    removeElements.push('individual-document-container')
   }
   if (requirements.indexOf('individual.verification.additional_document') === -1) {
-    removeElements.push('individual_verification_additional_document-container')
+    removeElements.push('individual-additional-document-container')
   }
   if (req.body) {
     for (const field in req.body) {
@@ -187,9 +187,6 @@ async function renderPage (req, res, messageTemplate) {
   }
   for (const id of removeElements) {
     const element = doc.getElementById(id)
-    if (!element) {
-      continue
-    }
     element.parentNode.removeChild(element)
   }
   return dashboard.Response.end(req, res, doc)
