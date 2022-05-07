@@ -5,11 +5,11 @@ global.connectWebhookEndPointSecret = global.connectWebhookEndPointSecret || pro
 if (!global.connectWebhookEndPointSecret) {
   throw new Error('invalid-connect-webhook-endpoint-secret')
 }
-global.stripePublishableKey = process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
+global.stripePublishableKey = global.stripePublishableKey || process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
 if (global.stripeJS > 0 && !global.stripePublishableKey) {
   throw new Error('invalid-stripe-publishable-key')
 }
-global.stripeKey = process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+global.stripeKey = global.stripeKey || process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 if (!global.stripeKey) {
   throw new Error('invalid-stripe-key')
 }
