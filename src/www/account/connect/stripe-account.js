@@ -219,10 +219,10 @@ async function renderPage (req, res, messageTemplate) {
       removeElements.push('start-registration-link', 'update-registration-link')
     } else {
       if (req.data.registrationStarted) {
-        dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
+        dashboard.HTML.renderTemplate(doc, null, 'requires-registration-information', 'account-status')
         removeElements.push('start-registration-link')
       } else {
-        dashboard.HTML.renderTemplate(doc, null, 'requires-registration-information', 'account-status')
+        dashboard.HTML.renderTemplate(doc, null, 'unstarted-registration', 'account-status')
         removeElements.push('update-registration-link')
       }
     }
