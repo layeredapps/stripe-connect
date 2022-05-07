@@ -259,10 +259,18 @@ function updateStripeAccount (e) {
         if (!result || result.error) {
           return window.renderError(result.error)
         }
-        documentBack.value = ''
-        documentFront.value = ''
-        additionalDocumentBack.value = ''
-        additionalDocumentFront.value = ''
+        if (documentBack) {
+          documentBack.value = ''
+        }
+        if (documentFront) {
+          documentFront.value = ''
+        }
+        if (additionalDocumentBack) {
+          additionalDocumentBack.value = ''
+        }
+        if (additionalDocumentFront) {
+          additionalDocumentFront.value = ''
+        }
         const token = document.getElementById('token')
         token.value = result.token.id
         const form = document.getElementById('submit-form')
