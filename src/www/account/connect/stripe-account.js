@@ -121,6 +121,13 @@ async function renderPage (req, res, messageTemplate) {
       removeElements.push('submitted')
     }
     const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
+    if (completedPaymentInformation) {
+      removeElements.push('setup-payment')
+      dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
+    } else {
+      removeElements.push('update-payment')
+      dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
+    }
     if (req.data.stripeAccount.business_type === 'individual') {
       removeElements.push('business', 'business-name', 'representative-container', 'owners-container', 'directors-container', 'executives-container')
       if (req.data.stripeAccount.individual.first_name) {
@@ -146,13 +153,6 @@ async function renderPage (req, res, messageTemplate) {
         }
       } else {
         removeElements.push('representatives-table')
-      }
-      if (completedPaymentInformation) {
-        removeElements.push('setup-payment')
-        dashboard.HTML.renderTemplate(doc, req.data.stripeAccount.external_accounts.data[0], 'payment-information', 'payment-information-status')
-      } else {
-        removeElements.push('update-payment')
-        dashboard.HTML.renderTemplate(doc, null, 'no-payment-information', 'payment-information-status')
       }
       if (req.data.owners && req.data.owners.length) {
         dashboard.HTML.renderTable(doc, req.data.owners, 'person-row', 'owners-table')
