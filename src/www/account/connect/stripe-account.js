@@ -122,7 +122,7 @@ async function renderPage (req, res, messageTemplate) {
     }
     const completedPaymentInformation = req.data.stripeAccount.external_accounts.data.length
     if (req.data.stripeAccount.business_type === 'individual') {
-      removeElements.push('business', 'business-name')
+      removeElements.push('business', 'business-name', 'representative-container', 'owners-container', 'directors-container', 'executives-container')
       if (req.data.stripeAccount.individual.first_name) {
         removeElements.push('blank-name')
       } else {
