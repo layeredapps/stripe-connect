@@ -72,6 +72,7 @@ async function renderPage (req, res, messageTemplate) {
     }
   }
   const requirements = req.data.stripeAccount.requirements.currently_due.concat(req.data.stripeAccount.requirements.eventually_due)
+  let hasRequirements = false
   if (req.data.stripeAccount.business_type === 'individual') {
     if (req.data.stripeAccount.country !== 'JP') {
       removeElements.push(
@@ -83,36 +84,58 @@ async function renderPage (req, res, messageTemplate) {
     removeElements.push('company-address-container', 'company-container')
     if (requirements.indexOf('individual.first_name') === -1) {
       removeElements.push('individual-first_name-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.last_name') === -1) {
       removeElements.push('individual-last_name-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.phone') === -1) {
       removeElements.push('individual-phone-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.email') === -1) {
       removeElements.push('individual-email-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.dob.day') === -1) {
       removeElements.push('individual-dob-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.gender') === -1) {
       removeElements.push('individual-gender-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.id_number') === -1) {
       removeElements.push('individual-id_number-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.ssn_last_4') === -1) {
       removeElements.push('individual-ssn_last_4-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('company.verification.document') === -1) {
       removeElements.push('company-document-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.verification.document') === -1) {
       removeElements.push('individual-document-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('individual.verification.additional_document') === -1) {
       removeElements.push('individual-additional-document-container')
+    } else {
+      hasRequirements = true
     }
   } else {
     if (req.data.stripeAccount.country !== 'JP') {
@@ -124,12 +147,18 @@ async function renderPage (req, res, messageTemplate) {
     removeElements.push('individual-container')
     if (requirements.indexOf('company.phone') === -1) {
       removeElements.push('company-phone-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('company.tax_id') === -1) {
       removeElements.push('company-tax_id-container')
+    } else {
+      hasRequirements = true
     }
     if (requirements.indexOf('company.registration_number') === -1) {
       removeElements.push('company-registration_number-container')
+    } else {
+      hasRequirements = true
     }
   }
   let requireAddress = false
@@ -142,6 +171,7 @@ async function renderPage (req, res, messageTemplate) {
   if (!requireAddress) {
     removeElements.push(`${req.data.stripeAccount.business_type}-address-container`)
   } else {
+    hasRequirements = true
     if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.line1`) === -1) {
       removeElements.push(
         `${req.data.stripeAccount.business_type}-address_line1-container`,
@@ -159,6 +189,7 @@ async function renderPage (req, res, messageTemplate) {
     }
   }
   if (requirements.indexOf('business_profile.mcc') > -1) {
+    hasRequirements = true
     const mccList = connect.getMerchantCategoryCodes(req.language)
     dashboard.HTML.renderList(doc, mccList, 'mcc-option', 'business_profile_mcc')
   } else {
@@ -166,21 +197,29 @@ async function renderPage (req, res, messageTemplate) {
   }
   if (requirements.indexOf('business_profile.url') === -1) {
     removeElements.push('business_profile_url-container')
+  } else {
+    hasRequirements = true
   }
   if (requirements.indexOf(`${req.data.stripeAccount.business_type}.address.state`) > -1) {
+    hasRequirements = true
     const personalStates = connect.countryDivisions[req.data.stripeAccount.country]
     dashboard.HTML.renderList(doc, personalStates, 'state-option', `${req.data.stripeAccount.business_type}_address_state`)
   }
-  if (req.body) {
-    for (const field in req.body) {
-      const element = doc.getElementById(field)
-      if (!element) {
-        continue
-      }
-      if (element.tag === 'input') {
-        element.setAttribute('value', dashboard.Format.replaceQuotes(req.body[field] || ''))
-      } else if (element.tag === 'select') {
-        dashboard.HTML.setSelectedOptionByValue(doc, field, req.body[field] || '')
+  if (!hasRequirements) {
+    removeElements.push('submit-form')
+    dashboard.HTML.renderTemplate(doc, null, 'no-required-information', 'message-container')
+  } else {
+    if (req.body) {
+      for (const field in req.body) {
+        const element = doc.getElementById(field)
+        if (!element) {
+          continue
+        }
+        if (element.tag === 'input') {
+          element.setAttribute('value', dashboard.Format.replaceQuotes(req.body[field] || ''))
+        } else if (element.tag === 'select') {
+          dashboard.HTML.setSelectedOptionByValue(doc, field, req.body[field] || '')
+        }
       }
     }
   }
