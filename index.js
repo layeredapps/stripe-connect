@@ -1,6 +1,7 @@
 global.stripeAPIVersion = '2020-08-27'
 global.stripeJS = process.env.STRIPE_JS === 'false' ? false : parseInt(process.env.STRIPE_JS, 10)
 global.maximumStripeRetries = parseInt(process.env.MAXIMUM_STRIPE_RETRIES || '0', 10)
+global.applicationFee = parseInt(process.env.APPLICATION_FEE || '0', 10)
 global.connectWebhookEndPointSecret = global.connectWebhookEndPointSecret || process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET
 if (!global.connectWebhookEndPointSecret) {
   throw new Error('invalid-connect-webhook-endpoint-secret')
