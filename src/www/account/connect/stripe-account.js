@@ -75,7 +75,7 @@ async function beforeRequest (req) {
     if (stripeAccount.business_type === 'company') {
       registrationStarted = stripeAccount.company.name && stripeAccount.company.name.length
     } else {
-      registrationStarted = stripeAccount.individual.first_name && stripeAccount.individual.first_name.length
+      registrationStarted = stripeAccount.individual && stripeAccount.individual.first_name && stripeAccount.individual.first_name.length
     }
   }
   stripeAccount.company = stripeAccount.company || {}
