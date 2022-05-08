@@ -165,6 +165,11 @@ async function renderPage (req, res, messageTemplate) {
     } else {
       hasRequirements = true
     }
+    if (requirements.indexOf('company.verification.document') === -1) {
+      removeElements.push('company-document-container')
+    } else {
+      hasRequirements = true
+    }
   }
   let requireAddress = false
   for (const field of requirements) {
@@ -209,11 +214,6 @@ async function renderPage (req, res, messageTemplate) {
     hasRequirements = true
     const personalStates = connect.countryDivisions[req.data.stripeAccount.country]
     dashboard.HTML.renderList(doc, personalStates, 'state-option', `${req.data.stripeAccount.business_type}_address_state`)
-  }
-  if (requirements.indexOf('company.verification.document') === -1) {
-    removeElements.push('company-document-container')
-  } else {
-    hasRequirements = true
   }
   if (!hasRequirements) {
     removeElements.push('submit-form')
