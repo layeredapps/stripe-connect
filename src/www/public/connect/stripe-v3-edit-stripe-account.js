@@ -221,14 +221,14 @@ function updateStripeAccount (e) {
         }
       }
     } else if (documentFront) {
-      return window.renderError(`invalid-${businessType}_verification_additional_document_front`)
+      return window.renderError(`invalid-${businessType}_verification_document_front`)
     }
     if (back && back.id) {
       accountData[businessType].verification = accountData[businessType].verification || {}
       accountData[businessType].verification.document = accountData[businessType].verification.document || {}
       accountData[businessType].verification.document.back = back.id
     } else if (documentBack) {
-      return window.renderError(`invalid-${businessType}_verification_additional_document_back`)
+      return window.renderError(`invalid-${businessType}_verification_document_back`)
     }
     const additionalDocumentFront = document.getElementById(businessType + '_verification_additional_document_front')
     const additionalDocumentBack = document.getElementById(businessType + '_verification_additional_document_back')
