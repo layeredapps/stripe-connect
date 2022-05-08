@@ -22,6 +22,10 @@
     STRIPE_PUBLISHABLE_KEY
       The `pk_test_xxx` key from Stripe
         ✔ String
+    APPLICATION_FEE
+      The platform commission on charges
+        ✔ default 0
+        ✔ Integer
 
   server/stripe-connect/bind-stripekey
     after
@@ -1005,5 +1009,5 @@
       ✔ environment STRIPE_JS
 
 
-  612 passing (58m)
+  614 passing (56m)
 
