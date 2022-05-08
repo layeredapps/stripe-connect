@@ -1,5 +1,5 @@
 
-> @layeredapps/stripe-connect@0.0.38 test
+> @layeredapps/stripe-connect@0.0.57 test
 > PORT=50010 NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
 
 
@@ -1005,5 +1005,5 @@
       ✔ environment STRIPE_JS
 
 
-  612 passing (59m)
+  612 passing (58m)
 

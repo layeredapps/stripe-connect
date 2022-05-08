@@ -1,5 +1,5 @@
-@layeredapps/dashboard 0.0.105
-http://localhost:8000
+@layeredapps/dashboard 0.0.106
+http://localhost:50009
 
 Administrator menu:
 @layeredapps/stripe-connect/src/www/administrator/connect "Stripe Connect <span translate="yes">module</span>"
@@ -15,7 +15,7 @@ Special HTML files:
 @layeredapps/dashboard/redirect.html
 
 Dashboard modules:
-@layeredapps/maxmind-geoip (1.0.23)
+@layeredapps/maxmind-geoip (1.0.24)
 
 Content handlers:
 @layeredapps/dashboard/src/content/insert-csrf-token.js
@@ -185,4 +185,4 @@ URL -------------------------------------------------- AUTH - TEMPLATE - HTTP RE
 /home                                                                                    static-page                    /src/www                  
 /webhooks/connect/index-connect-data                   GUEST             POST            /src/www                       /src/www                  
 
-2022-05-07T06:04:23.341Z
+2022-05-08T01:48:40.001Z
