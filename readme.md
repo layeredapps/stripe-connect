@@ -72,11 +72,9 @@ This module comes with some convenience scripts you can add to your `package.jso
 By default this module will share whatever storage you use for Dashboard.  You can specify nothing, specify an alternate storage backend, or specify the same type with a separate database.
 
     CONNECT_STORAGE=mysql
-    CONNECT_MYSQL_HOST=localhost
-    CONNECT_MYSQL_PORT=3306
-    CONNECT_MYSQL_DATABASE=connect
-    CONNECT_MYSQL_USERNAME=user
-    CONNECT_MYSQL_PASSWORD=password
+    CONNECT_DATABASE_URL=mysql://...
+    CONNECT_MAX_CONNECTIONS=
+    CONNECT_IDLE_CONNECTION_LIMIT= 
 
 ### Access the API
 
