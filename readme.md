@@ -82,7 +82,7 @@ If your Dashboard is configured with database read replication servers this modu
     CONNECT_DATABASE_URL=postgres://1.0.0.0:5432/connect
     CONNECT_READ_DATABASE_URL1=postgres://1.0.0.1:5432/connect
     CONNECT_READ_DATABASE_URL2=postgres://1.0.0.2:5432/connect
-    CONNECT_READ_DATABASE_URL#=postgres://1.0.0.3:5432/connect
+    CONNECT_READ_DATABASE_URL3=postgres://1.0.0.3:5432/connect
 
 ### Access the API
 
