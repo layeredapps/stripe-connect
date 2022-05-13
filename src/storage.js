@@ -320,7 +320,6 @@ async function createConnection (dialect) {
     })
     return sequelize
   }
-
   const sequelize = new Sequelize(url, {
     dialect,
     dialectOptions,
