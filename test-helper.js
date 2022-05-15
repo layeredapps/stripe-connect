@@ -232,11 +232,11 @@ let webhookRotation = 0
 async function setupBeforeEach () {
   Log.info('setupBeforeEach')
   global.packageJSON.dashboard.serverFilePaths.push(
-    path.join(__dirname, '/src/server/bind-stripekey.js'),
+    path.join(__dirname, '/src/server/bind-stripe-key.js'),
     require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   global.packageJSON.dashboard.server.push(
-    require(path.join(__dirname, '/src/server/bind-stripekey.js')),
+    require(path.join(__dirname, '/src/server/bind-stripe-key.js')),
     require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   await connect.Storage.flush()
