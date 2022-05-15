@@ -420,8 +420,11 @@
             </div>
           </div>
         </div>
-        <div class="form-buttons">
-          <button id="submit-button" class="button" translate="yes">Update Stripe account</button>
+        <div class="input-fields">
+          <label class="field-label"></label>
+          <div class="form-buttons">
+            <button id="submit-button" type="submit" class="button" translate="yes">Update registration</button>
+          </div>
         </div>
       </form>
     </div>
@@ -436,19 +439,14 @@
         <span translate="yes">Success! The Stripe account has been updated</span>
       </div>
     </template>
-    <template id="unknown-error">
-      <div class="error message" translate="yes">
-        Error! An unknown error occurred
-      </div>
-    </template>
     <template id="upload-error">
       <div class="error message" translate="yes">
-        Error! An unknown error occurred
+        Error! An error ocurred uploading your documents
       </div>
     </template>
     <template id="invalid-token">
       <div class="error message" translate="yes">
-        Error! An unknown error occurred
+        Error! An error ocurred uploading your documents to Stripe
       </div>
     </template>
     <template id="invalid-business_profile_url">
@@ -738,7 +736,7 @@
     </template>
     <template id="unknown-error">
       <div class="error message" translate="yes">
-        Error! An unknown error occurred
+        Error! Something went wrong submitting the form
       </div>
     </template>
     <template id="no-required-information">
