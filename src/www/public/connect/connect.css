@@ -25,13 +25,6 @@
   .requirements-wrapper .requirements:first-of-type { margin-bottom: 1rem }
 }
 
-/* color settings */
 :root {
-  --requirements-border-color: rgba(0, 0, 0, 0.25);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --requirements-border-color: rgba(255, 255, 255, 0.25);
-  }
+  --requirements-border-color: var(--content-gray-light);
 }
