@@ -838,6 +838,8 @@ function createAccountData (identity, country, stripeAccount, prefilled) {
       case 'company.tax_id':
         if (stripeAccount.country === 'BR') {
           payload[pseudonym] = prefilled[field] || '00000000000000'
+        } else if (stripeAccount.country === 'DE') {
+          payload[pseudonym] = prefilled[field] || 'HRB 1234'
         } else {
           payload[pseudonym] = prefilled[field] || '00000000000'
         }
