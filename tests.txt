@@ -1,6 +1,6 @@
 
-> @layeredapps/stripe-connect@0.0.57 test
-> PORT=50010 NODE_ENV=testing STORAGE=sqlite SQLITE_DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
+> @layeredapps/stripe-connect@0.0.60 test
+> PORT=50010 NODE_ENV=testing STORAGE=sqlite DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
 
 
 
@@ -27,7 +27,7 @@
         ✔ default 0
         ✔ Integer
 
-  server/stripe-connect/bind-stripekey
+  server/stripe-connect/bind-stripe-key
     after
       ✔ should bind data to req
 
@@ -1009,5 +1009,5 @@
       ✔ environment STRIPE_JS
 
 
-  614 passing (56m)
+  614 passing (54m)
 
