@@ -235,9 +235,6 @@ async function renderPage (req, res, messageTemplate) {
   }
   for (const id of removeElements) {
     const element = doc.getElementById(id)
-    if (!element) {
-      console.log('no element', id, removeElements)
-    }
     element.parentNode.removeChild(element)
     if (id === 'submit-form') {
       break
