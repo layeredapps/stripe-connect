@@ -32,6 +32,20 @@ async function renderPage (req, res, messageTemplate) {
     }
   }
   dashboard.HTML.renderList(doc, connect.countrySpecs, 'country-option', 'country')
+  let countryCode
+  if (req.body) {
+    countryCode = req.body.address_country
+  } else {
+    if (req.country) {
+      countryCode = req.country.country.iso_code
+    } else {
+      req.query = req.query || {}
+      req.query.ip = req.ip
+      const defaultCountry = await global.api.user.geoip.Country.get(req)
+      countryCode = defaultCountry.country.iso_code
+    }
+  }
+  dashboard.HTML.setSelectedOptionByValue(doc, 'country', countryCode)
   return dashboard.Response.end(req, res, doc)
 }
 
