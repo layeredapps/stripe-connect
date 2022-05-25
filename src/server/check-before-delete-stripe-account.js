@@ -14,7 +14,14 @@ async function checkBeforeDeleteStripeAccount (req, res) {
   } else {
     req.url = `/api/check-before-delete-stripe-account?stripeid=${req.query.stripeid}`
   }
-  const response = await dashboard.Proxy.get(req)
+  let response
+  try {
+    const responseRaw = await dashboard.Proxy.get(req)
+    if (responseRaw && responseRaw.toString) {
+      response = responseRaw.toString()
+    }
+  } catch (error) {
+  }
   req.url = urlWas
   if (response.startsWith('{')) {
     const result = JSON.parse(response)
