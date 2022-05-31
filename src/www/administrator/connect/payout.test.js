@@ -52,7 +52,7 @@ describe('/administrator/connect/payout', function () {
   })
 
   describe('view', () => {
-    it('should have row for payout (screenshots)', async function () {
+    it('should present payout table (screenshots)', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)

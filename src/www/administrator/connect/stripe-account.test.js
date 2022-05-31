@@ -51,7 +51,7 @@ describe('/administrator/connect/stripe-account', function () {
   })
 
   describe('view', () => {
-    it('should have row for Stripe account (screenshots)', async function () {
+    it('should present Stripe account table (screenshots)', async function () {
       await bundledData(this.test.currentRetry())
       const result = cachedResponses.view
       const doc = TestHelper.extractDoc(result.html)
