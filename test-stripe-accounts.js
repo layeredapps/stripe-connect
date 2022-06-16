@@ -772,10 +772,10 @@ function createAccountData (identity, country, stripeAccount, prefilled) {
         payload[pseudonym] = prefilled[field] || testData.phone[country] || '4567890123'
         continue
       case 'individual.first_name':
-        payload[pseudonym] = prefilled[field] || identity.firstName
+        payload[pseudonym] = prefilled[field] || identity.firstName || identity.fullName.split(' ')[0]
         continue
       case 'individual.last_name':
-        payload[pseudonym] = prefilled[field] || identity.lastName
+        payload[pseudonym] = prefilled[field] || identity.lastName || identity.fullName.split(' ')[1]
         continue
       case 'individual.first_name_kana':
         payload[pseudonym] = prefilled[field] || 'ﾄｳｷﾖｳﾄ'
@@ -896,10 +896,10 @@ function createPersonData (identity, country, person, prefilled) {
         payload[pseudonym] = prefilled[field] || testData.phone[country] || '4567890123'
         continue
       case 'first_name':
-        payload[pseudonym] = prefilled[field] || identity.firstName
+        payload[pseudonym] = prefilled[field] || identity.firstName || identity.fullName.split(' ')[0]
         continue
       case 'last_name':
-        payload[pseudonym] = prefilled[field] || identity.lastName
+        payload[pseudonym] = prefilled[field] || identity.lastName || identity.fullName.split(' ')[1]
         continue
       case 'email':
         payload[pseudonym] = prefilled[field] || identity.contactEmail || identity.email
@@ -952,7 +952,7 @@ function createBankingData (type, identity, country, prefilled, arrayIndex) {
       payload[pseudonym] = prefilled[field] || testData.banking[country][field]
     }
   }
-  payload.account_holder_name = prefilled.account_holder_name || `${identity.firstName} ${identity.lastName}`
+  payload.account_holder_name = prefilled.account_holder_name || identity.firstName ? `${identity.firstName} ${identity.lastName}` : identity.fullName
   payload.account_holder_type = prefilled.account_holder_type || type
   return payload
 }
