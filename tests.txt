@@ -1,5 +1,5 @@
 
-> @layeredapps/stripe-connect@0.0.61 test
+> @layeredapps/stripe-connect@0.0.65 test
 > PORT=50010 NODE_ENV=testing STORAGE=sqlite DATABASE=connect mocha --ignore 'node_modules/**/*' --timeout 480000 --slow 480000 --recursive --extension .test.js .
 
 
@@ -412,7 +412,7 @@
     before
       ✔ should bind data to req
     view
-      ✔ should have row for payout (screenshots)
+      ✔ should present payout table (screenshots)
     errors
       ✔ invalid-payoutid
 
@@ -439,7 +439,7 @@
     before
       ✔ should bind data to req
     view
-      ✔ should have row for Stripe account (screenshots)
+      ✔ should present Stripe account table (screenshots)
     error
       ✔ invalid-stripeid
 
@@ -1009,5 +1009,5 @@
       ✔ environment STRIPE_JS
 
 
-  614 passing (59m)
+  614 passing (58m)
 
