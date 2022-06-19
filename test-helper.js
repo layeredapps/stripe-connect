@@ -14,170 +14,20 @@ global.testConfiguration.subscriptionWebhookEndPointSecret = process.env.CONNECT
 const Log = require('@layeredapps/dashboard/src/log.js')('test-helper-stripe-connect')
 const path = require('path')
 const util = require('util')
-const ngrok = require('ngrok')
-const packageJSON = require('./package.json')
-const stripe = require('stripe')({
-  apiVersion: global.stripeAPIVersion,
-  telemetry: false,
-  maxNetworkRetries: global.maximumStripeRetries || 0,
-  appInfo: {
-    version: packageJSON.version,
-    name: '@layeredapps/stripe-connect (test suite)',
-    url: 'https://github.com/layeredapps/stripe-connect'
-  }
-})
+// const packageJSON = require('./package.json')
+// const stripe = require('stripe')({
+//   apiVersion: global.stripeAPIVersion,
+//   telemetry: false,
+//   maxNetworkRetries: global.maximumStripeRetries || 0,
+//   appInfo: {
+//     version: packageJSON.version,
+//     name: '@layeredapps/stripe-connect (test suite)',
+//     url: 'https://github.com/layeredapps/stripe-connect'
+//   }
+// })
 const stripeKey = {
-  apiKey: process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+  apiKey: global.connectStripeKey || global.stripeKey || process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
 }
-const enabledEvents = [
-  // 'setup_intent.canceled',
-  // 'setup_intent.created',
-  // 'setup_intent.setup_failed',
-  // 'setup_intent.succeeded',
-  // 'sigma.scheduled_query_run.created',
-  // 'review.closed',
-  // 'review.opened',
-  // 'sku.created',
-  // 'sku.deleted',
-  // 'sku.updated',
-  // 'source.canceled',
-  // 'source.chargeable',
-  // 'source.failed',
-  // 'source.mandate_notification',
-  // 'source.refund_attributes_required',
-  // 'source.transaction.created',
-  // 'source.transaction.updated',
-  // 'tax_rate.created',
-  // 'tax_rate.updated',
-  // 'topup.canceled',
-  // 'topup.created',
-  // 'topup.failed',
-  // 'topup.reversed',
-  // 'topup.succeeded',
-  // 'transfer.created',
-  // 'transfer.failed',
-  // 'transfer.paid',
-  // 'transfer.reversed',
-  // 'transfer.updated',
-  // 'reporting.report_run.failed',
-  // 'reporting.report_run.succeeded',
-  // 'reporting.report_type.updated',
-  // 'product.created',
-  // 'product.deleted',
-  // 'product.updated',
-  // 'price.created',
-  // 'price.deleted',
-  // 'price.updated',
-  // 'plan.created',
-  // 'plan.deleted',
-  // 'plan.updated',
-  // 'order_return.created',
-  // 'payment_intent.amount_capturable_updated',
-  // 'payment_intent.canceled',
-  // 'payment_intent.created',
-  // 'payment_intent.payment_failed',
-  // 'payment_intent.processing',
-  // 'payment_intent.succeeded',
-  // 'order.payment_succeeded',
-  // 'payment_method.attached',
-  // 'payment_method.card_automatically_updated',
-  // 'payment_method.detached',
-  // 'payment_method.updated',
-  'payout.canceled',
-  'payout.created',
-  'payout.failed',
-  'payout.paid',
-  'payout.updated',
-  // 'mandate.updated',
-  'person.created',
-  'person.deleted',
-  'person.updated',
-  // 'issuing_card.created',
-  // 'issuing_card.updated',
-  // 'order.created',
-  // 'order.payment_failed',
-  // 'order.updated',
-  // 'issuing_dispute.created',
-  // 'issuing_dispute.funds_reinstated',
-  // 'issuing_dispute.updated',
-  // 'issuing_transaction.created',
-  // 'issuing_transaction.updated',
-  // 'issuing_authorization.created',
-  // 'issuing_authorization.request',
-  // 'issuing_authorization.updated',
-  // 'file.created',
-  // 'credit_note.created',
-  // 'credit_note.updated',
-  // 'credit_note.voided',
-  // 'issuing_cardholder.created',
-  // 'issuing_cardholder.updated',
-  // 'invoiceitem.created',
-  // 'invoiceitem.deleted',
-  // 'invoiceitem.updated',
-  // 'invoice.created',
-  // 'invoice.deleted',
-  // 'invoice.finalized',
-  // 'invoice.marked_uncollectible',
-  // 'invoice.paid',
-  // 'invoice.payment_action_required',
-  // 'invoice.payment_failed',
-  // 'invoice.payment_succeeded',
-  // 'invoice.sent',
-  // 'invoice.upcoming',
-  // 'invoice.updated',
-  // 'invoice.voided',
-  // 'coupon.created',
-  // 'coupon.deleted',
-  // 'coupon.updated',
-  // 'checkout.session.async_payment_failed',
-  // 'checkout.session.async_payment_succeeded',
-  // 'checkout.session.completed',
-  // 'customer.created',
-  // 'customer.deleted',
-  // 'customer.updated',
-  // 'customer.discount.created',
-  // 'customer.discount.deleted',
-  // 'customer.discount.updated',
-  // 'customer.source.created',
-  // 'customer.source.deleted',
-  // 'customer.source.expiring',
-  // 'customer.source.updated',
-  // 'customer.subscription.created',
-  // 'customer.subscription.deleted',
-  // 'customer.subscription.pending_update_applied',
-  // 'customer.subscription.pending_update_expired',
-  // 'customer.subscription.trial_will_end',
-  // 'customer.subscription.updated',
-  // 'customer.tax_id.created',
-  // 'customer.tax_id.deleted',
-  // 'customer.tax_id.updated',
-  'account.external_account.deleted',
-  // 'charge.captured',
-  // 'charge.expired',
-  // 'charge.failed',
-  // 'charge.pending',
-  // 'charge.refunded',
-  // 'charge.succeeded',
-  // 'charge.updated',
-  // 'charge.dispute.closed',
-  // 'charge.dispute.created',
-  // 'charge.dispute.funds_reinstated',
-  // 'charge.dispute.funds_withdrawn',
-  // 'charge.dispute.updated',
-  // 'charge.refund.updated',
-  // 'capability.updated',
-  // 'balance.available',
-  'account.updated',
-  'account.external_account.created',
-  'account.external_account.updated'
-  // 'subscription_schedule.aborted',
-  // 'subscription_schedule.canceled',
-  // 'subscription_schedule.completed',
-  // 'subscription_schedule.created',
-  // 'subscription_schedule.expiring',
-  // 'subscription_schedule.released',
-  // 'subscription_schedule.updated'
-]
 
 const wait = util.promisify((quantity, callback) => {
   return setTimeout(callback, quantity || 100)
@@ -188,11 +38,8 @@ module.exports = {
   createPayout,
   createPerson,
   createStripeAccount,
-  deleteOldWebhooks,
-  rotateWebhook,
   setupBefore,
   setupBeforeEach,
-  setupWebhook,
   submitCompanyOwners,
   submitCompanyDirectors,
   submitCompanyExecutives,
@@ -217,20 +64,18 @@ async function setupBefore () {
   Log.info('setupBefore')
   connect = require('./index.js')
   await connect.setup()
-  if (!webhook) {
-    await deleteOldWebhooks(true)
-    await setupWebhook()
-  }
+  webhook = await createWebHook()
+  global.connectWebhookEndPointSecret = webhook
+  global.testConfiguration.connectWebhookEndPointSecret = webhook
   const helperRoutes = require('./test-helper-routes.js')
   global.sitemap['/api/fake-payout'] = helperRoutes.fakePayout
   global.sitemap['/api/substitute-failed-document-front'] = helperRoutes.substituteFailedDocumentFront
   global.sitemap['/api/substitute-failed-document-back'] = helperRoutes.substituteFailedDocumentBack
 }
 
-let webhookRotation = 0
-
 async function setupBeforeEach () {
   Log.info('setupBeforeEach')
+  global.webhooks = []
   global.packageJSON.dashboard.serverFilePaths.push(
     path.join(__dirname, '/src/server/bind-stripe-key.js'),
     require.resolve('@layeredapps/maxmind-geoip/src/server/bind-country.js')
@@ -240,55 +85,23 @@ async function setupBeforeEach () {
     require('@layeredapps/maxmind-geoip/src/server/bind-country.js')
   )
   await connect.Storage.flush()
-  if (!global.webhooks || global.webhooks.length) {
-    await rotateWebhook()
-    global.webhooks = []
-  }
 }
 
-async function rotateWebhook (remake) {
-  Log.info('rotateWebhook', remake)
-  if (!global.webhooks) {
-    global.webhooks = []
-    await setupWebhook()
-  } else if (global.webhooks.length > 0) {
-    webhookRotation += global.webhooks.length
-    if (remake || webhookRotation >= 20) {
-      webhookRotation = 0
-      await stripe.webhookEndpoints.del(webhook.id, stripeKey)
-      webhook = null
-      await setupWebhook()
-    }
-  }
-}
+let webhook, tunnel
 
-let webhook
-
-async function setupWebhook () {
-  Log.info('setupWebhook')
-  webhook = null
-  while (!webhook) {
-    try {
-      await deleteOldWebhooks()
-      await ngrok.kill()
-      const tunnel = await ngrok.connect({
-        port: global.port,
-        // auth: process.env.NGROK_AUTH,
-        onLogEvent: Log.info
-      })
-      webhook = await stripe.webhookEndpoints.create({
-        url: `${tunnel}/webhooks/connect/index-connect-data`,
-        enabled_events: enabledEvents,
-        connect: true
-      }, stripeKey)
-      global.connectWebhookEndPointSecret = webhook.secret
-    } catch (error) {
+const createWebHook = util.promisify((callback) => {
+  const endpoint = `${global.dashboardServer}/webhooks/connect/index-connect-data`
+  const childProcess = require('child_process')
+  tunnel = childProcess.spawn('stripe', ['--api-key', stripeKey.apiKey, 'listen', '--forward-to', endpoint.substring(endpoint.indexOf('://') + 3), '--latest'], { detached: true })
+  tunnel.stderr.on('data', (raw) => {
+    const data = (raw || '').toString()
+    if (data.indexOf('whsec') > -1) {
+      let secret = data.substring(data.indexOf('whsec'))
+      secret = secret.substring(0, secret.indexOf(' '))
+      return callback(null, secret)
     }
-    if (!webhook) {
-      await wait(100)
-    }
-  }
-}
+  })
+})
 
 before(setupBefore)
 beforeEach(setupBeforeEach)
@@ -297,50 +110,36 @@ afterEach(async () => {
   Log.info('afterEach')
   await connect.Storage.flush()
   await deleteOldStripeAccounts()
+  if (global.webhooks.length) {
+    process.kill(-tunnel.pid)
+    webhook = await createWebHook()
+    global.connectWebhookEndPointSecret = webhook
+    global.testConfiguration.connectWebhookEndPointSecret = webhook
+  }
 })
 
 after(async () => {
   Log.info('after')
-  if (webhook) {
-    await deleteOldWebhooks()
-    webhook = null
-  }
-  await ngrok.kill()
+  process.kill(-tunnel.pid)
 })
 
-async function deleteOldWebhooks () {
-  Log.info('deleteOldWebhooks')
-  webhook = null
-  try {
-    const webhooks = await stripe.webhookEndpoints.list({ limit: 100 }, stripeKey)
-    if (webhooks && webhooks.data && webhooks.data.length) {
-      for (const webhook of webhooks.data) {
-        if (webhook === 0) {
-          continue
-        }
-        await stripe.webhookEndpoints.del(webhook.id, stripeKey)
-      }
-    }
-  } catch (error) {
-  }
-}
-
 async function deleteOldStripeAccounts () {
-  Log.info('deleteOldStripeAccounts')
-  try {
-    const accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
-    if (accounts && accounts.data && accounts.data.length) {
-      for (const account of accounts.data) {
-        try {
-          await stripe.accounts.del(account.id, stripeKey)
-        } catch (error) {
-          Log.error('error deleting account', account.id, error)
-        }
-      }
-    }
-  } catch (error) {
-    Log.error('error listing accounts for delete', error)
-  }
+  // return
+  // Log.info('deleteOldStripeAccounts')
+  // try {
+  //   const accounts = await stripe.accounts.list({ limit: 100 }, stripeKey)
+  //   if (accounts && accounts.data && accounts.data.length) {
+  //     for (const account of accounts.data) {
+  //       try {
+  //         await stripe.accounts.del(account.id, stripeKey)
+  //       } catch (error) {
+  //         Log.error('error deleting account', account.id, error)
+  //       }
+  //     }
+  //   }
+  // } catch (error) {
+  //   Log.error('error listing accounts for delete', error)
+  // }
 }
 
 async function createStripeAccount (user, body) {

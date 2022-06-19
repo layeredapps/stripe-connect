@@ -10,13 +10,12 @@ const properties = [
 ]
 
 describe('index', () => {
-  let webhookSecret, stripeKey, stripePublishableKey
+  const webhookSecret = global.connectWebhookEndPointSecret
+  const stripeKey = process.env.CONNECT_STRIPE_KEY || process.env.STRIPE_KEY
+  const stripePublishableKey = process.env.CONNECT_STRIPE_PUBLISHABLE_KEY || process.env.STRIPE_PUBLISHABLE_KEY
   before(async () => {
     const testHelper = require('./test-helper.js')
     await testHelper.setupBefore()
-    webhookSecret = global.connectWebhookEndPointSecret
-    stripeKey = global.stripeKey
-    stripePublishableKey = global.stripePublishableKey
   })
   beforeEach(async () => {
     delete (global.stripeKey)
@@ -67,7 +66,23 @@ describe('index', () => {
           assert.strictEqual(global[property.camelCase].toString(), property.value)
           delete (require.cache[require.resolve('./index.js')])
         })
+        global.stripeKey = stripeKey
+        global.stripePublishableKey = stripePublishableKey
+        global.connectWebhookEndPointSecret = webhookSecret
+        process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = webhookSecret
+        process.env.CONNECT_STRIPE_KEY = stripeKey
+        process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = stripePublishableKey
+        delete (require.cache[require.resolve('./index.js')])
+        require('./index.js').setup(global.applicationPath)
       })
     })
   }
+  global.stripeKey = stripeKey
+  global.stripePublishableKey = stripePublishableKey
+  global.connectWebhookEndPointSecret = webhookSecret
+  process.env.CONNECT_WEBHOOK_ENDPOINT_SECRET = webhookSecret
+  process.env.CONNECT_STRIPE_KEY = stripeKey
+  process.env.CONNECT_STRIPE_PUBLISHABLE_KEY = stripePublishableKey
+  delete (require.cache[require.resolve('./index.js')])
+  require('./index.js').setup(global.applicationPath)
 })

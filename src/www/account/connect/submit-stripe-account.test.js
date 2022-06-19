@@ -9,7 +9,6 @@ describe('/account/connect/submit-stripe-account', function () {
   async function bundledData (retryNumber) {
     if (retryNumber > 0) {
       cachedResponses = {}
-      await TestHelper.rotateWebhook(true)
     }
     if (cachedResponses && cachedResponses.finished) {
       return
@@ -40,7 +39,6 @@ describe('/account/connect/submit-stripe-account', function () {
     // 4) submitted
     cachedResponses.individualSubmit = await req.post()
     // company account
-    await TestHelper.rotateWebhook()
     await TestHelper.createStripeAccount(user, {
       country: 'DE',
       business_type: 'company'
@@ -71,7 +69,6 @@ describe('/account/connect/submit-stripe-account', function () {
     // 2) missing owner submission
     cachedResponses.missingOwners = await req.get()
     // 3) missing owner information
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_owner: 'true',
       relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
@@ -92,7 +89,6 @@ describe('/account/connect/submit-stripe-account', function () {
     cachedResponses.missingDirectors = await req.get()
     // 5) missing director information
     await TestStripeAccounts.waitForAccountField(user, 'company.directors_provided')
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_director: 'true',
       relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
@@ -115,7 +111,6 @@ describe('/account/connect/submit-stripe-account', function () {
     cachedResponses.missingExecutives = await req.get()
     // 7) missing executive information
     await TestStripeAccounts.waitForAccountField(user, 'company.directors_provided')
-    await TestHelper.rotateWebhook()
     await TestHelper.createPerson(user, {
       relationship_executive: user.stripeAccount.requiresExecutives ? 'true' : undefined,
       relationship_title: 'SVP Testing',

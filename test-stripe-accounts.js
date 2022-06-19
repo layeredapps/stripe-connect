@@ -220,7 +220,6 @@ const TestStripeAccounts = module.exports = {
       return stripeEvent.data.object.id === user.stripeAccount.stripeid &&
              stripeEvent.data.object.payouts_enabled === true
     })
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createSubmittedCompany: async (country, existingUser) => {
@@ -231,7 +230,6 @@ const TestStripeAccounts = module.exports = {
       return stripeEvent.data.object.id === user.stripeAccount.stripeid &&
              stripeEvent.data.object.payouts_enabled === true
     })
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createIndividualReadyForSubmission: async (country, existingUser) => {
@@ -256,7 +254,6 @@ const TestStripeAccounts = module.exports = {
       await waitForAccountFieldToLeave(user, 'individual.verification.document')
     }
     await waitForAccountField(user, false)
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyReadyForSubmission: async (country, existingUser) => {
@@ -314,7 +311,6 @@ const TestStripeAccounts = module.exports = {
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
     await waitForAccountField(user, false)
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyWithOwners: async (country, numOwners, existingUser) => {
@@ -395,7 +391,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updatePerson(user, user.representative, {}, uploadData)
       await waitForPersonFieldToLeave(user, 'representative', 'verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyMissingRepresentative: async (country, existingUser) => {
@@ -430,7 +425,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyMissingPaymentDetails: async (country, existingUser) => {
@@ -482,7 +476,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyMissingOwners: async (country, existingUser) => {
@@ -534,7 +527,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyMissingCompanyDetails: async (country, existingUser) => {
@@ -587,7 +579,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createCompanyMissingDirectors: async (country, existingUser) => {
@@ -639,7 +630,6 @@ const TestStripeAccounts = module.exports = {
       await TestHelper.updateStripeAccount(user, {}, companyUploadFiles)
       await waitForAccountFieldToLeave(user, 'company.verification.document')
     }
-    await TestHelper.rotateWebhook(true)
     return user
   },
   createIndividualMissingPaymentDetails: async (country, existingUser) => {
