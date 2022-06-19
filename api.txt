@@ -1,5 +1,5 @@
-@layeredapps/dashboard 0.0.143
-http://localhost:8000
+@layeredapps/dashboard 0.0.136
+http://localhost:50010
 
 |------------------------------------------------------------------------------|
 | /api/administrator/connect/delete-stripe-account                             |
